@@ -36,7 +36,8 @@ COPY helpers/*.py helpers/
 RUN apt-get update && apt-get install -y libmagic1
 
 # Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --upgrade pip
+RUN pip install --require-hashes --no-cache-dir --no-deps -r requirements.txt
 
 # Run as a web service on using the gunicorn webserver, with one worker process and 8 threads.
 #
