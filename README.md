@@ -218,6 +218,10 @@ gcloud functions deploy $FUNCTION_NAME \
 
 ## Deploying via Cloud Run
 
+### Prebuilt image
+
+A prebuilt container image is available on this page.
+
 ### Building the container
 
 A [`Dockerfile`](Dockerfile) has been provided for building the container. You can build the 
