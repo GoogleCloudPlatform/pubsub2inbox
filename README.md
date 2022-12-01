@@ -26,17 +26,17 @@ Out of the box, you'll have the following functionality:
     - [Email notifications of findings](examples/scc-config.yaml) ([how to set up finding notifications from SCC](https://cloud.google.com/security-command-center/docs/how-to-notifications))
     - [Create findings from Cloud IDS](examples/scc-cloud-ids.yaml)
     - [Create custom findings](examples/scc-finding-config.yaml)
-  - [Cloud Storage notifications](examples/storage-config.yaml)
+  - [Cloud Storage notifications](examples/storage-example.yaml)
     - [How to set up Cloud Storage notifications](https://cloud.google.com/storage/docs/reporting-changes)
     - For example, you can automatically send reports via email that are generated in a Cloud Storage bucket
-  - [BigQuery queries](examples/bigquery-config.yaml)
+  - [BigQuery queries](examples/bigquery-example.yaml)
     - For example, you can turn any BigQuery query results into CSV files or email messages.
-  - [Recommendations and Insights reports](examples/recommendations-example.yaml)
+  - [Recommendations and Insights reports](examples/recommendations/)
      - From [Recommender API](https://cloud.google.com/recommender/docs/overview).
-     - Also see [example with attached spreadsheet](examples/recommendations-example-2.yaml) and [example with with GCS and BigQuery output](examples/recommendations-example-3.yaml)..
+     - Also see [example with attached spreadsheet](examples/recommendations/per-project/recommendations.yaml) and [example with with GCS and BigQuery output](examples/recommendations/all-projects/recommendations-example-3.yaml).
   - [Cloud Monitoring alerts](examples/monitoring-alert-config.yaml)
-  - [Cloud Monitoring metrics](examples/cai.yaml)
-  - [Cloud Asset Inventory search](examples/cai.yaml)
+  - [Cloud Monitoring metrics](examples/cai-example.yaml)
+  - [Cloud Asset Inventory search](examples/cai-example.yaml)
   - [Cloud Storage copier](examples/gcscopy-example.yaml)
      - Copies objects between two buckets, useful for backing up.
   - [Cloud Identity groups](examples/groups-example.yaml) ([other example](examples/groups-example-2.yaml))
@@ -106,7 +106,7 @@ pull information from GCP:
  - `mail.py`
     - Group membership expansion requires following the instructions at
       [Groups API: Authenticating as a service account without domain-wide delegation](https://cloud.google.com/identity/docs/how-to/setup#auth-no-dwd)
-      to grant permissions to the service account the function is running under. You can also use [the helper script](helpers/grant-gsuite-role.py).
+      to grant permissions to the service account the function is running under. 
     - In addition, the service account that the script runs under will need to have `roles/iam.serviceAccountTokenCreator` on itself when
       running in Cloud Function/Cloud Run (for Directory API scoped tokens).
 
