@@ -21,7 +21,7 @@ import google_auth_httplib2
 import google.auth
 from googleapiclient import http
 
-PUBSUB2INBOX_VERSION = '1.3.0'
+PUBSUB2INBOX_VERSION = '1.4.1'
 
 
 class NoCredentialsException(Exception):
