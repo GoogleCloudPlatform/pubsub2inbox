@@ -1,4 +1,6 @@
 # ![Pubsub2Inbox](img/logo.png)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) ![Tests](https://github.com/GoogleCloudPlatform/pubsub2inbox/actions/workflows/test.yml/badge.svg)
+
 
 Pubsub2Inbox is a generic tool to handle input from Pub/Sub messages and turn them into
 email, webhooks or GCS objects. It's based on an extendable framework consisting of input 
