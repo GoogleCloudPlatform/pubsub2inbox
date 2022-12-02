@@ -1,4 +1,4 @@
-#   Copyright 2021 Google LLC
+#   Copyright 2022 Google LLC
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -17,19 +17,31 @@ from contextlib import redirect_stdout
 from .helpers import fixture_to_pubsub, load_config
 import unittest
 import logging
+from processors import shellscript
 
 
-class TestFilters(unittest.TestCase):
+class TestShellscript(unittest.TestCase):
 
-    def test_filters(self):
+    def test_shellscript_succeed(self):
         logger = logging.getLogger('test')
         logger.setLevel(logging.DEBUG)
-        config = load_config('filters')
+        config = load_config('shellscript-success')
         data, context = fixture_to_pubsub('generic')
 
         buf = io.StringIO()
         with redirect_stdout(buf):
             main.decode_and_process(logger, config, data, context)
+
+    def test_shellscript_fail(self):
+        logger = logging.getLogger('test')
+        logger.setLevel(logging.DEBUG)
+        config = load_config('shellscript-fail')
+        data, context = fixture_to_pubsub('generic')
+
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            with self.assertRaises(shellscript.CommandFailedException):
+                main.decode_and_process(logger, config, data, context)
 
 
 if __name__ == '__main__':
