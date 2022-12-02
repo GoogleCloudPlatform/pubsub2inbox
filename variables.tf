@@ -119,5 +119,5 @@ variable "cloud_run" {
 variable "cloud_run_container" {
   type        = string
   description = "Container URL when deploying via Cloud Run"
-  default     = ""
+  default     = "ghcr.io/googlecloudplatform/pubsub2inbox:v1.4.1"
 }
