@@ -44,6 +44,11 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --require-hashes --no-cache-dir --no-deps -r requirements.txt
+          pip install yapf
+
+      - name: Run lint check
+        run: |
+          yapf --style google --diff --recursive .
 
       - name: Run unit tests
         run: |

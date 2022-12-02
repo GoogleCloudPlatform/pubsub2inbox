@@ -79,9 +79,13 @@ class MailOutput(Output):
         return os.path.basename(blob.name), blob_string
 
     def _fetch_ms_access_token(self, client_id, client_secret, tenant_id):
-        authority = 'https://login.microsoftonline.com/%s' % urllib.parse.quote_plus(tenant_id)
-        app = ConfidentialClientApplication(client_id, client_credential=client_secret, authority=authority)
-        result = app.acquire_token_for_client(['https://graph.microsoft.com/.default'])
+        authority = 'https://login.microsoftonline.com/%s' % urllib.parse.quote_plus(
+            tenant_id)
+        app = ConfidentialClientApplication(client_id,
+                                            client_credential=client_secret,
+                                            authority=authority)
+        result = app.acquire_token_for_client(
+            ['https://graph.microsoft.com/.default'])
         if not 'access_token' in result:
             raise OAuthTokenFetchException(result.get('error_description'))
         return result['access_token']
@@ -328,22 +332,21 @@ class MailOutput(Output):
             raise NotConfiguredException(
                 'No tenant_id for MS Graph API configured!')
 
-        token = self._fetch_ms_access_token(transport['client_id'], transport['client_secret'], transport['tenant_id'])
-        url = 'https://graph.microsoft.com/v1.0/users/%s/sendMail' % urllib.parse.quote_plus(mail['mail_from'])
+        token = self._fetch_ms_access_token(transport['client_id'],
+                                            transport['client_secret'],
+                                            transport['tenant_id'])
+        url = 'https://graph.microsoft.com/v1.0/users/%s/sendMail' % urllib.parse.quote_plus(
+            mail['mail_from'])
         recipients = []
         for addr in mail['mail_to'].split(','):
-            recipient = {
-                "emailAddress": {
-                    "address": addr.strip()
-                }
-            }
+            recipient = {"emailAddress": {"address": addr.strip()}}
             recipients.append(recipient)
 
         content = mail['text_body']
         contentType = 'text'
         if 'html_body' in mail and mail['html_body'] != '':
-          content = mail['html_body']
-          contentType = 'html'
+            content = mail['html_body']
+            contentType = 'html'
 
         message = {
             'message': {
@@ -361,16 +364,16 @@ class MailOutput(Output):
             'Authorization': 'Bearer %s' % token
         }
         messageJSON = json.dumps(message, default=lambda o: o.__dict__)
-        messageJSON = messageJSON.replace('\\\\n','\\n')
+        messageJSON = messageJSON.replace('\\\\n', '\\n')
         self.logger.debug('Sending email through MS Graph API.')
-        response = requests.post(url,
-            headers=headers,
-            data=messageJSON
-        )
+        response = requests.post(url, headers=headers, data=messageJSON)
         if response.status_code >= 200 and response.status_code <= 299:
             return True
         self.logger.error('Failed to send via MS Graph API.',
-                              extra={'status_code': response.status_code, 'response': response.text})
+                          extra={
+                              'status_code': response.status_code,
+                              'response': response.text
+                          })
         return False
 
     def embed_images(self, config):
