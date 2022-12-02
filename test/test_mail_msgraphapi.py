@@ -38,7 +38,7 @@ class TestMailMsGraphAPI(unittest.TestCase):
 
         responses.add(
             responses.GET,
-            'https://login.microsoftonline.com/%s/v2.0/'
+            'https://login.microsoftonline.com:443/%s/v2.0/'
             '.well-known/openid-configuration' % tenant_id,
             json={
                 'token_endpoint':

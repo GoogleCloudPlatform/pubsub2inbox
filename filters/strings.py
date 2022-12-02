@@ -138,7 +138,8 @@ class InvalidSchemeSignedURLException(Exception):
 
 def generate_signed_url(url, expiration, **kwargs):
     """Returns a signed URL to a GCS object. URL should be in format "gs://bucket/file"."""
-    expiration_parsed = parsedatetime.Calendar().parse(expiration)
+    expiration_parsed = parsedatetime.Calendar(
+        version=parsedatetime.VERSION_CONTEXT_STYLE).parse(expiration)
     if len(expiration_parsed) > 1:
         expiration = datetime.fromtimestamp(mktime(expiration_parsed[0]),
                                             timezone.utc)

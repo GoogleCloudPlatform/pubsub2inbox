@@ -113,7 +113,8 @@ def process_message(config, data, event, context):
     if 'retryPeriod' in config:
         retry_period = config['retryPeriod']
     if retry_period != 'skip':
-        retry_period_parsed = parsedatetime.Calendar().parse(retry_period)
+        retry_period_parsed = parsedatetime.Calendar(
+            version=parsedatetime.VERSION_CONTEXT_STYLE).parse(retry_period)
         if len(retry_period_parsed) > 1:
             retry_earliest = datetime.fromtimestamp(
                 mktime(retry_period_parsed[0]), timezone.utc)
@@ -203,8 +204,9 @@ def process_message(config, data, event, context):
         if resend_blob.exists():
             resend_blob.reload()
             resend_period = config['resendPeriod']
-            resend_period_parsed = parsedatetime.Calendar().parse(
-                resend_period, sourceTime=resend_blob.time_created)
+            resend_period_parsed = parsedatetime.Calendar(
+                version=parsedatetime.VERSION_CONTEXT_STYLE).parse(
+                    resend_period, sourceTime=resend_blob.time_created)
             if len(resend_period_parsed) > 1:
                 resend_earliest = datetime.fromtimestamp(
                     mktime(resend_period_parsed[0]))
