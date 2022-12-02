@@ -26,11 +26,15 @@ class TestOutput(Output):
         if 'expected' not in self.output_config:
             raise NotConfiguredException('No expected test result defined!')
 
+        test_name = 'Test'
+        if 'name' in self.output_config:
+            test_name = self.output_config['name']
+
         result = self._jinja_expand_string(self.output_config['result'])
         expected = self.output_config['expected']
         if 'strip' in self.output_config and self.output_config['strip']:
             result = result.strip()
             expected = expected.strip()
         if result != expected:
-            raise TestFailedException('Expected "%s", got "%s"' %
-                                      (expected, result))
+            raise TestFailedException('%s: expected "%s", got "%s"' %
+                                      (test_name, expected, result))

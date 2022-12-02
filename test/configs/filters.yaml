@@ -1,0 +1,156 @@
+#   Copyright 2022 Google LLC
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+retryPeriod: skip
+allOutputsMustSucceed: true
+
+processors:
+  - genericjson 
+
+outputs:
+  - type: test
+    strip: true
+    name: genericjson
+    result: |
+      {{ data }}
+    expected: |
+      {'test': 'data'}
+
+  - type: test
+    strip: true
+    name: make_list
+    result: |
+      {{ "foo"|make_list }}
+    expected: |
+      ['foo']
+
+  - type: test
+    strip: true
+    name: add_links
+    result: |
+      {{ "https://www.google.com"|add_links }}
+    expected: |
+      <a href="https://www.google.com">https://www.google.com</a>
+
+  - type: test
+    strip: true
+    name: urlencode
+    result: |
+      {{ "url encoded @&#"|urlencode }}
+    expected: |
+      url%20encoded%20%40%26%23
+
+  - type: test
+    strip: true
+    name: re_escape
+    result: |
+      {{ "[a-z]+?"|re_escape }}
+    expected: |
+      \[a\-z\]\+\?
+
+  - type: test
+    strip: true
+    name: json
+    result: |
+      {{ {"hello":"world"}|json_encode|json_decode }}
+    expected: |
+      {'hello': 'world'}
+
+  - type: test
+    strip: true
+    name: yaml_encode
+    result: |
+      {{ {"hello":"world"}|yaml_encode|yaml_decode }}
+    expected: |
+      {'hello': 'world'}
+
+  - type: test
+    strip: true
+    name: b64decode
+    result: |
+      {{ "SGVsbG8gV29ybGQ="|b64decode }}
+    expected: |
+      Hello World
+
+  - type: test
+    strip: true
+    name: csv_encode
+    result: |
+      {{ ["Hello","World"]|csv_encode }}
+    expected: |
+      Hello,World
+
+  - type: test
+    strip: true
+    name: html_table_to_xslx
+    result: |
+      {{ "<html><body><table><tr><td>Hello World</td></tr></table></body></html>"|html_table_to_xlsx|filemagic }}
+    expected: |
+      application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+
+  - type: test
+    strip: true
+    name: filemagic
+    result: |
+      {{ "UEsFBgAAAAAAAAAAAAAAAAAAAAAAAAo="|filemagic }}
+    expected: |
+      application/zip
+
+  - type: test
+    strip: true
+    name: hash_string
+    result: |
+      {{ "Hello World"|hash_string('sha256') }}
+    expected: |
+      a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e
+      
+  - type: test
+    strip: true
+    name: strftime
+    result: |
+      {{ "2022-12-01 00:00:00"|strftime("%d-%m-%Y") }}
+    expected: |
+      01-12-2022
+      
+  - type: test
+    strip: true
+    name: split
+    result: |
+      {{ "hello,world"|split(",") }}
+    expected: |
+      ['hello', 'world']
+
+  - type: test
+    strip: true
+    name: index
+    result: |
+      {{ ["no","Hello","World","no"]|index(1,3) }}
+    expected: |
+      ['Hello', 'World']
+
+  - type: test
+    strip: true
+    name: merge_dict
+    result: |
+      {{ {"hello":"world"}|merge_dict({"from":"jinja"}) }}
+    expected: |
+      {'hello': 'world', 'from': 'jinja'}
+
+  - type: test
+    strip: true
+    name: regex_replace
+    result: |
+      {{ "Hello World"|regex_replace("World", "Python") }}
+    expected: |
+      Hello Python

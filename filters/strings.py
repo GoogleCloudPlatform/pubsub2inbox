@@ -74,7 +74,7 @@ def yaml_encode(v):
 
 
 def json_decode(v):
-    return json.decode(v)
+    return json.loads(v)
 
 
 def yaml_decode(v):
