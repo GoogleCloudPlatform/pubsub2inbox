@@ -21,6 +21,16 @@ class InvalidJobOptionException(Exception):
 
 
 class BigqueryOutput(Output):
+    """
+    BigQuery output processors can write data into BigQuery tables.
+
+    Args:
+        datasetWithTable (str): BigQuery table in "dataset.table" notation.
+        source (str): Source file on Cloud Storage to load the file from (in "gs://bucket/file" format).
+        location (str): Dataset location (eg. "europe-west4")
+        job (dict, optional): Job configuration, eg. skipLeadingRows, see: https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#JobConfigurationLoad
+        project (str, optional): Google Cloud project to issue BigQuery API calls against.
+    """
 
     def output(self):
         if 'datasetWithTable' not in self.output_config:
