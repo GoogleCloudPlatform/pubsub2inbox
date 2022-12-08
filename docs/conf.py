@@ -13,6 +13,7 @@
 #   limitations under the License.
 import sys
 import os
+
 sys.path.insert(0, os.path.abspath('../'))
 
 project = 'Pubsub2Inbox'
@@ -20,7 +21,10 @@ copyright = '2022, Google Professional Services'
 author = 'Google Professional Services'
 release = '1.4.1'
 
-extensions = ['sphinxcontrib.napoleon','sphinx_markdown_builder','sphinx.ext.autodoc','sphinx_autodoc_typehints','sphinx.ext.autosummary']
+extensions = [
+    'sphinxcontrib.napoleon', 'sphinx_markdown_builder', 'sphinx.ext.autodoc',
+    'sphinx_autodoc_typehints', 'sphinx.ext.autosummary'
+]
 
 templates_path = ['_templates']
 exclude_patterns = ['build/*', 'Thumbs.db', '.DS_Store']
@@ -29,5 +33,3 @@ html_theme = 'alabaster'
 html_static_path = ['_static']
 
 root_doc = 'docs/index'
-
-

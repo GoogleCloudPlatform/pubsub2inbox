@@ -35,6 +35,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Install cosign
+        run: |
+          wget -q "https://github.com/sigstore/cosign/releases/download/v1.13.1/cosign-linux-amd64"
+          mv cosign-linux-amd64 /usr/local/bin/cosign
+          chmod +x /usr/local/bin/cosign
+
       - name: Get version number
         run: |
           if [[ "$GITHUB_REF" == "refs/tags/"* ]]; then
@@ -52,6 +58,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push
+        id: build
         uses: docker/build-push-action@v3
         with:
           push: true
@@ -64,3 +71,9 @@ jobs:
             org.opencontainers.image.title=Pubsub2Inbox
             org.opencontainers.image.vendor=Google LLC
             org.opencontainers.image.version=${{ env.VERSION }}
+
+      - name: Sign image
+        env:
+          COSIGN_KEY: ${{ secrets.COSIGN_KEY }}
+        run: |
+          /usr/local/bin/cosign sign --key env://COSIGN_KEY ${{ env.image_tag }}@${{ steps.build.outputs.digest }}
