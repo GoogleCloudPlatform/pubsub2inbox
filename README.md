@@ -155,6 +155,7 @@ parameters in when using as a module:
   - `function_timeout` (number, optional): a timeout for the Cloud Function (defaults to `240` seconds)
   - `retry_minimum_backoff` (string, optional): minimum backoff time for exponential backoff retries in Cloud Run. Defaults to 10s.
   - `retry_maximum_backoff` (string, optional): maximum backoff time for exponential backoff retries in Cloud Run. Defaults to 600s.
+  - `vpc_connector` (string, optional): ID of the serverless VPC Connector for the Cloud Function
   - `cloud_run` (boolean, optional): deploy via Cloud Run instead of Cloud Function. Defaults to `false`. If set to `true`, also specify `cloud_run_container`.
   - `cloud_run_container` (string, optional): container image to deploy on Cloud Run. See previous parameter.
 

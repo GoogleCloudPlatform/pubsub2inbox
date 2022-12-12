@@ -231,6 +231,8 @@ resource "google_cloudfunctions_function" "function" {
   entry_point           = "process_pubsub"
   timeout               = var.function_timeout
 
+  vpc_connector = var.vpc_connector
+
   event_trigger {
     event_type = "google.pubsub.topic.publish"
     resource   = var.pubsub_topic
