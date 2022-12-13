@@ -114,7 +114,7 @@ variable "retry_maximum_backoff" {
 variable "vpc_connector" {
   type        = string
   description = "VPC connector ID for Cloud Function serverless access"
-  default     = ""
+  default     = null
 }
 
 variable "cloud_run" {
