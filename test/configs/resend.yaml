@@ -15,24 +15,13 @@
 maximumMessageAge: skip
 
 pipeline:
-  - type: processor.projects
+  - type: processor.genericjson
+    ignoreOn:
+      bucket: resend-test-bucket
+      period: 9 seconds
+    output: test_message
+  - type: output.logger
     config:
-      get:
-        - "%{PROJECT}"  
-  - type: processor.cai
-    config:
-      parent: |
-        projects/{{ (projects|first).projectNumber }}
-      assetTypes:
-        - storage.googleapis.com/Bucket
-      contentType: "RESOURCE"
-      indexing: "list"
-  - type: output.test
-    config:
-      strip: true
-      result: |
-        {%- set assetname = '//storage.googleapis.com/%{BUCKET}' -%}
-        {% for asset in assets|selectattr('name', '==', assetname) %}{{ asset.resource.data.id }} {% endfor %}
-      expected: |
-        %{BUCKET}
-
+      stdout: true
+      message: "RUN"
+  

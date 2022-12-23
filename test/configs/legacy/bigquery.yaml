@@ -11,26 +11,21 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-import main
-import io
-from contextlib import redirect_stdout
-from .helpers import fixture_to_pubsub, load_config
-import unittest
-import logging
+retryPeriod: skip
 
+processors:
+  - bigquery
 
-class TestFilters(unittest.TestCase):
+bigquery:
+  dialect: STANDARD
+  labels:
+    reason: "test"
+  query: |
+    SELECT title FROM `bigquery-public-data.hacker_news.stories` ORDER BY id ASC LIMIT 1
 
-    def test_filters(self):
-        logger = logging.getLogger('test')
-        logger.setLevel(logging.DEBUG)
-        config = load_config('legacy/filters')
-        data, context = fixture_to_pubsub('generic')
-
-        buf = io.StringIO()
-        with redirect_stdout(buf):
-            main.decode_and_process(logger, config, data, context)
-
-
-if __name__ == '__main__':
-    unittest.main()
+outputs:
+  - type: test
+    result: |
+      {{ (records|first).title }}
+    expected: "Y Combinator"
+  

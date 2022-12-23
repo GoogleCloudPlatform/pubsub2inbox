@@ -24,7 +24,7 @@ from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 import sendgrid
-from sendgrid.helpers.mail import Attachment
+from sendgrid.helpers.mail import Attachment, SandBoxMode
 from google.oauth2.credentials import Credentials
 from google.cloud import storage
 from python_http_client import exceptions
@@ -271,6 +271,12 @@ class MailOutput(Output):
             text_content = sendgrid.Content('text/plain', mail['text_body'])
         sendgrid_mail = sendgrid.Mail(from_email, to_email,
                                       mail['mail_subject'], text_content)
+        if 'sandbox' in transport and transport['sandbox']:
+            self.logger.info(
+                'Using Sendgrid sandbox mode (no emails will be sent).')
+            sendgrid_mail_settings = sendgrid.MailSettings(
+                sandbox_mode=SandBoxMode(True))
+            sendgrid_mail.mail_settings = sendgrid_mail_settings
         if mail['html_body'] != '':
             html_content = sendgrid.Content('text/html', mail['html_body'])
             sendgrid_mail.add_content(html_content)

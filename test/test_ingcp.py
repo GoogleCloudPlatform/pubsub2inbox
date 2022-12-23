@@ -27,6 +27,10 @@ from datetime import datetime
 class TestIngcp(unittest.TestCase):
 
     def test_in_gcp(self):
+        self._test_in_gcp(True)
+        self._test_in_gcp(False)
+
+    def _test_in_gcp(self, legacy=False):
         ALL_TESTS = ['bigquery', 'gcs', 'cai']
         logger = logging.getLogger('test')
         logger.setLevel(logging.DEBUG)
@@ -59,7 +63,11 @@ class TestIngcp(unittest.TestCase):
             os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = sa_key.name
 
             for test in ALL_TESTS:
-                config = load_config(test, params)
+                config = None
+                if legacy:
+                    config = load_config('legacy/%s' % (test), params)
+                else:
+                    config = load_config(test, params)
                 data, context = fixture_to_pubsub(test)
                 context.timestamp = datetime.utcnow().strftime(
                     '%Y-%m-%dT%H:%M:%S.%fZ')

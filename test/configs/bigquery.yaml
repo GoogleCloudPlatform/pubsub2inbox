@@ -1,4 +1,4 @@
-#   Copyright 2021 Google LLC
+#   Copyright 2022 Google LLC
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -11,21 +11,19 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-retryPeriod: skip
-
-processors:
-  - bigquery
-
-bigquery:
-  dialect: STANDARD
-  labels:
-    reason: "test"
-  query: |
-    SELECT title FROM `bigquery-public-data.hacker_news.stories` ORDER BY id ASC LIMIT 1
-
-outputs:
-  - type: test
-    result: |
-      {{ (records|first).title }}
-    expected: "Y Combinator"
+maximumMessageAge: skip
+pipeline:
+  - type: processor.bigquery
+    config:
+      dialect: STANDARD
+      labels:
+        reason: "test"
+      query: |
+        SELECT title FROM `bigquery-public-data.hacker_news.stories` ORDER BY id ASC LIMIT 1
+  - type: output.test
+    config:
+      result: |
+        {{ (records|first).title }}
+      expected: "Y Combinator"
+    
   

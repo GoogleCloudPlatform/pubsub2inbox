@@ -114,14 +114,31 @@ pull information from GCP:
 
 ## Configuring Pubsub2Inbox
 
+## Pipeline-based configuration
+
 Pubsub2Inbox is configured through a YAML file (for examples, see the [examples/](examples/)
-directory). Input processors are configured under `processors` key and outputs under `outputs`.
+directory). 
 
-Features of the specific processors are explain in the corresponding examples.
+The YAML file is structured of the following top level keys:
 
-## Retry and resend mechanism
+  - `pipeline`: a list of processors and/or outputs to run in sequence.
+    - `type`: what processor or output to run (eg. `processor.genericjson` or `output.logger`)
+    - `config`: configuration of the processor or output
+    - `runIf`: if this evaluates to empty, the processor/output is not run
+    - `stopIf`: if this evalues to non-empty, the processing is stopped immediately (before the processor/output is run)
+    - `ignoreOn`: skips reprocessing of messages, see below:
+      - `bucket`: Cloud Storage bucket to store reprocessing markers (zero-length files), has to exist
+      - `period`: textual presentation of the period after which a message can be reprocessed (eg. `2 days`)
+      - `key`: the object reprocessing marker name (filename), if not set, it is the message and its properties hashed,
+        otherwise you can specify a Jinja expression
+    - `output`: the output variable for processors (some processors accept a single string, some a list of keys and values)
+  - `maximumMessageAge`: a textual representation of maximum age of a message that can be processed (set to `skip` to ignore)
 
-Pubsub2Inbox has two mechanisms to prevent excessive retries and resend of messages.
+For example of a modern pipeline, see [shell script example](examples/shellscript-config.yaml) or [test configs](test/configs/).
+
+### Legacy configuration
+
+Input processors are configured under `processors` key and outputs under `outputs`.
 
 The retry mechanism acknowledges and discards any messages that are older than a 
 configured period (`retryPeriod` in configuration, default 2 days).
@@ -132,6 +149,7 @@ hashing the `resendKey` (if it is omitted, all template parameters are used). Th
 resend period is configurable through `resendPeriod`. To prevent the resend bucket
 from accumulating unlimited files, set an [Object Lifecycle Management policy](https://cloud.google.com/storage/docs/lifecycle)
 on the bucket.
+
 
 ## Deploying as Cloud Function
 

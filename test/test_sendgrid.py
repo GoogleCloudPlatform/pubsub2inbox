@@ -1,4 +1,4 @@
-#   Copyright 2021 Google LLC
+#   Copyright 2022 Google LLC
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -17,14 +17,18 @@ from contextlib import redirect_stdout
 from .helpers import fixture_to_pubsub, load_config
 import unittest
 import logging
+import os
 
 
-class TestFilters(unittest.TestCase):
+class TestSendgrid(unittest.TestCase):
 
-    def test_filters(self):
+    def test_sendgrid(self):
+        if os.getenv('SENDGRID_API_KEY') == '':
+            self.skipTest('No SENDGRID_API_KEY environment variable set.')
+
         logger = logging.getLogger('test')
         logger.setLevel(logging.DEBUG)
-        config = load_config('legacy/filters')
+        config = load_config('sendgrid')
         data, context = fixture_to_pubsub('generic')
 
         buf = io.StringIO()

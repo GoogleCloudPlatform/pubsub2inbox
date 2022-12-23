@@ -1,4 +1,4 @@
-#   Copyright 2021 Google LLC
+#   Copyright 2022 Google LLC
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -11,34 +11,36 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-retryPeriod: skip
+maximumMessageAge: skip
 
-processors:
-  - genericjson
-
-outputs:
-  - type: gcs
-    bucket: "%{BUCKET}"
-    object: gcs-test
-    contents: |
-      Hello World
-  - type: gcscopy
-    sourceBucket: "%{BUCKET}"
-    sourceObject: "gcs-test"
-    destinationBucket: "%{BUCKET}"
-    destinationObject: "copy-gcs-test"
-  - type: gcs
-    bucket: "%{BUCKET}"
-    object: gcs-test-2
-    contents: |
-      {{ ('gs://' ~ "%{BUCKET}" ~ '/copy-gcs-test')|read_gcs_object(0, 1024)|b64decode }} 2
-  - type: test
-    strip: true
-    result: |
-      1: {{ ('gs://' ~ "%{BUCKET}" ~ '/gcs-test')|read_gcs_object(0, 1024)|b64decode }}
-      2: {{ ('gs://' ~ "%{BUCKET}" ~ '/copy-gcs-test')|read_gcs_object(0, 1024)|b64decode }}
-      3: {{ ('gs://' ~ "%{BUCKET}" ~ '/gcs-test-2')|read_gcs_object(0, 1024)|b64decode }}
-    expected: |
-      1: Hello World
-      2: Hello World
-      3: Hello World 2
+pipeline:
+  - type: processor.genericjson
+  - type: output.gcs
+    config:
+      bucket: "%{BUCKET}"
+      object: gcs-test
+      contents: |
+        Hello World
+  - type: output.gcscopy
+    config:
+      sourceBucket: "%{BUCKET}"
+      sourceObject: "gcs-test"
+      destinationBucket: "%{BUCKET}"
+      destinationObject: "copy-gcs-test"
+  - type: output.gcs
+    config:
+      bucket: "%{BUCKET}"
+      object: gcs-test-2
+      contents: |
+        {{ ('gs://' ~ "%{BUCKET}" ~ '/copy-gcs-test')|read_gcs_object(0, 1024)|b64decode }} 2
+  - type: output.test
+    config:
+      strip: true
+      result: |
+        1: {{ ('gs://' ~ "%{BUCKET}" ~ '/gcs-test')|read_gcs_object(0, 1024)|b64decode }}
+        2: {{ ('gs://' ~ "%{BUCKET}" ~ '/copy-gcs-test')|read_gcs_object(0, 1024)|b64decode }}
+        3: {{ ('gs://' ~ "%{BUCKET}" ~ '/gcs-test-2')|read_gcs_object(0, 1024)|b64decode }}
+      expected: |
+        1: Hello World
+        2: Hello World
+        3: Hello World 2

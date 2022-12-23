@@ -1,4 +1,4 @@
-#   Copyright 2021 Google LLC
+#   Copyright 2022 Google LLC
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -17,19 +17,39 @@ from contextlib import redirect_stdout
 from .helpers import fixture_to_pubsub, load_config
 import unittest
 import logging
+from gcp_storage_emulator.server import create_server
+import os
+import time
 
 
-class TestFilters(unittest.TestCase):
+class TestResend(unittest.TestCase):
 
-    def test_filters(self):
+    def test_resend(self):
         logger = logging.getLogger('test')
         logger.setLevel(logging.DEBUG)
-        config = load_config('legacy/filters')
+
+        # Start fake GCS server
+        server = create_server("localhost",
+                               9023,
+                               in_memory=True,
+                               default_bucket="resend-test-bucket")
+        server.start()
+        os.environ["STORAGE_EMULATOR_HOST"] = "http://localhost:9023"
+        os.environ["GOOGLE_CLOUD_PROJECT"] = "fictional"
+
+        config = load_config('resend')
         data, context = fixture_to_pubsub('generic')
 
         buf = io.StringIO()
         with redirect_stdout(buf):
             main.decode_and_process(logger, config, data, context)
+            main.decode_and_process(logger, config, data, context)
+            time.sleep(10)
+            main.decode_and_process(logger, config, data, context)
+
+        server.stop()
+
+        self.assertEqual("RUN\nRUN", buf.getvalue().rstrip())
 
 
 if __name__ == '__main__':

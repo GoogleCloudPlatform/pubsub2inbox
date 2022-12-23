@@ -39,7 +39,9 @@ class LoggerOutput(Output):
                 self.output_config['level'])
             loglevel_template.name = 'loglevel'
             log_level = loglevel_template.render()
-        if log_level == 'error' or log_level == 'err':
+        if 'stdout' in self.output_config and self.output_config['stdout']:
+            print(message_rendered)
+        elif log_level == 'error' or log_level == 'err':
             self.logger.error(message_rendered, extra=extra_vars)
         elif log_level == 'warn' or log_level == 'warning':
             self.logger.warning(message_rendered, extra=extra_vars)

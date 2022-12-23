@@ -23,9 +23,17 @@ from processors import shellscript
 class TestShellscript(unittest.TestCase):
 
     def test_shellscript_succeed(self):
+        self._test_shellscript_succeed(True)
+        self._test_shellscript_succeed(False)
+
+    def _test_shellscript_succeed(self, legacy=False):
         logger = logging.getLogger('test')
         logger.setLevel(logging.DEBUG)
-        config = load_config('shellscript-success')
+        config = None
+        if legacy:
+            config = load_config('legacy/shellscript-success')
+        else:
+            config = load_config('shellscript-success')
         data, context = fixture_to_pubsub('generic')
 
         buf = io.StringIO()
@@ -33,9 +41,17 @@ class TestShellscript(unittest.TestCase):
             main.decode_and_process(logger, config, data, context)
 
     def test_shellscript_fail(self):
+        self._test_shellscript_fail(True)
+        self._test_shellscript_fail(False)
+
+    def _test_shellscript_fail(self, legacy=False):
         logger = logging.getLogger('test')
         logger.setLevel(logging.DEBUG)
-        config = load_config('shellscript-fail')
+        config = None
+        if legacy:
+            config = load_config('legacy/shellscript-fail')
+        else:
+            config = load_config('shellscript-fail')
         data, context = fixture_to_pubsub('generic')
 
         buf = io.StringIO()
