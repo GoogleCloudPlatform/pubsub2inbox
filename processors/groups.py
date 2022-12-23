@@ -20,14 +20,17 @@ import re
 
 class GroupsProcessor(Processor):
 
-    def process(self, config_key=None):
-        if config_key is None:
-            config_key = 'groups'
-        if config_key not in self.config:
-            raise NotConfiguredException(
-                'No Cloud Identity groups configuration specified in config!')
+    def get_default_config_key():
+        return 'groups'
 
-        groups_config = self.config[config_key]
+    def process(
+        self,
+        output_var={
+            'all_groups': 'all_groups',
+            'groups_by_owner': 'groups_by_owner',
+            'groups_by_manager': 'groups_by_manager'
+        }):
+        groups_config = self.config
         service_account = groups_config[
             'serviceAccountEmail'] if 'serviceAccountEmail' in groups_config else None
 

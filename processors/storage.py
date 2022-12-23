@@ -17,8 +17,9 @@ import json
 
 class StorageProcessor(Processor):
 
-    def process(self, config_key=None):
+    def get_default_config_key():
+        return 'storage'
+
+    def process(self, output_var='object'):
         data = json.loads(self.data)
-        return {
-            'object': data,
-        }
+        return {output_var: data}

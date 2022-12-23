@@ -371,14 +371,18 @@ class RecommendationsProcessor(Processor):
                     insights_rollup[parent][sub_type]['count'] += 1
         return insights_rollup
 
-    def process(self, config_key=None):
-        if config_key is None:
-            config_key = 'recommendations'
-        if config_key not in self.config:
-            raise NotConfiguredException(
-                'No Recommender configuration specified in config!')
+    def get_default_config_key():
+        return 'recommendations'
 
-        recommender_config = self.config[config_key]
+    def process(
+        self,
+        output_var={
+            'recommendations': 'recommendations',
+            'recommendations_rollup': 'recommendations_rollup',
+            'insights': 'insights',
+            'insights_rollup': 'insights_rollup'
+        }):
+        recommender_config = self.config
 
         for recommender in recommender_config['recommender_types']:
             if recommender not in self.recommenders:
@@ -488,10 +492,10 @@ class RecommendationsProcessor(Processor):
 
         self.logger.debug('Fetching recommendations and/or insights finished.')
         _ret = {
-            'recommendations': recommendations,
-            'recommendations_rollup': recommendations_rollup,
-            'insights': insights,
-            'insights_rollup': insights_rollup,
+            output_var['recommendations']: recommendations,
+            output_var['recommendations_rollup']: recommendations_rollup,
+            output_var['insights']: insights,
+            output_var['insights_rollup']: insights_rollup,
         }
         if 'vars' in recommender_config:
             return {**recommender_config['vars'], **_ret}

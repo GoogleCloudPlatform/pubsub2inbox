@@ -17,7 +17,16 @@ import json
 
 class SccProcessor(Processor):
 
-    def process(self, config_key=None):
+    def get_default_config_key():
+        return 'scc'
+
+    def process(
+        self,
+        output_var={
+            'organization': 'organization',
+            'projects': 'projects',
+            'finding': 'finding'
+        }):
         data = json.loads(self.data)
         projects = []
         if 'sourceProperties' in data['finding'] and 'ResourcePath' in data[
@@ -26,7 +35,7 @@ class SccProcessor(Processor):
                 data['finding']['sourceProperties']['ResourcePath'])
         organization = data['notificationConfigName'].split('/')[1]
         return {
-            'organization': organization,
-            'projects': projects,
-            'finding': data['finding']
+            output_var['organization']: organization,
+            output_var['projects']: projects,
+            output_var['finding']: data['finding'],
         }

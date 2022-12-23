@@ -26,15 +26,17 @@ class CommandFailedException(Exception):
 
 class ShellscriptProcessor(Processor):
 
-    def process(self, config_key=None):
-        if config_key is None:
-            config_key = 'shellscript'
+    def get_default_config_key():
+        return 'shellscript'
 
-        shell_config = self.config[config_key]
+    def process(self, output_var='shellscript'):
+        shell_config = self.config
         if 'command' not in shell_config:
             raise NotConfiguredException('No executable command found!')
-        if 'output' not in shell_config:
-            raise NotConfiguredException('No output variable found!')
+
+        if 'output' in shell_config:
+            output_var = self._jinja_expand_string(shell_config['output'],
+                                                   'output')
 
         command = self._jinja_expand_string(shell_config['command'], 'command')
 
@@ -105,9 +107,7 @@ class ShellscriptProcessor(Processor):
                 data.append(row)
 
         ret = {}
-        output_variable = self._jinja_expand_string(shell_config['output'],
-                                                    'output')
-        ret[output_variable] = {
+        ret[output_var] = {
             'parsed': data,
             'stdout': result.stdout,
             'stderr': result.stderr,

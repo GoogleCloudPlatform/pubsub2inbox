@@ -144,9 +144,35 @@ def process_message(config, data, event, context):
     if 'processors' in config:
         for processor in config['processors']:
             config_key = None
+            output_var = None
             if isinstance(processor, dict):
                 config_key = processor[
                     'config'] if 'config' in processor else None
+                if config_key:
+                    # Expand config key if it's a Jinja expression
+                    config_key_template = jinja_environment.from_string(
+                        config_key)
+                    config_key_template.name = 'config'
+                    config_key = config_key_template.render()
+
+                output_var = processor[
+                    'output'] if 'output' in processor else None
+                if output_var:
+                    if isinstance(output_var, str):
+                        # Expand output variable if it's a Jinja expression
+                        output_var_template = jinja_environment.from_string(
+                            output_var)
+                        output_var_template.name = 'output'
+                        output_var = output_var_template.render()
+                    elif isinstance(output_var, dict):
+                        new_output_var = {}
+                        for k, v in output_var.items():
+                            output_var_template = jinja_environment.from_string(
+                                v)
+                            output_var_template.name = 'output'
+                            new_output_var[k] = output_var_template.render()
+                        output_var = new_output_var
+
                 processor = processor['processor']
 
             logger.debug('Processing message using input processor: %s' %
@@ -155,10 +181,22 @@ def process_message(config, data, event, context):
             processor_module = getattr(mod, processor)
             processor_class = getattr(processor_module,
                                       '%sProcessor' % processor.capitalize())
-            processor_instance = processor_class(config, jinja_environment,
-                                                 data, event, context)
-            processor_variables = processor_instance.process(
-                config_key=config_key)
+            if not config_key:
+                config_key = processor_class.get_default_config_key()
+
+            processor_config = {}
+            if config_key in config:
+                processor_config = config[config_key]
+
+            processor_instance = processor_class(processor_config,
+                                                 jinja_environment, data, event,
+                                                 context)
+
+            if output_var:
+                processor_variables = processor_instance.process(
+                    output_var=output_var)
+            else:
+                processor_variables = processor_instance.process()
             template_variables.update(processor_variables)
             jinja_environment.globals = {
                 **jinja_environment.globals,
