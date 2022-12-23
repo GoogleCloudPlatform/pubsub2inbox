@@ -29,7 +29,10 @@ class BudgetProcessor(Processor):
     def _get_budget_request(self):
         return GetBudgetRequest()
 
-    def process(self, config_key=None):
+    def get_default_config_key():
+        return 'budget'
+
+    def process(self, output_var={'projects': 'projects', 'budget': 'budget'}):
         if 'budgetId' not in self.event[
                 'attributes'] or 'billingAccountId' not in self.event[
                     'attributes']:
@@ -51,8 +54,8 @@ class BudgetProcessor(Processor):
         data = json.loads(self.data)
 
         ret = {
-            'projects': projects,
-            'budget': {
+            output_var['projects']: projects,
+            output_var['budget']: {
                 'name':
                     response.name,
                 'display_name':

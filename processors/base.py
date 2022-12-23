@@ -28,6 +28,10 @@ class UnknownProjectException(Exception):
     pass
 
 
+class NoConfigKeySetException(Exception):
+    pass
+
+
 class Processor(BaseHelper):
     config = None
     data = None
@@ -101,5 +105,10 @@ class Processor(BaseHelper):
         return ret
 
     @abc.abstractmethod
-    def process(self, config_key=None):
+    def process(self, output_var=None):
         pass
+
+    @staticmethod
+    @abc.abstractmethod
+    def get_default_config_key():
+        raise NoConfigKeySetException

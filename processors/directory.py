@@ -18,13 +18,12 @@ from google.oauth2.credentials import Credentials
 
 class DirectoryProcessor(Processor):
 
-    def process(self, config_key=None):
-        if config_key is None:
-            config_key = 'directory'
-        if config_key not in self.config:
-            raise NotConfiguredException('No settings configured!')
+    def get_default_config_key():
+        return 'directory'
 
-        directory_config = self.config[config_key]
+    def process(self, output_var='results'):
+
+        directory_config = self.config
         if 'api' not in directory_config and directory_config['api'] in [
                 'groups', 'users', 'members', 'groupsettings'
         ]:
@@ -140,5 +139,5 @@ class DirectoryProcessor(Processor):
                     break
                 group_unique_id = groups.pop()
 
-        res = {'results': results}
+        res = {output_v: results}
         return res

@@ -18,14 +18,11 @@ from google.cloud import bigquery
 
 class BigqueryProcessor(Processor):
 
-    def process(self, config_key=None):
-        if config_key is None:
-            config_key = 'bigquery'
-        if config_key not in self.config:
-            raise NotConfiguredException(
-                'No BigQuery configuration specified in config!')
+    def get_default_config_key(elf):
+        return 'bigquery'
 
-        bigquery_config = self.config[config_key]
+    def process(self, output_var='records'):
+        bigquery_config = self.config
         if 'query' not in bigquery_config:
             raise NotConfiguredException(
                 'No BigQuery query specified in configuration!')
@@ -67,5 +64,5 @@ class BigqueryProcessor(Processor):
         self.logger.debug('BigQuery execution finished.',
                           extra={'count': len(records)})
         return {
-            'records': records,
+            output_var: records,
         }

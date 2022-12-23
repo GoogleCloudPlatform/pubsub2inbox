@@ -17,13 +17,11 @@ from googleapiclient import discovery
 
 class ProjectsProcessor(Processor):
 
-    def process(self, config_key=None):
-        if config_key is None:
-            config_key = 'projects'
-        if config_key not in self.config:
-            raise NotConfiguredException('No settings configured!')
+    def get_default_config_key():
+        return 'projects'
 
-        projects_config = self.config[config_key]
+    def process(self, output_var='projects'):
+        projects_config = self.config
 
         service = discovery.build('cloudresourcemanager',
                                   'v1',
@@ -84,5 +82,5 @@ class ProjectsProcessor(Processor):
                 break
 
         return {
-            'projects': projects,
+            output_var: projects,
         }

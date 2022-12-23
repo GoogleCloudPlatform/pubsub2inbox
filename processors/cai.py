@@ -17,13 +17,11 @@ from googleapiclient import discovery
 
 class CaiProcessor(Processor):
 
-    def process(self, config_key=None):
-        if config_key is None:
-            config_key = 'cai'
-        if config_key not in self.config:
-            raise NotConfiguredException('No settings configured!')
+    def get_default_config_key():
+        return 'cai'
 
-        cai_config = self.config[config_key]
+    def process(self, output_var='assets'):
+        cai_config = self.config
         if 'parent' not in cai_config:
             raise NotConfiguredException('No parent configured!')
 
@@ -70,4 +68,4 @@ class CaiProcessor(Processor):
             else:
                 break
 
-        return {'assets': assets}
+        return {output_var: assets}
