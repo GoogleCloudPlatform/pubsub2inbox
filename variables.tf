@@ -62,7 +62,8 @@ variable "config" {
   type        = string
   description = "Configuration contents (either specify config_file or config)"
 
-  default = null
+  default   = null
+  sensitive = true
 }
 
 variable "service_account" {
@@ -108,6 +109,12 @@ variable "retry_maximum_backoff" {
   type        = string
   description = "Maximum retry backoff (value between 0-600 seconds, suffixed with s, default 600s, Cloud Run Only)"
   default     = "600s"
+}
+
+variable "vpc_connector" {
+  type        = string
+  description = "VPC connector ID for Cloud Function serverless access"
+  default     = null
 }
 
 variable "cloud_run" {
