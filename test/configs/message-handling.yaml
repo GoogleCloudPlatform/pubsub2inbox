@@ -15,24 +15,24 @@
 maximumMessageAge: skip
 
 pipeline:
-  - type: processor.projects
+  - type: processor.genericjson
+    output: test_message
+  - type: output.logger
+    runIf: "{% if not test_message.test %}1{% endif %}"
     config:
-      get:
-        - "%{PROJECT}"  
-  - type: processor.cai
+      stdout: true
+      message: "This will not be run"
+  - type: output.logger
+    runIf: "{% if test_message.test %}1{% endif %}"
     config:
-      parent: |
-        projects/{{ (projects|first).projectNumber }}
-      assetTypes:
-        - storage.googleapis.com/Bucket
-      contentType: "RESOURCE"
-      indexing: "list"
-  - type: output.test
+      stdout: true
+      message: "OK1"
+  - type: output.logger
+    stopIf: "{% if test_message.test %}1{% endif %}"
     config:
-      strip: true
-      result: |
-        {%- set assetname = '//storage.googleapis.com/%{BUCKET}' -%}
-        {% for asset in assets|selectattr('name', '==', assetname) %}{{ asset.resource.data.id }} {% endfor %}
-      expected: |
-        %{BUCKET}
-
+      stdout: true
+      message: "This will not run"
+  - type: output.logger
+    config:
+      stdout: true
+      message: "This will not run"

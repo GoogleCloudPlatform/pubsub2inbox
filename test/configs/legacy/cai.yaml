@@ -11,26 +11,30 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-import main
-import io
-from contextlib import redirect_stdout
-from .helpers import fixture_to_pubsub, load_config
-import unittest
-import logging
+#
+retryPeriod: skip
 
+processors:
+  - projects
+  - cai
 
-class TestFilters(unittest.TestCase):
+projects:
+  get:
+    - "%{PROJECT}"  
+    
+cai:
+  parent: |
+    projects/{{ (projects|first).projectNumber }}
+  assetTypes:
+    - storage.googleapis.com/Bucket
+  contentType: "RESOURCE"
+  indexing: "list"
 
-    def test_filters(self):
-        logger = logging.getLogger('test')
-        logger.setLevel(logging.DEBUG)
-        config = load_config('legacy/filters')
-        data, context = fixture_to_pubsub('generic')
-
-        buf = io.StringIO()
-        with redirect_stdout(buf):
-            main.decode_and_process(logger, config, data, context)
-
-
-if __name__ == '__main__':
-    unittest.main()
+outputs:
+  - type: test
+    strip: true
+    result: |
+      {%- set assetname = '//storage.googleapis.com/%{BUCKET}' -%}
+      {% for asset in assets|selectattr('name', '==', assetname) %}{{ asset.resource.data.id }} {% endfor %}
+    expected: |
+      %{BUCKET}

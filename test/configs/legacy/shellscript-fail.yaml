@@ -11,21 +11,24 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-maximumMessageAge: skip
+retryPeriod: skip
+allOutputsMustSucceed: true
 
-pipeline:
-  - type: processor.genericjson
-  - type: processor.shellscript
-    output: shell_fail
-    config:
-      command: /bin/bash
-      args:
-        - '-c'
-        - |
-          exit 1
-  - type: output.test
-    config:
-      name: "shellscript_fail"
-      result: "{{ shell_fail }}"
-      strip: true
-      expected: "nothing"
+processors:
+  - genericjson
+  - { processor: shellscript, config: shellscript_fail }
+
+shellscript_fail:
+  output: shell_fail
+  command: /bin/bash
+  args:
+    - '-c'
+    - |
+      exit 1
+
+outputs:
+  - type: test
+    name: "shellscript_fail"
+    result: "{{ shell_fail }}"
+    strip: true
+    expected: "nothing"

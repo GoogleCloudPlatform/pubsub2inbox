@@ -28,16 +28,24 @@ class TestPubsub(unittest.TestCase):
     message_sent = False
     message = {}
 
-    def test_message_too_old(self):
+    def _test_message_too_old(self, legacy=False):
         logger = logging.getLogger('test')
         logger.setLevel(logging.DEBUG)
-        config = load_config('budget')
+        config = None
+        if legacy:
+            config = load_config('legacy/budget')
+        else:
+            config = load_config('budget')
         data, context = fixture_to_pubsub('budget')
 
         buf = io.StringIO()
         with redirect_stdout(buf):
             with self.assertRaises(main.MessageTooOldException):
                 main.decode_and_process(logger, config, data, context)
+
+    def test_message_too_old(self):
+        self._test_message_too_old(True)
+        self._test_message_too_old(False)
 
     def _sendmail(self, msg_from, msg_to, msg):
         self.message_sent = True
@@ -48,8 +56,23 @@ class TestPubsub(unittest.TestCase):
     @mock.patch("output.mail.smtplib.SMTP", autospec=True)
     @mock.patch("output.mail.smtplib.SMTP_SSL", autospec=True)
     @mock.patch("processors.budget.BudgetProcessor.expand_projects")
-    def test_message_is_not_too_old(self, expand_projects, smtp_ssl, smtp,
-                                    client):
+    def test_message_is_not_too_old(self,
+                                    expand_projects,
+                                    smtp_ssl,
+                                    smtp,
+                                    client,
+                                    legacy=False):
+        self._test_message_is_not_too_old(expand_projects, smtp_ssl, smtp,
+                                          client, True)
+        self._test_message_is_not_too_old(expand_projects, smtp_ssl, smtp,
+                                          client, False)
+
+    def _test_message_is_not_too_old(self,
+                                     expand_projects,
+                                     smtp_ssl,
+                                     smtp,
+                                     client,
+                                     legacy=False):
         expand_projects.return_value = [('example-project', '1234567890',
                                          'Example Project', {
                                              'label': 'test'
@@ -75,7 +98,11 @@ class TestPubsub(unittest.TestCase):
 
         logger = logging.getLogger('test')
         logger.setLevel(logging.DEBUG)
-        config = load_config('budget')
+        config = None
+        if legacy:
+            config = load_config('legacy/budget')
+        else:
+            config = load_config('budget')
         data, context = fixture_to_pubsub('budget')
         context.timestamp = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
 

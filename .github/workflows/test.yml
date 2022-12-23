@@ -44,6 +44,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --require-hashes --no-cache-dir --no-deps -r requirements.txt
+          pip install --no-cache-dir --no-deps -r requirements-dev.txt
           pip install yapf
 
       - name: Run lint check
@@ -51,5 +52,7 @@ jobs:
           yapf --style google --diff --recursive .
 
       - name: Run unit tests
+        env:
+          SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
         run: |
           python3 -m unittest discover -v

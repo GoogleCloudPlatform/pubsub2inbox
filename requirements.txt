@@ -629,10 +629,6 @@ markupsafe==2.0.1 \
     # via
     #   -r requirements.txt.in
     #   jinja2
-mock==4.0.3 \
-    --hash=sha256:122fcb64ee37cfad5b3f48d7a7d51875d7031aaf3d8be7c42e2bee25044eee62 \
-    --hash=sha256:7d3fbbde18228f4ff2f1f119a45cdffa458b4c0dee32eb4d2bb2f82554bac7bc
-    # via -r requirements.txt.in
 msal==1.20.0 \
     --hash=sha256:78344cd4c91d6134a593b5e3e45541e666e37b747ff8a6316c3668dd1e6ab6b2 \
     --hash=sha256:d2f1c26368ecdc28c8657d457352faa0b81b1845a7b889d8676787721ba86792
@@ -846,10 +842,6 @@ starkbank-ecdsa==2.2.0 \
 tablepyxl==0.6.1 \
     --hash=sha256:520a6cb14edac28f3aa99c2c363b8800c4b54813e42495efdfaa63c6dad68346 \
     --hash=sha256:fb5a6b9984eb0a4965acef163e4e479417e9b74eae55bb1d2d6a88f6ff3fdaf2
-    # via -r requirements.txt.in
-tftest==1.6.5 \
-    --hash=sha256:122b4de3a833e6d33d8de9d6a24f0733e22deee8500ab56f19993b70f944e352 \
-    --hash=sha256:c90237af4b2477efbd81e0d824455b94cc349d79360f21f09d1b333d7e3c601e
     # via -r requirements.txt.in
 twilio==7.9.3 \
     --hash=sha256:35fe9e8b82366948c74fab48c480813cbac145288110c89cf5891c6067535c68 \

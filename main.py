@@ -93,6 +93,18 @@ class NoOutputsConfiguredException(Exception):
     pass
 
 
+class NoPipelineConfiguredException(Exception):
+    pass
+
+
+class NoTypeInPipelineException(Exception):
+    pass
+
+
+class MalformedTypeInPipelineException(Exception):
+    pass
+
+
 class NoDataFieldException(Exception):
     pass
 
@@ -105,13 +117,13 @@ class InvalidMessageFormatException(Exception):
     pass
 
 
-def process_message(config, data, event, context):
-    logger = logging.getLogger('pubsub2inbox')
-
+def check_retry_period(config, context, logger):
     # Ignore messages submitted before our retry period
     retry_period = '2 days ago'
     if 'retryPeriod' in config:
         retry_period = config['retryPeriod']
+    if 'maximumMessageAge' in config:
+        retry_period = config['maximumMessageAge']
     if retry_period != 'skip':
         retry_period_parsed = parsedatetime.Calendar(
             version=parsedatetime.VERSION_CONTEXT_STYLE).parse(retry_period)
@@ -134,6 +146,8 @@ def process_message(config, data, event, context):
             raise MessageTooOldException(
                 'Ignoring message because it\'s past the retry period.')
 
+
+def process_message_legacy(logger, config, data, event, context):
     template_variables = {
         'data': data,
         'event': event,
@@ -326,6 +340,216 @@ def process_message(config, data, event, context):
 
     else:
         raise NoOutputsConfiguredException('No outputs configured!')
+
+
+def handle_ignore_on(logger, ignore_config, jinja_environment,
+                     template_variables):
+    if 'bucket' not in ignore_config:
+        raise NoResendConfigException(
+            'No Cloud Storage bucket configured, even though ignoreOn is set!')
+
+    if 'period' not in ignore_config:
+        raise NoResendConfigException(
+            'No period configured, even though ignoreOn is set!')
+
+    resend_key_hash = hashlib.sha256()
+    if 'key' not in ignore_config:
+        default_resend_key = template_variables.copy()
+        default_resend_key.pop('context')
+        resend_key_hash.update(json.dumps(default_resend_key).encode('utf-8'))
+    else:
+        key_template = jinja_environment.from_string(ignore_config['key'])
+        key_template.name = 'resend'
+        key_contents = key_template.render()
+        resend_key_hash.update(key_contents.encode('utf-8'))
+
+    resend_file = resend_key_hash.hexdigest()
+    logger.debug('Checking for ignore object in bucket...',
+                 extra={
+                     'bucket': ignore_config['bucket'],
+                     'blob': resend_file
+                 })
+
+    storage_client = storage.Client(client_info=get_grpc_client_info())
+    bucket = storage_client.bucket(ignore_config['bucket'])
+    resend_blob = bucket.blob(resend_file)
+    if resend_blob.exists():
+        resend_blob.reload()
+        resend_period = ignore_config['period']
+        resend_period_parsed = parsedatetime.Calendar(
+            version=parsedatetime.VERSION_CONTEXT_STYLE).parse(
+                resend_period, sourceTime=resend_blob.time_created)
+        if len(resend_period_parsed) > 1:
+            resend_earliest = datetime.fromtimestamp(
+                mktime(resend_period_parsed[0]))
+        else:
+            resend_earliest = datetime.fromtimestamp(
+                mktime(resend_period_parsed))
+
+        if datetime.utcnow() >= resend_earliest:
+            logger.info('Ignore period elapsed, reprocessing the message now.',
+                        extra={
+                            'resend_earliest': resend_earliest,
+                            'blob_time_created': resend_blob.time_created
+                        })
+            resend_blob.upload_from_string('')
+        else:
+            logger.info(
+                'Ignore period not elapsed, not reprocessing the message.',
+                extra={
+                    'resend_earliest': resend_earliest,
+                    'blob_time_created': resend_blob.time_created
+                })
+            return False
+    else:
+        try:
+            resend_blob.upload_from_string('', if_generation_match=0)
+        except Exception as exc:
+            # Handle TOCTOU condition
+            if 'conditionNotMet' in str(exc):
+                logger.warning(
+                    'Message processing already in progress (message ignore key already exist).',
+                    extra={'exception': exc})
+                return False
+            else:
+                raise exc
+    return True
+
+
+def process_message_pipeline(logger, config, data, event, context):
+    template_variables = {
+        'data': data,
+        'event': event,
+        'context': context,
+    }
+
+    if len(config['pipeline']) == 0:
+        raise NoPipelineConfiguredException('Empty pipeline configured!')
+
+    jinja_environment = get_jinja_environment()
+    task_number = 1
+    for task in config['pipeline']:
+        if 'type' not in task or not task['type']:
+            raise NoTypeInPipelineException('No type in pipeline task #%d: %s' %
+                                            (task_number, str(task)))
+
+        task_type, task_handler = task['type'].split('.', 2)
+        if not task_type or not task_handler or task_type not in [
+                'processor', 'output'
+        ]:
+            raise NoTypeInPipelineException(
+                'Malformed type in pipeline task #%d: %s' %
+                (task_number, str(task)))
+
+        task_config = {}
+        if 'config' in task:
+            task_config = task['config']
+
+        # Handle resend prevention mechanism
+        if 'ignoreOn' in task:
+            if not handle_ignore_on(logger, task['ignoreOn'], jinja_environment,
+                                    template_variables):
+                return
+
+        # Handle stop processing mechanism
+        if 'stopIf' in task:
+            stopif_template = jinja_environment.from_string(task['stopIf'])
+            stopif_template.name = 'stopif'
+            stopif_contents = stopif_template.render()
+            if stopif_contents.strip() != '':
+                logger.info(
+                    'Pipeline task #%d (%s) stop-if condition evaluated to true, stopping processing.'
+                    % (task_number, task['type']))
+                return
+
+        # Handle conditional execution mechanism
+        if 'runIf' in task:
+            runif_template = jinja_environment.from_string(task['runIf'])
+            runif_template.name = 'runif'
+            runif_contents = runif_template.render()
+            if runif_contents.strip() == '':
+                logger.info(
+                    'Pipeline task #%d (%s) run-if condition evaluated to true, skipping task.'
+                    % (task_number, task['type']))
+                continue
+        try:
+            # Handle output variable expansion
+            output_var = task['output'] if 'output' in task else None
+            if output_var:
+                if isinstance(output_var, str):
+                    # Expand output variable if it's a Jinja expression
+                    output_var_template = jinja_environment.from_string(
+                        output_var)
+                    output_var_template.name = 'output'
+                    output_var = output_var_template.render()
+                elif isinstance(output_var, dict):
+                    new_output_var = {}
+                    for k, v in output_var.items():
+                        output_var_template = jinja_environment.from_string(v)
+                        output_var_template.name = 'output'
+                        new_output_var[k] = output_var_template.render()
+                    output_var = new_output_var
+
+            # Handle the actual work
+            if task_type == 'processor':  # Handle processor
+                processor = task_handler
+                logger.debug('Pipeline task #%d (%s), running processor: %s' %
+                             (task_number, task['type'], processor))
+                mod = __import__('processors.%s' % processor)
+                processor_module = getattr(mod, processor)
+                processor_class = getattr(
+                    processor_module, '%sProcessor' % processor.capitalize())
+
+                processor_instance = processor_class(task_config,
+                                                     jinja_environment, data,
+                                                     event, context)
+                if output_var:
+                    processor_variables = processor_instance.process(
+                        output_var=output_var)
+                else:
+                    processor_variables = processor_instance.process()
+                template_variables.update(processor_variables)
+                jinja_environment.globals = {
+                    **jinja_environment.globals,
+                    **template_variables
+                }
+            elif task_type == 'output':  # Handle output
+                output_type = task_handler
+                logger.debug('Pipeline task #%d (%s), running output: %s' %
+                             (task_number, task['type'], output_type))
+                mod = __import__('output.%s' % output_type)
+                output_module = getattr(mod, output_type)
+                output_class = getattr(output_module,
+                                       '%sOutput' % output_type.capitalize())
+                output_instance = output_class(task_config, task_config,
+                                               jinja_environment, data, event,
+                                               context)
+                output_instance.output()
+        except Exception as exc:
+            if 'canFail' not in task or task['canFail']:
+                logger.error(
+                    'Pipeline task #%d (%s) failed, stopping processing.' %
+                    (task_number, task['type']),
+                    extra={'exception': traceback.format_exc()})
+                raise exc
+            else:
+                logger.warning(
+                    'Pipeline task #%d (%s) failed, but continuing...' %
+                    (task_number, task['type']),
+                    extra={'exception': traceback.format_exc()})
+
+        task_number += 1
+
+
+def process_message(config, data, event, context):
+    logger = logging.getLogger('pubsub2inbox')
+
+    check_retry_period(config, context, logger)
+
+    if 'pipeline' in config and isinstance(config['pipeline'], list):
+        process_message_pipeline(logger, config, data, event, context)
+    else:
+        process_message_legacy(logger, config, data, event, context)
 
 
 def decode_and_process(logger, config, event, context):
