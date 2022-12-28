@@ -40,7 +40,7 @@ jobs:
       - name: Create ZIP for release
         run: |
           zip -q pubsub2inbox-${{ env.VERSION }}.zip LICENSE main.py requirements.txt filters/*.py output/*.py processors/*.py helpers/*.py
-          tar -cfz pubsub2inbox-${{ env.VERSION }}.tar.gz LICENSE main.py requirements.txt filters/*.py output/*.py processors/*.py helpers/*.py
+          tar -czf pubsub2inbox-${{ env.VERSION }}.tar.gz LICENSE main.py requirements.txt filters/*.py output/*.py processors/*.py helpers/*.py
       
       - name: Create a new release
         uses: "marvinpinto/action-automatic-releases@v1.2.1"
