@@ -111,9 +111,27 @@ variable "retry_maximum_backoff" {
   default     = "600s"
 }
 
+variable "instance_limits" {
+  type = object({
+    min_instances = number
+    max_instances = number
+  })
+  description = "Set default min/max instances"
+  default = {
+    min_instances = 0
+    max_instances = 100
+  }
+}
+
 variable "vpc_connector" {
   type        = string
   description = "VPC connector ID for Cloud Function serverless access"
+  default     = null
+}
+
+variable "cloudsql_connection" {
+  type        = string
+  description = "Cloud SQL connection name"
   default     = null
 }
 
@@ -126,7 +144,7 @@ variable "use_local_files" {
 variable "release_version" {
   type        = string
   description = "When not using local files, the release version to download"
-  default     = "v1.4.4"
+  default     = "v1.4.5"
 }
 
 variable "cloud_run" {
@@ -138,5 +156,5 @@ variable "cloud_run" {
 variable "cloud_run_container" {
   type        = string
   description = "Container URL when deploying via Cloud Run"
-  default     = "ghcr.io/googlecloudplatform/pubsub2inbox:v1.4.1"
+  default     = "ghcr.io/googlecloudplatform/pubsub2inbox:v1.4.5"
 }

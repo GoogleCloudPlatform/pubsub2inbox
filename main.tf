@@ -274,6 +274,9 @@ resource "google_cloudfunctions_function" "function" {
     }
   }
 
+  min_instances = var.instance_limits.min_instances
+  max_instances = var.instance_limits.max_instances
+
   environment_variables = {
     # You could also specify latest secret version here, in case you don't want to redeploy
     # and are fine with the function picking up the new config on subsequent runs.
@@ -364,6 +367,16 @@ resource "google_cloud_run_service" "function" {
       service_account_name  = google_service_account.service-account.email
       container_concurrency = 8
       timeout_seconds       = var.function_timeout
+    }
+    metadata {
+      annotations = merge({
+        "autoscaling.knative.dev/minScale" = var.instance_limits.min_instances
+        "autoscaling.knative.dev/maxScale" = var.instance_limits.max_instances
+        }, var.cloudsql_connection != null ? {
+        "run.googleapis.com/cloudsql-instances" = var.cloudsql_connection
+        } : {}, var.vpc_connector != null ? {
+        "run.googleapis.com/vpc-access-connector" = var.vpc_connector
+      } : {})
     }
   }
   traffic {

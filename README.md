@@ -264,6 +264,52 @@ The provided Terraform scripts can deploy the code as a Cloud Function or Cloud 
 Cloud Run deployment, build and push the image and set `cloud_run` and `cloud_run_container`
 parameters (see the parameter descriptions above).
 
+This is a simple example of deploying the function straight from the repository:
+
+```hcl
+locals {
+  project_id    = <YOUR-PROJECT-ID>
+  region        = "europe-west1"
+  helper_bucket = true
+}
+
+module "pubsub-topic" {
+  source     = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/pubsub"
+  project_id = local.project_id
+  name       = "pubsub-example-1"
+  iam = {}
+}
+
+# This optional helper bucket is used to store resend objects for example
+module "helper-bucket" {
+  count      = local.helper_bucket ? 1 : 0
+  source     = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/gcs"
+  project_id = local.project_id
+  name       = format("pubsub2inbox-helper-%s", module.pubsub2inbox.name)
+}
+
+module "pubsub2inbox" {
+  source = "github.com/GoogleCloudPlatform/pubsub2inbox"
+
+  project_id = local.project_id
+  region     = local.region
+
+  function_name = "function-example-1"
+  pubsub_topic  = module.pubsub-topic.id
+
+  config_file     = "<YOUR-CONFIGURATION-FILE>.yaml"
+  # Downloads the release from Github
+  use_local_files = false
+
+  bucket_name        = format("pubsub2inbox-source-%s", module.pubsub2inbox.name)
+  bucket_location    = local.region
+  helper_bucket_name = local.helper_bucket ? module.helper-bucket.0.bucket.name : ""
+
+  # Add additional permissions for the service account here
+  function_roles = []
+}
+```
+
 ### Running tests
 
 Run the command:
