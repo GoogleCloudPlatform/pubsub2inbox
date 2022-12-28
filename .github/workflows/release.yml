@@ -48,6 +48,7 @@ jobs:
         run: |
           zip -q pubsub2inbox-${{ env.VERSION }}.zip LICENSE main.py requirements.txt filters/*.py output/*.py processors/*.py helpers/*.py
           tar -czf pubsub2inbox-${{ env.VERSION }}.tar.gz LICENSE main.py requirements.txt filters/*.py output/*.py processors/*.py helpers/*.py
+          base64 -i pubsub2inbox-${{ env.VERSION }}.zip > pubsub2inbox-${{ env.VERSION }}.zip.b64
       
       - name: Create a new release
         uses: "marvinpinto/action-automatic-releases@v1.2.1"
@@ -58,5 +59,7 @@ jobs:
           title: "Pubsub2Inbox ${{ env.VERSION }}"
           files: |
             pubsub2inbox-${{ env.VERSION }}.zip
+            pubsub2inbox-${{ env.VERSION }}.zip.b64
             pubsub2inbox-${{ env.VERSION }}.tar.gz
+
 
