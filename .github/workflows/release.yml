@@ -18,6 +18,12 @@ on:
   push:
     tags:
     - v*
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to release'
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -34,7 +40,7 @@ jobs:
           if [[ "$GITHUB_REF" == "refs/tags/"* ]]; then
             echo "VERSION=${GITHUB_REF##*/}" >> $GITHUB_ENV
           else
-            echo "VERSION=latest" >> $GITHUB_ENV
+            echo "VERSION=${{ inputs.tag }}" >> $GITHUB_ENV
           fi
 
       - name: Create ZIP for release
