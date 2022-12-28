@@ -13,11 +13,19 @@
 #   limitations under the License.
 
 terraform {
-  required_version = ">= 0.13.0"
+  required_version = ">= 0.14.0"
 
   required_providers {
     google  = ">= 3.40.0"
     archive = ">= 2.2.0"
+    http = {
+      source  = "hashicorp/http"
+      version = ">= 3.2.1"
+    }
+    local = {
+      source  = "hashicorp/local"
+      version = ">= 2.2.3"
+    }
   }
 }
 
@@ -178,6 +186,7 @@ resource "google_storage_bucket" "function-bucket" {
   name                        = format("%s-%s", var.bucket_name, random_id.bucket-suffix[0].hex)
   location                    = var.bucket_location
   uniform_bucket_level_access = true
+  force_destroy               = true
 }
 
 locals {
@@ -205,9 +214,33 @@ resource "google_storage_bucket_object" "function-archive" {
 
   name   = format("index-%s.zip", md5(join(",", local.function_file_hashes)))
   bucket = google_storage_bucket.function-bucket[0].name
-  source = format("%s/index.zip", path.root)
+  source = var.use_local_files ? format("%s/index.zip", path.root) : null
   depends_on = [
     data.archive_file.function-zip.0
+  ]
+}
+
+data "http" "function-archive" {
+  count  = !var.use_local_files ? 1 : 0
+  url    = format("https://github.com/GoogleCloudPlatform/pubsub2inbox/releases/download/%s/pubsub2inbox-%s.zip.b64", var.release_version, var.release_version)
+  method = "GET"
+}
+
+resource "local_file" "function-archive" {
+  count          = !var.use_local_files ? 1 : 0
+  filename       = "index.zip"
+  content_base64 = data.http.function-archive[0].response_body
+}
+
+resource "google_storage_bucket_object" "function-archive-release" {
+  count = !var.cloud_run && !var.use_local_files ? 1 : 0
+
+  name   = format("index-%s.zip", md5(data.http.function-archive[0].response_body))
+  bucket = google_storage_bucket.function-bucket[0].name
+  source = "index.zip"
+
+  depends_on = [
+    local_file.function-archive.0
   ]
 }
 
@@ -227,7 +260,7 @@ resource "google_cloudfunctions_function" "function" {
 
   available_memory_mb   = 256
   source_archive_bucket = google_storage_bucket.function-bucket[0].name
-  source_archive_object = google_storage_bucket_object.function-archive[0].name
+  source_archive_object = var.use_local_files ? google_storage_bucket_object.function-archive[0].name : google_storage_bucket_object.function-archive-release[0].name
   entry_point           = "process_pubsub"
   timeout               = var.function_timeout
 

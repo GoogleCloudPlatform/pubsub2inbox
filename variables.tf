@@ -123,6 +123,12 @@ variable "use_local_files" {
   default     = true
 }
 
+variable "release_version" {
+  type        = string
+  description = "When not using local files, the release version to download"
+  default     = "v1.4.2"
+}
+
 variable "cloud_run" {
   type        = bool
   description = "Deploy via Cloud Run"
