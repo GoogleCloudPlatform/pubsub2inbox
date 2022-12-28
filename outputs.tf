@@ -1,4 +1,4 @@
-#   Copyright 2021 Google LLC
+#   Copyright 2022 Google LLC
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -14,4 +14,25 @@
 
 output "service_account" {
   value = google_service_account.service-account.email
+}
+
+output "name" {
+  value = var.function_name
+}
+
+output "region" {
+  value = var.region
+}
+
+output "project_id" {
+  value = var.project_id
+}
+
+output "secret" {
+  value     = google_secret_manager_secret.config-secret
+  sensitive = true
+}
+
+output "bucket" {
+  value = !var.cloud_run ? google_storage_bucket.function-bucket : null
 }

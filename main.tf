@@ -187,7 +187,7 @@ locals {
 }
 
 data "archive_file" "function-zip" {
-  count = !var.cloud_run ? 1 : 0
+  count = !var.cloud_run && var.use_local_files ? 1 : 0
 
   type        = "zip"
   output_path = "${path.module}/index.zip"
@@ -201,7 +201,7 @@ data "archive_file" "function-zip" {
 }
 
 resource "google_storage_bucket_object" "function-archive" {
-  count = !var.cloud_run ? 1 : 0
+  count = !var.cloud_run && var.use_local_files ? 1 : 0
 
   name   = format("index-%s.zip", md5(join(",", local.function_file_hashes)))
   bucket = google_storage_bucket.function-bucket[0].name

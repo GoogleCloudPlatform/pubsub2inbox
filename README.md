@@ -241,7 +241,12 @@ gcloud functions deploy $FUNCTION_NAME \
 
 ### Prebuilt image
 
-A prebuilt container image is available on this page.
+A prebuilt container image is available on this page. The container is signed and the signature
+can be verified with `cosign` for example:
+
+```sh
+cosign verify --key container-signature.pub ghcr.io/googlecloudplatform/pubsub2inbox:latest
+```
 
 ### Building the container
 

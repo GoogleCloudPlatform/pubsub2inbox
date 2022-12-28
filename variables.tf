@@ -117,6 +117,12 @@ variable "vpc_connector" {
   default     = null
 }
 
+variable "use_local_files" {
+  type        = bool
+  description = "Use local function files (if set to false, uses http provider to download a release archive from Github)"
+  default     = true
+}
+
 variable "cloud_run" {
   type        = bool
   description = "Deploy via Cloud Run"
