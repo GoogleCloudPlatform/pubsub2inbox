@@ -22,7 +22,7 @@ import google.auth
 from googleapiclient import http
 from google.cloud import resourcemanager_v3
 
-PUBSUB2INBOX_VERSION = '1.4.1'
+PUBSUB2INBOX_VERSION = '1.4.6'
 
 
 class NoCredentialsException(Exception):
