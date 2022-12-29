@@ -115,6 +115,7 @@ The YAML file is structured of the following top level keys:
       - `period`: textual presentation of the period after which a message can be reprocessed (eg. `2 days`)
       - `key`: the object reprocessing marker name (filename), if not set, it is the message and its properties hashed,
         otherwise you can specify a Jinja expression
+    - `canFail`: if set to true, the task can fail but processing will still continue
     - `output`: the output variable for processors (some processors accept a single string, some a list of keys and values)
   - `maximumMessageAge`: a textual representation of maximum age of a message that can be processed (set to `skip` to ignore)
 

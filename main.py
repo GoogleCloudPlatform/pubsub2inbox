@@ -526,7 +526,7 @@ def process_message_pipeline(logger, config, data, event, context):
                                                context)
                 output_instance.output()
         except Exception as exc:
-            if 'canFail' not in task or task['canFail']:
+            if 'canFail' not in task or not task['canFail']:
                 logger.error(
                     'Pipeline task #%d (%s) failed, stopping processing.' %
                     (task_number, task['type']),
