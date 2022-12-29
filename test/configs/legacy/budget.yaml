@@ -26,12 +26,11 @@ outputs:
         # ssl: false
       - type: sendgrid
         apiKey: your-sendgrid-api-key
-    from: notifications@your.domain
-    to: |
+    from: notifications@pubsub2inbox.dev
       {% for project in projects %}
-       owners-{{ project[0] }}@your.domain
+       owners-{{ project[0] }}@pubsub2inbox.dev
       {% endfor %}
-      cfo@your.domain
+      cfo@pubsub2inbox.dev
     subject: |
       Your project(s) are over the budget: {% for project in projects %}{{ project[2] }}{% if not loop.last %}, {% endif %}{% endfor %}
     body:

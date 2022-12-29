@@ -52,27 +52,16 @@ class TestPubsub(unittest.TestCase):
         self.message = {'from': msg_from, 'to': msg_to, 'body': msg}
         return True
 
+    def test_message_is_not_too_old(self):
+        self._test_message_is_not_too_old(True)
+        self._test_message_is_not_too_old(False)
+
     @mock.patch("processors.budget.BudgetProcessor._get_budget_service_client")
     @mock.patch("output.mail.smtplib.SMTP", autospec=True)
     @mock.patch("output.mail.smtplib.SMTP_SSL", autospec=True)
     @mock.patch("processors.budget.BudgetProcessor.expand_projects")
-    def test_message_is_not_too_old(self,
-                                    expand_projects,
-                                    smtp_ssl,
-                                    smtp,
-                                    client,
-                                    legacy=False):
-        self._test_message_is_not_too_old(expand_projects, smtp_ssl, smtp,
-                                          client, True)
-        self._test_message_is_not_too_old(expand_projects, smtp_ssl, smtp,
-                                          client, False)
-
-    def _test_message_is_not_too_old(self,
-                                     expand_projects,
-                                     smtp_ssl,
-                                     smtp,
-                                     client,
-                                     legacy=False):
+    def _test_message_is_not_too_old(self, legacy, expand_projects, smtp_ssl,
+                                     smtp, client):
         expand_projects.return_value = [('example-project', '1234567890',
                                          'Example Project', {
                                              'label': 'test'
@@ -82,7 +71,7 @@ class TestPubsub(unittest.TestCase):
             name=
             'billingAccounts/123456-AABBCC-DDEEFF/budgets/40b3572a-3490-42aa-8d2f-f58f290cf05c',
             display_name='Sample budget',
-            budget_filter=Filter(projects=['projects/806988760884']),
+            budget_filter=Filter(projects=['projects/1234567890']),
             amount=BudgetAmount(
                 specified_amount=money.Money(units=3000, currency_code='USD')),
             all_updates_rule=AllUpdatesRule(
@@ -111,9 +100,11 @@ class TestPubsub(unittest.TestCase):
             main.decode_and_process(logger, config, data, context)
         self.assertTrue(self.message_sent)
         self.assertIn('example-project', self.message['body'])
-        self.assertEqual('notifications@your.domain', self.message['from'])
-        self.assertEqual('owners-example-project@your.domain, cfo@your.domain',
-                         ', '.join(self.message['to']))
+        print(self.message)
+        self.assertEqual('notifications@pubsub2inbox.dev', self.message['from'])
+        self.assertEqual(
+            'owners-example-project@pubsub2inbox.dev, cfo@pubsub2inbox.dev',
+            ', '.join(self.message['to']))
 
 
 if __name__ == '__main__':

@@ -19,14 +19,16 @@ pipeline:
   - type: output.mail
     config:
       transports:
-        - type: sendgrid
-          apiKey: your-sendgrid-api-key
-          sandbox: true
+        - type: smtp
+          host: your.email.server.smtp
+          port: 587
+          starttls: true
       from: notifications@pubsub2inbox.dev
       to: |
         {% for project in projects %}
         test-{{ project[0] }}@pubsub2inbox.dev
         {% endfor %}
+        cfo@pubsub2inbox.dev
       subject: |
         Your project(s) are over the budget: {% for project in projects %}{{ project[2] }}{% if not loop.last %}, {% endif %}{% endfor %}
       body:
