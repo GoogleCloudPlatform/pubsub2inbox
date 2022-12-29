@@ -27,8 +27,9 @@ outputs:
       - type: sendgrid
         apiKey: your-sendgrid-api-key
     from: notifications@pubsub2inbox.dev
+    to: |
       {% for project in projects %}
-       owners-{{ project[0] }}@pubsub2inbox.dev
+      test-{{ project[0] }}@pubsub2inbox.dev
       {% endfor %}
       cfo@pubsub2inbox.dev
     subject: |

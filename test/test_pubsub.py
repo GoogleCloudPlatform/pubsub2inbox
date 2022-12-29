@@ -100,10 +100,9 @@ class TestPubsub(unittest.TestCase):
             main.decode_and_process(logger, config, data, context)
         self.assertTrue(self.message_sent)
         self.assertIn('example-project', self.message['body'])
-        print(self.message)
         self.assertEqual('notifications@pubsub2inbox.dev', self.message['from'])
         self.assertEqual(
-            'owners-example-project@pubsub2inbox.dev, cfo@pubsub2inbox.dev',
+            'test-example-project@pubsub2inbox.dev, cfo@pubsub2inbox.dev',
             ', '.join(self.message['to']))
 
 
