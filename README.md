@@ -22,39 +22,22 @@ or connect via [Serverless VPC Connector](https://cloud.google.com/vpc/docs/conf
 
 Out of the box, you'll have the following functionality:
 
-  - [Budget alert notifications](examples/budget-config.yaml)
-    - [How to set up programmatic notifications from billing budgets](https://cloud.google.com/billing/docs/how-to/budgets-programmatic-notifications)
-  - [Cloud Security Command Center](https://cloud.google.com/security-command-center)
-    - [Email notifications of findings](examples/scc-config.yaml) ([how to set up finding notifications from SCC](https://cloud.google.com/security-command-center/docs/how-to-notifications))
-    - [Create findings from Cloud IDS](examples/scc-cloud-ids.yaml)
-    - [Create custom findings](examples/scc-finding-config.yaml)
-  - [Cloud Storage notifications](examples/storage-example.yaml)
-    - [How to set up Cloud Storage notifications](https://cloud.google.com/storage/docs/reporting-changes)
-    - For example, you can automatically send reports via email that are generated in a Cloud Storage bucket
-  - [BigQuery queries](examples/bigquery-example.yaml)
-    - For example, you can turn any BigQuery query results into CSV files or email messages.
-  - [Recommendations and Insights reports](examples/recommendations/)
-     - From [Recommender API](https://cloud.google.com/recommender/docs/overview).
-     - Also see [example with attached spreadsheet](examples/recommendations/per-project/recommendations.yaml) and [example with with GCS and BigQuery output](examples/recommendations/all-projects/recommendations-example-3.yaml).
-  - [Cloud Monitoring alerts](examples/monitoring-alert-config.yaml)
-  - [Cloud Monitoring metrics](examples/cai-example.yaml)
-  - [Cloud Asset Inventory search](examples/cai-example.yaml)
-  - [Cloud Storage copier](examples/gcscopy-example.yaml)
-     - Copies objects between two buckets, useful for backing up.
-  - [Cloud Identity groups](examples/groups-example.yaml) ([other example](examples/groups-example-2.yaml))
-     - Retrieves group and membership information from [Cloud Identity Groups API](https://cloud.google.com/identity/docs/apis)
-     - Useful for example building membership review reports
-  - [Groups that allow external members](examples/external-groups-example.yaml) ([general example for Directory API](examples/directory-example.yaml))
-  - [Update group default settings on creation](examples/groups-settings.yaml)
-  - [GCP projects](examples/projects-example.yaml)
-     - Retrieves a list of projects using Cloud Resource Manager API
-  - [Send SMS messages](examples/twilio-example.yaml)
-     - Retrieves a list of projects using Cloud Resource Manager API
-  - Any binary or shell script!
-    - [See the example of shell processor](examples/shellscript-config.yaml)
-  - Any JSON
-    - [See the example of generic JSON processing](examples/generic-config.yaml)
-
+| Title                         | Example use cases                                                                                                                                                                                                                             | Samples                                                                                                                                                                                                                                                                                                                                        |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Budget alerts                 | Get email if a project's budget exceeds certain limit. For more information, see [How to set up programmatic notifications from billing budgets](https://cloud.google.com/billing/docs/how-to/budgets-programmatic-notifications).            | [Budget alerts](examples/budget-config.yaml)                                                                                                                                                                                                                                                                                                   |
+| Cloud Security Command Center | Send emails when a new security finding is made (see [how to set up finding notifications from SCC](https://cloud.google.com/security-command-center/docs/how-to-notifications)), or create new findings from any Pub/Sub message.            | [Email notifications of findings](examples/scc-config.yaml)<br />[Create findings from Cloud IDS](examples/scc-cloud-ids.yaml)<br />[Create custom findings](examples/scc-finding-config.yaml)                                                                                                                                                 |
+| Cloud Storage                 | When a new report arrives in a bucket, send it out as an email attachment. Or copy files to a backup bucket as soon as they arrive. See: [How to set up Cloud Storage notifications](https://cloud.google.com/storage/docs/reporting-changes) | [Cloud Storage notifications](examples/storage-example.yaml)<br />[Cloud Storage backup copier](examples/gcscopy-example.yaml)                                                                                                                                                                                                                 |
+| BigQuery                      | Run BigQuery queries on a schedule and turn the results into CSV or spreadsheets and send them out as email attachments.                                                                                                                      | [BigQuery queries](examples/bigquery-example.yaml)                                                                                                                                                                                                                                                                                             |
+| Recommendations               | Generate recommendations and insights for project owner's on a scheduled basis. Uses [Recommender API](https://cloud.google.com/recommender/docs/overview).                                                                                   | [Recommendations and Insights reports](examples/recommendations/)<br />[Example with attached spreadsheet](examples/recommendations/per-project/recommendations.yaml)<br />[Example with with GCS and BigQuery output](examples/recommendations/all-projects/recommendations-example-3.yaml).                                                  |
+| Cloud Monitoring              | Send alerts from Cloud Monitoring via your own SMTP servers, or use an unsupported messaging platform. Or run Cloud Monitoring MQL queries and send the results.                                                                              | [Cloud Monitoring alerts](examples/monitoring-alert-config.yaml)<br />[Service account usage reporting using Cloud Monitoring and Cloud Asset Inventory](examples/cai-example.yaml)                                                                                                                                                            |
+| Cloud Asset Inventory         | Use Cloud Asset Inventory to fetch resources organization-wide.                                                                                                                                                                               | [Fetch all service accounts from CAI](examples/cai-example.yaml)                                                                                                                                                                                                                                                                               |
+| Cloud Identity                | Fetch groups or memberships, or change group settings. For example, build a report of members in a group for review and send it out via email.                                                                                                | [Cloud Identity groups](examples/groups-example.yaml)<br />[Another example](examples/groups-example-2.yaml)<br />[Groups that allow external members](examples/external-groups-example.yaml)<br />[Example of Directory API](examples/directory-example.yaml)<br />[Update group default settings on creation](examples/groups-settings.yaml) |
+| Resource Manager              | List and search for GCP projects.                                                                                                                                                                                                             | [GCP projects](examples/projects-example.yaml)                                                                                                                                                                                                                                                                                                 |
+| Scripting                     | Run any binary or shell script and parse the output (supports JSON, YAML, CSV, etc.)                                                                                                                                                          | [Shell processor](examples/shellscript-config.yaml)                                                                                                                                                                                                                                                                                            |
+| Transcoder                    | Transcode video and audio using [Transcoder API](https://cloud.google.com/transcoder).                                                                                                                                                        | [Transcoding a video](examples/transcode-example.yaml)                                                                                                                                                                                                                                                                                         |
+| Third party                   | Send SMS messages.                                                                                                                                                                                                                            | [Send SMS messages using Twilio](examples/twilio-example.yaml)                                                                                                                                                                                                                                                                                 |
+| JSON                          | Generic JSON parser.                                                                                                                                                                                                                          | [Generic JSON processing](examples/generic-config.yaml)                                                                                                                                                                                                                                                                                        |
+  
 ## Input processors
 
 Available input processors are:
@@ -74,6 +57,7 @@ Available input processors are:
   - [projects.py](processors/projects.py): Searches or gets GCP project details
   - [cai.py](processors/cai.py): Fetch assets from Cloud Asset Inventory
   - [shellscript.py](processors/shellscript.py): Run any binary or shell script and parse the output (JSON, YAML, CSV, TSV, ...)
+  - [transcode.py](processors/transcode.py): Transcode media using Transcoder API.
 
 For full documentation of permissions, processor input and output parameters, see [PROCESSORS.md](PROCESSORS.md).
 

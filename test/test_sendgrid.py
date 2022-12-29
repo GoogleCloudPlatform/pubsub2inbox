@@ -23,7 +23,7 @@ import os
 class TestSendgrid(unittest.TestCase):
 
     def test_sendgrid(self):
-        if os.getenv('SENDGRID_API_KEY') == '':
+        if not os.getenv('SENDGRID_API_KEY'):
             self.skipTest('No SENDGRID_API_KEY environment variable set.')
 
         logger = logging.getLogger('test')
