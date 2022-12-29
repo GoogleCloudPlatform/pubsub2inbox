@@ -110,6 +110,11 @@ locals {
       project = ["roles/cloudasset.viewer"]
       apis    = ["cloudasset.googleapis.com"]
     }
+    transcoder = {
+      org     = []
+      project = ["roles/transcoder.admin"]
+      apis    = ["transcoder.googleapis.com"]
+    }
   }
   org_permissions     = flatten([for role in var.function_roles : local.iam_permissions[role].org])
   project_permissions = flatten([for role in var.function_roles : local.iam_permissions[role].project])

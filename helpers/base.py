@@ -20,6 +20,7 @@ from google.api_core.gapic_v1 import client_info as grpc_client_info
 import google_auth_httplib2
 import google.auth
 from googleapiclient import http
+from google.cloud import resourcemanager_v3
 
 PUBSUB2INBOX_VERSION = '1.4.1'
 
@@ -49,6 +50,7 @@ def get_grpc_client_info():
 class BaseHelper:
     logger = None
     jinja_environment = None
+    project_number_cache = {}
 
     def __init__(self, jinja_environment):
         self.jinja_environment = jinja_environment
@@ -62,6 +64,21 @@ class BaseHelper:
 
     def _get_grpc_client_info(self):
         return get_grpc_client_info()
+
+    def get_project_number(self, project_id, credentials=None):
+        if project_id in self.project_number_cache:
+            return self.project_number_cache[project_id]
+
+        client = resourcemanager_v3.ProjectsClient(credentials=credentials)
+        request = resourcemanager_v3.SearchProjectsRequest(
+            query="projectId=%s" % (project_id),)
+        response = client.search_projects(request=request)
+        project = next(iter(response))
+        if project:
+            self.project_number_cache[project_id] = int(
+                project.name.replace("projects/", ""))
+            return self.project_number_cache[project_id]
+        return None
 
     def get_token_for_scopes(self, scopes, service_account=None):
         if not service_account:

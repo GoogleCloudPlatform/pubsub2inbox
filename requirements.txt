@@ -191,10 +191,11 @@ functions-framework==2.2.1 \
     --hash=sha256:0b36c081ac4eac46d65d02761c47d00e74e5bf8830fa5ce9f825521dc0d3d6ff \
     --hash=sha256:837a772190b6f2abb0eec8ea26af889a270fe0d50d067b6bedaced2476cd858a
     # via -r requirements.txt.in
-google-api-core[grpc]==2.10.2 \
-    --hash=sha256:10c06f7739fe57781f87523375e8e1a3a4674bf6392cd6131a3222182b971320 \
-    --hash=sha256:34f24bd1d5f72a8c4519773d99ca6bf080a6c4e041b4e9f024fe230191dda62e
+google-api-core[grpc]==1.34.0 \
+    --hash=sha256:6fb380f49d19ee1d09a9722d0379042b7edb06c0112e4796c7a395078a043e71 \
+    --hash=sha256:7421474c39d396a74dfa317dddbc69188f2336835f526087c7648f91105e32ff
     # via
+    #   -r requirements.txt.in
     #   google-api-python-client
     #   google-cloud-appengine-logging
     #   google-cloud-bigquery
@@ -205,6 +206,7 @@ google-api-core[grpc]==2.10.2 \
     #   google-cloud-logging
     #   google-cloud-pubsub
     #   google-cloud-recommender
+    #   google-cloud-resource-manager
     #   google-cloud-secret-manager
     #   google-cloud-storage
 google-api-python-client==2.23.0 \
@@ -266,6 +268,10 @@ google-cloud-pubsub==2.8.0 \
 google-cloud-recommender==2.3.4 \
     --hash=sha256:4912e90cb2bf171a1758688967201d66af5d8afe2896d71fd82c87169e375029 \
     --hash=sha256:55f0c52584585b951c9d3ce89ab7d9e05e477bdf0c53865c49ef9ff7947a6d96
+    # via -r requirements.txt.in
+google-cloud-resource-manager==1.7.0 \
+    --hash=sha256:39bbb9e8d2bc0194cfa1049a1296a9d7b668003a689a057643e9b0c9796e0583 \
+    --hash=sha256:9fae98977c52189371ca7d8b25518ef1fb97b422851cb45c09ea1686fc420a89
     # via -r requirements.txt.in
 google-cloud-secret-manager==2.7.2 \
     --hash=sha256:182e58f6f507d7322fa0ec3e526ee1dae48963efd1d957678499502c849b74a5 \
@@ -366,6 +372,7 @@ grpc-google-iam-v1==0.12.4 \
     # via
     #   google-cloud-logging
     #   google-cloud-pubsub
+    #   google-cloud-resource-manager
     #   google-cloud-secret-manager
 grpcio==1.51.1 \
     --hash=sha256:094e64236253590d9d4075665c77b329d707b6fca864dd62b144255e199b4f87 \
@@ -683,6 +690,7 @@ proto-plus==1.22.1 \
     #   google-cloud-logging
     #   google-cloud-pubsub
     #   google-cloud-recommender
+    #   google-cloud-resource-manager
     #   google-cloud-secret-manager
 protobuf==3.20.3 \
     --hash=sha256:03038ac1cfbc41aa21f6afcbcd357281d7521b4157926f30ebecc8d4ea59dcb7 \
@@ -713,6 +721,7 @@ protobuf==3.20.3 \
     #   google-cloud-audit-log
     #   google-cloud-bigquery
     #   google-cloud-logging
+    #   google-cloud-resource-manager
     #   google-cloud-storage
     #   googleapis-common-protos
     #   grpcio-status
