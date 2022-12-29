@@ -13,6 +13,10 @@ Bases: `object`
 Bases: `Exception`
 
 
+### _exception_ main.MalformedTypeInPipelineException()
+Bases: `Exception`
+
+
 ### _exception_ main.MessageTooOldException()
 Bases: `Exception`
 
@@ -29,6 +33,10 @@ Bases: `Exception`
 Bases: `Exception`
 
 
+### _exception_ main.NoPipelineConfiguredException()
+Bases: `Exception`
+
+
 ### _exception_ main.NoResendConfigException()
 Bases: `Exception`
 
@@ -37,15 +45,27 @@ Bases: `Exception`
 Bases: `Exception`
 
 
+### _exception_ main.NoTypeInPipelineException()
+Bases: `Exception`
+
+
+### main.check_retry_period(config, context, logger)
+
 ### main.decode_and_process(logger, config, event, context)
 
 ### main.get_jinja_environment()
 
 ### main.get_jinja_escaping(template_name)
 
+### main.handle_ignore_on(logger, ignore_config, jinja_environment, template_variables)
+
 ### main.load_configuration(file_name)
 
 ### main.process_message(config, data, event, context)
+
+### main.process_message_legacy(logger, config, data, event, context)
+
+### main.process_message_pipeline(logger, config, data, event, context)
 
 ### main.process_pubsub(event, context, message_too_old_exception=False)
 Function that is triggered by Pub/Sub incoming message.

@@ -20,6 +20,14 @@ test.test\_filters module
    :undoc-members:
    :show-inheritance:
 
+test.test\_handling module
+--------------------------
+
+.. automodule:: test.test_handling
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 test.test\_ingcp module
 -----------------------
 
@@ -40,6 +48,22 @@ test.test\_pubsub module
 ------------------------
 
 .. automodule:: test.test_pubsub
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+test.test\_resend module
+------------------------
+
+.. automodule:: test.test_resend
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+test.test\_sendgrid module
+--------------------------
+
+.. automodule:: test.test_sendgrid
    :members:
    :undoc-members:
    :show-inheritance:

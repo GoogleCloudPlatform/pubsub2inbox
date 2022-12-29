@@ -5,6 +5,10 @@
 ## processors.base module
 
 
+### _exception_ processors.base.NoConfigKeySetException()
+Bases: `Exception`
+
+
 ### _exception_ processors.base.NotConfiguredException()
 Bases: `Exception`
 
@@ -23,7 +27,9 @@ Bases: [`BaseHelper`](helpers.md#helpers.base.BaseHelper)
 
 #### expand_projects(projects)
 
-#### _abstract_ process(config_key=None)
+#### _abstract static_ get_default_config_key()
+
+#### _abstract_ process(output_var=None)
 
 ### _exception_ processors.base.UnknownProjectException()
 Bases: `Exception`
@@ -37,7 +43,9 @@ Bases: `Processor`
 
 #### context(_: Contex_ )
 
-#### process(config_key=None)
+#### get_default_config_key()
+
+#### process(output_var='records')
 ## processors.budget module
 
 
@@ -47,7 +55,9 @@ Bases: `Processor`
 
 #### context(_: Contex_ )
 
-#### process(config_key=None)
+#### get_default_config_key()
+
+#### process(output_var={'budget': 'budget', 'projects': 'projects'})
 
 ### _exception_ processors.budget.MissingAttributesException()
 Bases: `Exception`
@@ -61,7 +71,9 @@ Bases: `Processor`
 
 #### context(_: Contex_ )
 
-#### process(config_key=None)
+#### get_default_config_key()
+
+#### process(output_var='assets')
 ## processors.directory module
 
 
@@ -71,7 +83,9 @@ Bases: `Processor`
 
 #### context(_: Contex_ )
 
-#### process(config_key=None)
+#### get_default_config_key()
+
+#### process(output_var='results')
 ## processors.genericjson module
 
 
@@ -81,7 +95,9 @@ Bases: `Processor`
 
 #### context(_: Contex_ )
 
-#### process(config_key=None)
+#### get_default_config_key()
+
+#### process(output_var='data')
 ## processors.groups module
 
 
@@ -91,7 +107,9 @@ Bases: `Processor`
 
 #### context(_: Contex_ )
 
-#### process(config_key=None)
+#### get_default_config_key()
+
+#### process(output_var={'all_groups': 'all_groups', 'groups_by_manager': 'groups_by_manager', 'groups_by_owner': 'groups_by_owner'})
 ## processors.monitoring module
 
 
@@ -101,7 +119,9 @@ Bases: `Processor`
 
 #### context(_: Contex_ )
 
-#### process(config_key=None)
+#### get_default_config_key()
+
+#### process(output_var='time_series')
 ## processors.projects module
 
 
@@ -111,7 +131,9 @@ Bases: `Processor`
 
 #### context(_: Contex_ )
 
-#### process(config_key=None)
+#### get_default_config_key()
+
+#### process(output_var='projects')
 ## processors.recommendations module
 
 
@@ -120,6 +142,8 @@ Bases: `Processor`
 
 
 #### context(_: Contex_ )
+
+#### get_default_config_key()
 
 #### get_insights(client, insight_types, parents, all_locations, filter)
 Fetches insights with specified insight types from applicable locations
@@ -159,7 +183,7 @@ Fetches all zones for a project
 
 #### multi_regions(_ = ['global', 'us', 'europe', 'asia'_ )
 
-#### process(config_key=None)
+#### process(output_var={'insights': 'insights', 'insights_rollup': 'insights_rollup', 'recommendations': 'recommendations', 'recommendations_rollup': 'recommendations_rollup'})
 
 #### recommenders(_ = {_ )
 
@@ -179,7 +203,9 @@ Bases: `Processor`
 
 #### context(_: Contex_ )
 
-#### process(config_key=None)
+#### get_default_config_key()
+
+#### process(output_var={'finding': 'finding', 'organization': 'organization', 'projects': 'projects'})
 ## processors.shellscript module
 
 
@@ -193,7 +219,9 @@ Bases: `Processor`
 
 #### context(_: Contex_ )
 
-#### process(config_key=None)
+#### get_default_config_key()
+
+#### process(output_var='shellscript')
 ## processors.storage module
 
 
@@ -203,5 +231,42 @@ Bases: `Processor`
 
 #### context(_: Contex_ )
 
-#### process(config_key=None)
+#### get_default_config_key()
+
+#### process(output_var='object')
+## processors.transcode module
+
+
+### _exception_ processors.transcode.InvalidModeException()
+Bases: `Exception`
+
+
+### _class_ processors.transcode.TranscodeProcessor(config, jinja_environment, data, event, context)
+Bases: `Processor`
+
+Transcode media using Transcoder API. For more information, see:
+[https://cloud.google.com/transcoder/docs](https://cloud.google.com/transcoder/docs)
+
+
+* **Parameters**
+
+    
+    * **mode** (*enum**, **optional*) – Select mode: create (creates a new job), get (gets existing job)
+
+
+    * **project** (*str**, **optional*) – Google Cloud project ID.
+
+
+    * **location** (*str*) – Processing location (eg. “europe-west4”)
+
+
+    * **job** (*dict*) – Transcoding job configuration.
+
+
+
+#### context(_: Contex_ )
+
+#### get_default_config_key()
+
+#### process(output_var='transcode')
 ## Module contents

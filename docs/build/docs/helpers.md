@@ -9,11 +9,15 @@
 Bases: `object`
 
 
+#### get_project_number(project_id, credentials=None)
+
 #### get_token_for_scopes(scopes, service_account=None)
 
 #### jinja_environment(_ = Non_ )
 
 #### logger(_ = Non_ )
+
+#### project_number_cache(_ = {_ )
 
 ### _exception_ helpers.base.NoCredentialsException()
 Bases: `Exception`

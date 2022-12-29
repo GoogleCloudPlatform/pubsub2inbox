@@ -59,6 +59,16 @@ BigQuery output processors can write data into BigQuery tables.
 ### _exception_ output.bigquery.InvalidJobOptionException()
 Bases: `Exception`
 
+## output.delay module
+
+
+### _class_ output.delay.DelayOutput(config, output_config, jinja_environment, data, event, context)
+Bases: `Output`
+
+
+#### context(_: Contex_ )
+
+#### output()
 ## output.gcs module
 
 

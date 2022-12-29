@@ -108,6 +108,14 @@ processors.storage module
    :undoc-members:
    :show-inheritance:
 
+processors.transcode module
+---------------------------
+
+.. automodule:: processors.transcode
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 

@@ -20,6 +20,14 @@ output.bigquery module
    :undoc-members:
    :show-inheritance:
 
+output.delay module
+-------------------
+
+.. automodule:: output.delay
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 output.gcs module
 -----------------
 
