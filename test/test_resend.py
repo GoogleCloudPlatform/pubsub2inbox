@@ -11,7 +11,6 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-import main
 import io
 from contextlib import redirect_stdout
 from .helpers import fixture_to_pubsub, load_config
@@ -40,14 +39,18 @@ class TestResend(unittest.TestCase):
         config = load_config('resend')
         data, context = fixture_to_pubsub('generic')
 
-        buf = io.StringIO()
-        with redirect_stdout(buf):
-            main.decode_and_process(logger, config, data, context)
-            main.decode_and_process(logger, config, data, context)
-            time.sleep(10)
-            main.decode_and_process(logger, config, data, context)
+        try:
+            buf = io.StringIO()
+            with redirect_stdout(buf):
+                import main
+                main.decode_and_process(logger, config, data, context)
+                main.decode_and_process(logger, config, data, context)
+                time.sleep(10)
+                main.decode_and_process(logger, config, data, context)
 
-        self.assertEqual("RUN\nRUN", buf.getvalue().rstrip())
+            self.assertEqual("RUN\nRUN", buf.getvalue().rstrip())
+        finally:
+            server.stop()
 
 
 if __name__ == '__main__':

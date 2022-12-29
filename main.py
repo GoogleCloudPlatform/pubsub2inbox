@@ -370,7 +370,16 @@ def handle_ignore_on(logger, ignore_config, jinja_environment,
                      'blob': resend_file
                  })
 
-    storage_client = storage.Client(client_info=get_grpc_client_info())
+    if os.getenv('STORAGE_EMULATOR_HOST'):
+        from google.auth.credentials import AnonymousCredentials
+
+        anon_credentials = AnonymousCredentials()
+        storage_client = storage.Client(
+            client_info=get_grpc_client_info(),
+            client_options={"api_endpoint": os.getenv('STORAGE_EMULATOR_HOST')},
+            credentials=anon_credentials)
+    else:
+        storage_client = storage.Client(client_info=get_grpc_client_info())
     bucket = storage_client.bucket(ignore_config['bucket'])
     resend_blob = bucket.blob(resend_file)
     if resend_blob.exists():

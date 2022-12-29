@@ -54,9 +54,10 @@ jobs:
       - name: Run unit tests
         env:
           SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+          GOOGLE_APPLICATION_CREDENTIALS: none
         run: |
           echo "Starting unit tests..."
 
           python3 -m unittest discover -v
-          
+
           echo "Unit testing finished."
