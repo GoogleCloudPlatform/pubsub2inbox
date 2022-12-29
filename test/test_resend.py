@@ -47,8 +47,6 @@ class TestResend(unittest.TestCase):
             time.sleep(10)
             main.decode_and_process(logger, config, data, context)
 
-        server.stop()
-
         self.assertEqual("RUN\nRUN", buf.getvalue().rstrip())
 
 

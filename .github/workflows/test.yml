@@ -55,4 +55,8 @@ jobs:
         env:
           SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
         run: |
+          echo "Starting unit tests..."
+
           python3 -m unittest discover -v
+          
+          echo "Unit testing finished."
