@@ -574,6 +574,24 @@
             * [`DirectoryProcessor.process()`](processors.md#processors.directory.DirectoryProcessor.process)
 
 
+    * [processors.dns module](processors.md#module-processors.dns)
+
+
+        * [`DnsProcessor`](processors.md#processors.dns.DnsProcessor)
+
+
+            * [`DnsProcessor.context`](processors.md#processors.dns.DnsProcessor.context)
+
+
+            * [`DnsProcessor.get_default_config_key()`](processors.md#processors.dns.DnsProcessor.get_default_config_key)
+
+
+            * [`DnsProcessor.process()`](processors.md#processors.dns.DnsProcessor.process)
+
+
+        * [`InvalidModeException`](processors.md#processors.dns.InvalidModeException)
+
+
     * [processors.genericjson module](processors.md#module-processors.genericjson)
 
 
