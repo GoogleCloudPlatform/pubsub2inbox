@@ -44,6 +44,14 @@ processors.directory module
    :undoc-members:
    :show-inheritance:
 
+processors.dns module
+---------------------
+
+.. automodule:: processors.dns
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 processors.genericjson module
 -----------------------------
 

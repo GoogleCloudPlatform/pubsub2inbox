@@ -86,6 +86,38 @@ Bases: `Processor`
 #### get_default_config_key()
 
 #### process(output_var='results')
+## processors.dns module
+
+
+### _class_ processors.dns.DnsProcessor(config, jinja_environment, data, event, context)
+Bases: `Processor`
+
+Submit changes to Cloud DNS API. For more information, see:
+[https://cloud.google.com/dns/docs/reference/v1/changes](https://cloud.google.com/dns/docs/reference/v1/changes)
+
+
+* **Parameters**
+
+    
+    * **managedZone** (*str*) – Cloud DNS zone ID.
+
+
+    * **project** (*str**, **optional*) – Google Cloud project ID.
+
+
+    * **changes** (*dict*) – Changes to submit.
+
+
+
+#### context(_: Contex_ )
+
+#### get_default_config_key()
+
+#### process(output_var='dns')
+
+### _exception_ processors.dns.InvalidModeException()
+Bases: `Exception`
+
 ## processors.genericjson module
 
 
