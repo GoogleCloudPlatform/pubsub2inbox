@@ -141,6 +141,12 @@ variable "use_local_files" {
   default     = true
 }
 
+variable "local_files_path" {
+  type        = string
+  description = "Local files path when use_local_files is true"
+  default     = null
+}
+
 variable "release_version" {
   type        = string
   description = "When not using local files, the release version to download"

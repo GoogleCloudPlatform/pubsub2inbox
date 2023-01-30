@@ -196,8 +196,10 @@ resource "google_storage_bucket" "function-bucket" {
 
 locals {
   function_files       = ["main.py", "requirements.txt", "filters/*.py", "output/*.py", "processors/*.py", "helpers/*.py"]
-  all_function_files   = setunion([for glob in local.function_files : fileset(path.module, glob)]...)
-  function_file_hashes = [for file_path in local.all_function_files : filemd5(format("%s/%s", path.module, file_path))]
+  local_files_path     = var.local_files_path == null ? path.module : var.local_files_path
+  all_function_files   = var.use_local_files ? setunion([for glob in local.function_files : fileset(local.local_files_path, glob)]...) : []
+  function_file_hashes = [for file_path in local.all_function_files : filemd5(format("%s/%s", local.local_files_path, file_path))]
+
 }
 
 data "archive_file" "function-zip" {
@@ -219,7 +221,7 @@ resource "google_storage_bucket_object" "function-archive" {
 
   name   = format("index-%s.zip", md5(join(",", local.function_file_hashes)))
   bucket = google_storage_bucket.function-bucket[0].name
-  source = var.use_local_files ? format("%s/index.zip", path.root) : null
+  source = var.use_local_files ? format("%s/index.zip", path.module) : null
   depends_on = [
     data.archive_file.function-zip.0
   ]
@@ -259,7 +261,7 @@ resource "google_cloudfunctions_function" "function" {
 
   name        = var.function_name
   description = "Pubsub2Inbox"
-  runtime     = "python38"
+  runtime     = "python39"
 
   service_account_email = google_service_account.service-account.email
 
