@@ -150,7 +150,7 @@ variable "local_files_path" {
 variable "release_version" {
   type        = string
   description = "When not using local files, the release version to download"
-  default     = "v1.4.5"
+  default     = "v1.4.7"
 }
 
 variable "cloud_run" {
