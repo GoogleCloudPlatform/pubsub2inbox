@@ -114,10 +114,6 @@ Submit changes to Cloud DNS API. For more information, see:
 #### get_default_config_key()
 
 #### process(output_var='dns')
-
-### _exception_ processors.dns.InvalidModeException()
-Bases: `Exception`
-
 ## processors.genericjson module
 
 
@@ -238,6 +234,38 @@ Bases: `Processor`
 #### get_default_config_key()
 
 #### process(output_var={'finding': 'finding', 'organization': 'organization', 'projects': 'projects'})
+## processors.secret module
+
+
+### _class_ processors.secret.SecretProcessor(config, jinja_environment, data, event, context)
+Bases: `Processor`
+
+Fetch secrets from Secret Manager API and store them in Jinja
+environment.
+
+
+* **Parameters**
+
+    
+    * **project** (*str**, **optional*) – Google Cloud project ID.
+
+
+    * **secret** (*str*) – Secret name.
+
+
+    * **version** (*str**, **optional*) – Secret version, defaults to “latest”.
+
+
+    * **mode** (*str**, **optional*) – Mode of operation, by default leaves data untouched.
+    Also supports “json” to parse JSON, “yaml” for YAML, “base64” for base64.
+
+
+
+#### context(_: Contex_ )
+
+#### get_default_config_key()
+
+#### process(output_var='secret')
 ## processors.shellscript module
 
 
@@ -266,6 +294,36 @@ Bases: `Processor`
 #### get_default_config_key()
 
 #### process(output_var='object')
+## processors.stt module
+
+
+### _class_ processors.stt.SttProcessor(config, jinja_environment, data, event, context)
+Bases: `Processor`
+
+Generate text from speech from video or audio.
+
+
+* **Parameters**
+
+    
+    * **project** (*str**, **optional*) – Google Cloud project ID.
+
+
+    * **config** (*dict*) – Recognition configuration.
+
+
+    * **audio** (*dict*) – Input audio configuration.
+
+
+    * **outputConfig** (*dict*) – Output configuration.
+
+
+
+#### context(_: Contex_ )
+
+#### get_default_config_key()
+
+#### process(output_var='stt')
 ## processors.transcode module
 
 
