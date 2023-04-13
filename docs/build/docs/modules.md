@@ -589,9 +589,6 @@
             * [`DnsProcessor.process()`](processors.md#processors.dns.DnsProcessor.process)
 
 
-        * [`InvalidModeException`](processors.md#processors.dns.InvalidModeException)
-
-
     * [processors.genericjson module](processors.md#module-processors.genericjson)
 
 
@@ -739,6 +736,21 @@
             * [`SccProcessor.process()`](processors.md#processors.scc.SccProcessor.process)
 
 
+    * [processors.secret module](processors.md#module-processors.secret)
+
+
+        * [`SecretProcessor`](processors.md#processors.secret.SecretProcessor)
+
+
+            * [`SecretProcessor.context`](processors.md#processors.secret.SecretProcessor.context)
+
+
+            * [`SecretProcessor.get_default_config_key()`](processors.md#processors.secret.SecretProcessor.get_default_config_key)
+
+
+            * [`SecretProcessor.process()`](processors.md#processors.secret.SecretProcessor.process)
+
+
     * [processors.shellscript module](processors.md#module-processors.shellscript)
 
 
@@ -770,6 +782,21 @@
 
 
             * [`StorageProcessor.process()`](processors.md#processors.storage.StorageProcessor.process)
+
+
+    * [processors.stt module](processors.md#module-processors.stt)
+
+
+        * [`SttProcessor`](processors.md#processors.stt.SttProcessor)
+
+
+            * [`SttProcessor.context`](processors.md#processors.stt.SttProcessor.context)
+
+
+            * [`SttProcessor.get_default_config_key()`](processors.md#processors.stt.SttProcessor.get_default_config_key)
+
+
+            * [`SttProcessor.process()`](processors.md#processors.stt.SttProcessor.process)
 
 
     * [processors.transcode module](processors.md#module-processors.transcode)

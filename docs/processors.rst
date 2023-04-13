@@ -100,6 +100,14 @@ processors.scc module
    :undoc-members:
    :show-inheritance:
 
+processors.secret module
+------------------------
+
+.. automodule:: processors.secret
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 processors.shellscript module
 -----------------------------
 
@@ -112,6 +120,14 @@ processors.storage module
 -------------------------
 
 .. automodule:: processors.storage
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+processors.stt module
+---------------------
+
+.. automodule:: processors.stt
    :members:
    :undoc-members:
    :show-inheritance:
