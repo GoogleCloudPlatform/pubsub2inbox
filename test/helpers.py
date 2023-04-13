@@ -13,7 +13,7 @@
 #   limitations under the License.
 import json
 import yaml
-from google.cloud.functions.context import Context
+from helpers.base import Context
 
 
 def load_config(config_name, params=None):

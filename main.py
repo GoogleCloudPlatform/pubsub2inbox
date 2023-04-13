@@ -27,10 +27,9 @@ from dateutil import parser
 from filters import get_jinja_filters, get_jinja_tests
 from jinja2 import Environment, TemplateError
 from google.cloud import secretmanager, storage
-from google.cloud.functions.context import Context
 from pythonjsonlogger import jsonlogger
 import traceback
-from helpers.base import get_grpc_client_info
+from helpers.base import get_grpc_client_info, Context
 
 config_file_name = 'config.yaml'
 execution_count = 0

@@ -89,16 +89,6 @@ charset-normalizer==2.0.12 \
     --hash=sha256:2857e29ff0d34db842cd7ca3230549d1a697f96ee6d3fb071cfa6c7393832597 \
     --hash=sha256:6881edbebdb17b39b4eaaa821b438bf6eddffb4468cf344f09f89def34a8b1df
     # via requests
-click==7.1.2 \
-    --hash=sha256:d2b5255c7c6349bc1bd1e59e08cd12acbbd63ce649f2588755783aa94dfb6b1a \
-    --hash=sha256:dacca89f4bfadd5de3d7489b7c8a566eee0d3676333fbb50030263894c38c0dc
-    # via
-    #   flask
-    #   functions-framework
-cloudevents==1.9.0 \
-    --hash=sha256:1011459d56d8f0184a46456f5d72632a2565f18171e51b33e06f643e723d30c9 \
-    --hash=sha256:8beb27503f97e215f886f73c17671012e96bb6268137fb3b2f9ef552727ab5b1
-    # via functions-framework
 cryptography==40.0.1 \
     --hash=sha256:0a4e3406cfed6b1f6d6e87ed243363652b2586b2d917b0609ca4f97072994405 \
     --hash=sha256:1e0af458515d5e4028aad75f3bb3fe7a31e46ad920648cd59b64d3da842e4356 \
@@ -131,10 +121,6 @@ cssutils==2.6.0 \
     --hash=sha256:30c72f3a5c5951a11151640600aae7b3bf10e4c0d5c87f5bc505c2cd4a26e0c2 \
     --hash=sha256:f7dcd23c1cec909fdf3630de346e1413b7b2555936dec14ba2ebb9913bf0818e
     # via premailer
-deprecation==2.1.0 \
-    --hash=sha256:72b3bde64e5d778694b0cf68178aed03d15e15477116add3fb773e581f9518ff \
-    --hash=sha256:a10811591210e1fb0e768a8c25517cabeabcba6f0bf96564f8ff45189f90b14a
-    # via cloudevents
 et-xmlfile==1.1.0 \
     --hash=sha256:8eb9e2bc2f8c97e37a2dc85a09ecdcdec9d8a396530a6d5a33b30b9a92da0c5c \
     --hash=sha256:a2ba85d1d6a74ef63837eed693bcb89c3f752169b0e3e7ae5b16ca5e1b3deada
@@ -175,14 +161,6 @@ falcon==3.1.1 \
     # via -r requirements.txt.in
 filemagic==1.6 \
     --hash=sha256:e684359ef40820fe406f0ebc5bf8a78f89717bdb7fed688af68082d991d6dbf3
-    # via -r requirements.txt.in
-flask==1.1.4 \
-    --hash=sha256:0fbeb6180d383a9186d0d6ed954e0042ad9f18e0e8de088b2b419d526927d196 \
-    --hash=sha256:c34f04500f2cbbea882b1acb02002ad6fe6b7ffa64a6164577995657f50aed22
-    # via functions-framework
-functions-framework==3.3.0 \
-    --hash=sha256:b61ef4a25f2bec0e035551171d9910875df0794433339998abceac95fc2e259b \
-    --hash=sha256:e6c97d2b009f4f0428c483c5a23bae3192a96107c9f1217cb1ecfa456c5375cc
     # via -r requirements.txt.in
 google-api-core[grpc]==1.34.0 \
     --hash=sha256:6fb380f49d19ee1d09a9722d0379042b7edb06c0112e4796c7a395078a043e71 \
@@ -425,10 +403,6 @@ grpcio-status==1.41.1 \
     --hash=sha256:640d4f7e2bba3647711e9e88988276fc786ae3b00ace4ca6339655789205c1d3 \
     --hash=sha256:6c37cf353902143e22c69a9c44a8a584ebbe84f373fba9e298679e6db63421f4
     # via google-api-core
-gunicorn==20.1.0 \
-    --hash=sha256:9dcc4547dbb1cb284accfb15ab5667a0e5d1881cc443e0677b4882a4067a807e \
-    --hash=sha256:e0a968b5ba15f8a328fdfd7ab1fcb5af4470c28aaf7e55df02a99bc13138e6e8
-    # via functions-framework
 httplib2==0.21.0 \
     --hash=sha256:987c8bb3eb82d3fa60c68699510a692aa2ad9c4bd4f123e51dfb1488c14cdd01 \
     --hash=sha256:fc144f091c7286b82bec71bdbd9b27323ba709cc612568d3000893bfd9cb4b34
@@ -440,16 +414,10 @@ idna==3.4 \
     --hash=sha256:814f528e8dead7d329833b91c5faa87d60bf71824cd12a7530b5526063d02cb4 \
     --hash=sha256:90b77e79eaa3eba6de819a0c442c0b4ceefc341a7a2ab77d7562bf49f425c5c2
     # via requests
-itsdangerous==1.1.0 \
-    --hash=sha256:321b033d07f2a4136d3ec762eac9f16a10ccd60f53c0c91af90217ace7ba1f19 \
-    --hash=sha256:b12271b2047cb23eeb98c8b5622e2e5c5e9abd9784a153e9d8ef9cb4dd09d749
-    # via flask
 jinja2==2.11.3 \
     --hash=sha256:03e47ad063331dd6a3f04a43eddca8a966a26ba0c5b7207a9a9e4e08f1b29419 \
     --hash=sha256:a6d58433de0ae800347cab1fa3043cebbabe8baa9d29e668f1c768cb87a333c6
-    # via
-    #   -r requirements.txt.in
-    #   flask
+    # via -r requirements.txt.in
 libcst==0.4.9 \
     --hash=sha256:01786c403348f76f274dbaf3888ae237ffb73e6ed6973e65eba5c1fc389861dd \
     --hash=sha256:045b3b0b06413cdae6e9751b5f417f789ffa410f2cb2815e3e0e0ea6bef10ec0 \
@@ -653,7 +621,6 @@ packaging==21.3 \
     --hash=sha256:dd47c42927d89ab911e606518907cc2d3a1f38bbd026385970643f9c5b8ecfeb \
     --hash=sha256:ef103e05f519cdc783ae24ea4e2e0f508a9c99b2d4969652eed6a2e1ea5bd522
     # via
-    #   deprecation
     #   google-cloud-bigquery
     #   google-cloud-billing-budgets
     #   google-cloud-error-reporting
@@ -874,42 +841,3 @@ waitress==2.1.2 \
     --hash=sha256:7500c9625927c8ec60f54377d590f67b30c8e70ef4b8894214ac6e4cad233d2a \
     --hash=sha256:780a4082c5fbc0fde6a2fcfe5e26e6efc1e8f425730863c04085769781f51eba
     # via -r requirements.txt.in
-watchdog==3.0.0 \
-    --hash=sha256:0e06ab8858a76e1219e68c7573dfeba9dd1c0219476c5a44d5333b01d7e1743a \
-    --hash=sha256:13bbbb462ee42ec3c5723e1205be8ced776f05b100e4737518c67c8325cf6100 \
-    --hash=sha256:233b5817932685d39a7896b1090353fc8efc1ef99c9c054e46c8002561252fb8 \
-    --hash=sha256:25f70b4aa53bd743729c7475d7ec41093a580528b100e9a8c5b5efe8899592fc \
-    --hash=sha256:2b57a1e730af3156d13b7fdddfc23dea6487fceca29fc75c5a868beed29177ae \
-    --hash=sha256:336adfc6f5cc4e037d52db31194f7581ff744b67382eb6021c868322e32eef41 \
-    --hash=sha256:3aa7f6a12e831ddfe78cdd4f8996af9cf334fd6346531b16cec61c3b3c0d8da0 \
-    --hash=sha256:3ed7c71a9dccfe838c2f0b6314ed0d9b22e77d268c67e015450a29036a81f60f \
-    --hash=sha256:4c9956d27be0bb08fc5f30d9d0179a855436e655f046d288e2bcc11adfae893c \
-    --hash=sha256:4d98a320595da7a7c5a18fc48cb633c2e73cda78f93cac2ef42d42bf609a33f9 \
-    --hash=sha256:4f94069eb16657d2c6faada4624c39464f65c05606af50bb7902e036e3219be3 \
-    --hash=sha256:5113334cf8cf0ac8cd45e1f8309a603291b614191c9add34d33075727a967709 \
-    --hash=sha256:51f90f73b4697bac9c9a78394c3acbbd331ccd3655c11be1a15ae6fe289a8c83 \
-    --hash=sha256:5d9f3a10e02d7371cd929b5d8f11e87d4bad890212ed3901f9b4d68767bee759 \
-    --hash=sha256:7ade88d0d778b1b222adebcc0927428f883db07017618a5e684fd03b83342bd9 \
-    --hash=sha256:7c5f84b5194c24dd573fa6472685b2a27cc5a17fe5f7b6fd40345378ca6812e3 \
-    --hash=sha256:7e447d172af52ad204d19982739aa2346245cc5ba6f579d16dac4bfec226d2e7 \
-    --hash=sha256:8ae9cda41fa114e28faf86cb137d751a17ffd0316d1c34ccf2235e8a84365c7f \
-    --hash=sha256:8f3ceecd20d71067c7fd4c9e832d4e22584318983cabc013dbf3f70ea95de346 \
-    --hash=sha256:9fac43a7466eb73e64a9940ac9ed6369baa39b3bf221ae23493a9ec4d0022674 \
-    --hash=sha256:a70a8dcde91be523c35b2bf96196edc5730edb347e374c7de7cd20c43ed95397 \
-    --hash=sha256:adfdeab2da79ea2f76f87eb42a3ab1966a5313e5a69a0213a3cc06ef692b0e96 \
-    --hash=sha256:ba07e92756c97e3aca0912b5cbc4e5ad802f4557212788e72a72a47ff376950d \
-    --hash=sha256:c07253088265c363d1ddf4b3cdb808d59a0468ecd017770ed716991620b8f77a \
-    --hash=sha256:c9d8c8ec7efb887333cf71e328e39cffbf771d8f8f95d308ea4125bf5f90ba64 \
-    --hash=sha256:d00e6be486affb5781468457b21a6cbe848c33ef43f9ea4a73b4882e5f188a44 \
-    --hash=sha256:d429c2430c93b7903914e4db9a966c7f2b068dd2ebdd2fa9b9ce094c7d459f33
-    # via functions-framework
-werkzeug==1.0.1 \
-    --hash=sha256:2de2a5db0baeae7b2d2664949077c2ac63fbd16d98da0ff71837f7d1dea3fd43 \
-    --hash=sha256:6c80b1e5ad3665290ea39320b91e1be1e0d5f60652b964a3070216de83d2e47c
-    # via flask
-
-# The following packages are considered to be unsafe in a requirements file:
-setuptools==67.6.1 \
-    --hash=sha256:257de92a9d50a60b8e22abfcbb771571fde0dbf3ec234463212027a4eeecbe9a \
-    --hash=sha256:e728ca814a823bf7bf60162daf9db95b93d532948c4c0bea762ce62f60189078
-    # via gunicorn
