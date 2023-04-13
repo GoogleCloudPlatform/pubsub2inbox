@@ -36,9 +36,9 @@ def strftime(timestamp_string, strftime_format):
                 version=parsedatetime.VERSION_CONTEXT_STYLE).parse(
                     timestamp_string)
             if len(parsed) > 1:
-                dt = datetime.fromtimestamp(mktime(parsed[0]))
+                dt = datetime(*parsed[0][:6])
             else:
-                dt = datetime.fromtimestamp(mktime(parsed))
+                dt = datetime(*parsed[:6])
 
     return dt.strftime(strftime_format)
 
