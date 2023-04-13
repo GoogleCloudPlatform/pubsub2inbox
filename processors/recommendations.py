@@ -12,9 +12,9 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 from .base import Processor, NotConfiguredException
+from helpers.base import Context
 import json
 import re
-from google.cloud.functions.context import Context
 from google.cloud.recommender_v1.services.recommender import RecommenderClient
 from google.cloud.recommender_v1.types.recommendation import Recommendation
 from google.cloud.recommender_v1.types.insight import Insight

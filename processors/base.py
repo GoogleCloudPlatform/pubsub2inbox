@@ -11,10 +11,9 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-from google.cloud.functions.context import Context
 from googleapiclient import discovery, http
 import abc
-from helpers.base import BaseHelper
+from helpers.base import BaseHelper, Context
 
 _PROJECT_NUM_CACHE = {}
 _PROJECT_ID_CACHE = {}

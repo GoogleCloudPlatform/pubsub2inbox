@@ -29,6 +29,23 @@ class NoCredentialsException(Exception):
     pass
 
 
+class Context(object):
+
+    def __init__(self, eventId="", timestamp="", eventType="", resource=""):
+        self.event_id = eventId
+        self.timestamp = timestamp
+        self.event_type = eventType
+        self.resource = resource
+
+    def __str__(self):
+        return "{event_id: %s, timestamp: %s, event_type: %s, resource: %s}" % (
+            self.event_id,
+            self.timestamp,
+            self.event_type,
+            self.resource,
+        )
+
+
 def get_user_agent():
     return 'google-pso-tool/pubsub2inbox/%s' % (PUBSUB2INBOX_VERSION)
 
