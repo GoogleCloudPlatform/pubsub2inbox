@@ -114,6 +114,14 @@ outputs:
       {{ "Hello World"|hash_string('sha256') }}
     expected: |
       a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e
+
+  - type: test
+    strip: true
+    name: strftime_tz
+    result: |
+      {{ "2022-12-01 00:00:00 UTC"|strftime("%d-%m-%Y") }}
+    expected: |
+      01-12-2022
       
   - type: test
     strip: true
@@ -122,7 +130,7 @@ outputs:
       {{ "2022-12-01 00:00:00"|strftime("%d-%m-%Y") }}
     expected: |
       01-12-2022
-      
+
   - type: test
     strip: true
     name: split
