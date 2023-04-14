@@ -56,7 +56,7 @@ class ChatOutput(Output):
         self.logger.debug('Chat message sent to: %s' % (chat_parent),
                           extra={
                               "response": chat_response,
-                              "message": chat_body
+                              "chat_message": chat_body
                           })
 
         # Redact message contents from response for logging
