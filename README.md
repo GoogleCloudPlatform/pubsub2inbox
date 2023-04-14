@@ -37,7 +37,8 @@ Out of the box, you'll have the following functionality:
 | Secret Manager                | Fetch secrets from Secret Manager.                                                                                                                                                                                                            | [Retrieve secret](examples/secret-example.yaml)                                                                                                                                                                                                                                                                                                |
 | Scripting                     | Run any binary or shell script and parse the output (supports JSON, YAML, CSV, etc.)                                                                                                                                                          | [Shell processor](examples/shellscript-config.yaml)                                                                                                                                                                                                                                                                                            |
 | Transcoder                    | Transcode video and audio using [Transcoder API](https://cloud.google.com/transcoder).                                                                                                                                                        | [Transcoding a video](examples/transcode-example.yaml)                                                                                                                                                                                                                                                                                         |
-| Third party                   | Send SMS messages.                                                                                                                                                                                                                            | [Send SMS messages using Twilio](examples/twilio-example.yaml)                                                                                                                                                                                                                                                                                 |
+| Messaging                     | Send messages to Google Chat or SMS messages.                                                                                                                                                                                                 | [Send SMS messages using Twilio](examples/twilio-example.yaml)<br />[Cloud Deploy notifications to Google Chat](examples/chat-example.yaml)                                                                                                                                                                                                    |
+|                               |
 | JSON                          | Generic JSON parser.                                                                                                                                                                                                                          | [Generic JSON processing](examples/generic-config.yaml)                                                                                                                                                                                                                                                                                        |
   
 ## Input processors
@@ -61,6 +62,7 @@ Available input processors are:
   - [shellscript.py](processors/shellscript.py): Run any binary or shell script and parse the output (JSON, YAML, CSV, TSV, ...)
   - [transcode.py](processors/transcode.py): Transcode media using Transcoder API.
   - [dns.py](processors/dns.py): Issue change requests to Cloud DNS.
+  - [secret.py](processor/secret.py): Fetches (additional) secrets from Secret Manager.
 
 For full documentation of permissions, processor input and output parameters, see [PROCESSORS.md](PROCESSORS.md).
 
@@ -88,6 +90,7 @@ Available output processors are:
   - [scc.py](output/scc.py): Sends findings to Cloud Security Command Center.
   - [twilio.py](output/twilio.py): Sends SMS messages via Twilio API.
   - [groupssettings.py](output/groupssettings.py): Updates Google Groups settings.
+  - [chat.py](output/chat.py): Send messages to Google Chat.
 
 Please note that the output processors have some IAM requirements to be able to
 pull information from GCP:
@@ -121,6 +124,8 @@ The YAML file is structured of the following top level keys:
     - `canFail`: if set to true, the task can fail but processing will still continue
     - `output`: the output variable for processors (some processors accept a single string, some a list of keys and values)
   - `maximumMessageAge`: a textual representation of maximum age of a message that can be processed (set to `skip` to ignore)
+  - `globals`: a dictionary of variables that is evaluated before starting the pipeline, useful for things like localization, 
+    or other configuration parameters that get repeatedly used in the pipeline configuration
 
 For example of a modern pipeline, see [shell script example](examples/shellscript-config.yaml) or [test configs](test/configs/).
 

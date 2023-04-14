@@ -20,6 +20,14 @@ output.bigquery module
    :undoc-members:
    :show-inheritance:
 
+output.chat module
+------------------
+
+.. automodule:: output.chat
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 output.delay module
 -------------------
 

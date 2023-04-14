@@ -27,6 +27,7 @@ import re
 import logging
 import hashlib
 import yaml
+import json_fix
 
 
 def make_list(s):

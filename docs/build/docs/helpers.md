@@ -19,6 +19,10 @@ Bases: `object`
 
 #### project_number_cache(_ = {_ )
 
+### _class_ helpers.base.Context(eventId='', timestamp='', eventType='', resource='')
+Bases: `object`
+
+
 ### _exception_ helpers.base.NoCredentialsException()
 Bases: `Exception`
 

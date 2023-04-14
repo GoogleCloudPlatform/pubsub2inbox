@@ -29,7 +29,7 @@ from jinja2 import Environment, TemplateError
 from google.cloud import secretmanager, storage
 from pythonjsonlogger import jsonlogger
 import traceback
-from helpers.base import get_grpc_client_info, Context
+from helpers.base import get_grpc_client_info, Context, BaseHelper
 
 config_file_name = 'config.yaml'
 execution_count = 0
@@ -116,6 +116,10 @@ class InvalidMessageFormatException(Exception):
     pass
 
 
+class MalformedGlobalsException(Exception):
+    pass
+
+
 def check_retry_period(config, context, logger):
     # Ignore messages submitted before our retry period
     retry_period = '2 days ago'
@@ -152,7 +156,6 @@ def process_message_legacy(logger, config, data, event, context):
         'event': event,
         'context': context,
     }
-
     jinja_environment = get_jinja_environment()
     if 'processors' in config:
         for processor in config['processors']:
@@ -430,11 +433,28 @@ def process_message_pipeline(logger, config, data, event, context):
         'event': event,
         'context': context,
     }
-
     if len(config['pipeline']) == 0:
         raise NoPipelineConfiguredException('Empty pipeline configured!')
 
     jinja_environment = get_jinja_environment()
+    jinja_environment.globals = {
+        **jinja_environment.globals,
+        **template_variables
+    }
+
+    if 'globals' in config:
+        if not isinstance(config['globals'], dict):
+            raise MalformedGlobalsException(
+                '"globals" in configuration should be a dictionary.')
+
+        helper = BaseHelper(jinja_environment)
+        template_globals = helper._jinja_expand_dict_all(
+            config['globals'], 'globals')
+        jinja_environment.globals = {
+            **jinja_environment.globals,
+            **template_globals
+        }
+
     task_number = 1
     for task in config['pipeline']:
         if 'type' not in task or not task['type']:
@@ -480,6 +500,7 @@ def process_message_pipeline(logger, config, data, event, context):
                     'Pipeline task #%d (%s) run-if condition evaluated to true, skipping task.'
                     % (task_number, task['type']))
                 continue
+
         try:
             # Handle output variable expansion
             output_var = task['output'] if 'output' in task else None
@@ -615,7 +636,7 @@ def process_pubsub(event, context, message_too_old_exception=False):
     except TemplateError as exc:
         logger.error('Error while evaluating a Jinja2 template!',
                      extra={
-                         'message': exc.message(),
+                         'error_message': exc,
                          'error': str(exc),
                      })
         raise exc
@@ -758,7 +779,8 @@ if __name__ == '__main__':
             for message in messages:
                 event = {
                     'data':
-                        message['message']['data'],
+                        message['message']['data']
+                        if 'data' in message['message'] else '',
                     'attributes':
                         message['message']['attributes']
                         if 'attributes' in message['message'] else {}

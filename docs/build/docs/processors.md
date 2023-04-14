@@ -19,7 +19,7 @@ Bases: [`BaseHelper`](helpers.md#helpers.base.BaseHelper)
 
 #### config(_ = Non_ )
 
-#### context(_: Contex_ )
+#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### data(_ = Non_ )
 
@@ -41,7 +41,7 @@ Bases: `Exception`
 Bases: `Processor`
 
 
-#### context(_: Contex_ )
+#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### get_default_config_key()
 
@@ -53,7 +53,7 @@ Bases: `Processor`
 Bases: `Processor`
 
 
-#### context(_: Contex_ )
+#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### get_default_config_key()
 
@@ -69,7 +69,7 @@ Bases: `Exception`
 Bases: `Processor`
 
 
-#### context(_: Contex_ )
+#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### get_default_config_key()
 
@@ -81,7 +81,7 @@ Bases: `Processor`
 Bases: `Processor`
 
 
-#### context(_: Contex_ )
+#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### get_default_config_key()
 
@@ -109,7 +109,7 @@ Submit changes to Cloud DNS API. For more information, see:
 
 
 
-#### context(_: Contex_ )
+#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### get_default_config_key()
 
@@ -121,7 +121,7 @@ Submit changes to Cloud DNS API. For more information, see:
 Bases: `Processor`
 
 
-#### context(_: Contex_ )
+#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### get_default_config_key()
 
@@ -133,7 +133,7 @@ Bases: `Processor`
 Bases: `Processor`
 
 
-#### context(_: Contex_ )
+#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### get_default_config_key()
 
@@ -145,7 +145,7 @@ Bases: `Processor`
 Bases: `Processor`
 
 
-#### context(_: Contex_ )
+#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### get_default_config_key()
 
@@ -157,7 +157,7 @@ Bases: `Processor`
 Bases: `Processor`
 
 
-#### context(_: Contex_ )
+#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### get_default_config_key()
 
@@ -169,7 +169,7 @@ Bases: `Processor`
 Bases: `Processor`
 
 
-#### context(_: Contex_ )
+#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### get_default_config_key()
 
@@ -229,7 +229,7 @@ Bases: `Exception`
 Bases: `Processor`
 
 
-#### context(_: Contex_ )
+#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### get_default_config_key()
 
@@ -261,7 +261,7 @@ environment.
 
 
 
-#### context(_: Contex_ )
+#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### get_default_config_key()
 
@@ -277,7 +277,7 @@ Bases: `Exception`
 Bases: `Processor`
 
 
-#### context(_: Contex_ )
+#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### get_default_config_key()
 
@@ -289,7 +289,7 @@ Bases: `Processor`
 Bases: `Processor`
 
 
-#### context(_: Contex_ )
+#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### get_default_config_key()
 
@@ -319,7 +319,7 @@ Generate text from speech from video or audio.
 
 
 
-#### context(_: Contex_ )
+#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### get_default_config_key()
 
@@ -354,7 +354,7 @@ Transcode media using Transcoder API. For more information, see:
 
 
 
-#### context(_: Contex_ )
+#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### get_default_config_key()
 

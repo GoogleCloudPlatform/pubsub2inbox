@@ -434,6 +434,10 @@ jinja2==2.11.3 \
     # via
     #   -r requirements.txt.in
     #   flask
+json-fix==0.5.2 \
+    --hash=sha256:5e65c8fd5fc674dd7141374968175c660d1af20481ca0d936a16a1633377a583 \
+    --hash=sha256:6d85ba545622603e2662afbd5cdb3b4af1f2992aa473b76cf58d7ed768e0efc8
+    # via -r requirements.txt.in
 libcst==0.4.9 \
     --hash=sha256:01786c403348f76f274dbaf3888ae237ffb73e6ed6973e65eba5c1fc389861dd \
     --hash=sha256:045b3b0b06413cdae6e9751b5f417f789ffa410f2cb2815e3e0e0ea6bef10ec0 \
