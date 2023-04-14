@@ -13,7 +13,7 @@
 #   limitations under the License.
 from .regex import regex_replace, regex_match, regex_search
 from .lists import split, index, merge_dict
-from .strings import add_links, urlencode, generate_signed_url, json_encode, json_decode, b64decode, csv_encode, re_escape, html_table_to_xlsx, make_list, read_gcs_object, filemagic, hash_string, yaml_encode, yaml_decode, read_file, read_file_b64
+from .strings import add_links, urlencode, generate_signed_url, json_encode, json_decode, b64decode, csv_encode, re_escape, html_table_to_xlsx, make_list, read_gcs_object, filemagic, hash_string, yaml_encode, yaml_decode, read_file, read_file_b64, parse_string, parse_url
 from .date import strftime, utc_strftime, recurring_date
 from .gcp import format_cost, get_cost, get_gcp_resource
 from .tests import test_contains
@@ -54,4 +54,6 @@ def get_jinja_filters():
         'read_file_b64': read_file_b64,
         'filemagic': filemagic,
         'hash_string': hash_string,
+        'parse_string': parse_string,
+        'parse_url': parse_url,
     }

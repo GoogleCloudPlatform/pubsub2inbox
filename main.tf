@@ -13,10 +13,10 @@
 #   limitations under the License.
 
 terraform {
-  required_version = ">= 0.14.0"
+  required_version = ">= 1.0.0"
 
   required_providers {
-    google  = ">= 3.40.0"
+    google  = ">= 4.48.0"
     archive = ">= 2.2.0"
     http = {
       source  = "hashicorp/http"
@@ -29,16 +29,14 @@ terraform {
   }
 }
 
-provider "google" {
-  project = var.project_id
-  region  = var.region
-}
-
 data "google_project" "project" {
+  project_id = var.project_id
 }
 
 # Secret Manager secret for the function
 resource "google_secret_manager_secret" "config-secret" {
+  project = var.project_id
+
   secret_id = var.secret_id != "" ? var.secret_id : var.function_name
 
   replication {
@@ -59,6 +57,9 @@ resource "google_secret_manager_secret_version" "config-secret-version" {
 
 # Service account for running the function
 resource "google_service_account" "service-account" {
+  count   = var.create_service_account ? 1 : 0
+  project = var.project_id
+
   account_id   = var.service_account != "" ? var.service_account : var.function_name
   display_name = format("%s Service Account", title(var.service_account))
 }
@@ -115,6 +116,16 @@ locals {
       project = ["roles/transcoder.admin"]
       apis    = ["transcoder.googleapis.com"]
     }
+    cloud-deploy = {
+      org     = []
+      project = ["roles/clouddeploy.operator", "roles/clouddeploy.approver"]
+      apis    = ["clouddeploy.googleapis.com"]
+    }
+    cloud-deploy-ro = {
+      org     = []
+      project = ["roles/clouddeploy.viewer"]
+      apis    = ["clouddeploy.googleapis.com"]
+    }
   }
   org_permissions     = flatten([for role in var.function_roles : local.iam_permissions[role].org])
   project_permissions = flatten([for role in var.function_roles : local.iam_permissions[role].project])
@@ -140,40 +151,67 @@ resource "google_project_service" "secret-manager-api" {
 
 # Add necessary project permissions to the service account in the project
 resource "google_project_iam_member" "service-account-project" {
-  for_each = toset(concat(["roles/serviceusage.serviceUsageConsumer"], local.project_permissions))
+  for_each = var.create_service_account ? toset(concat(["roles/serviceusage.serviceUsageConsumer"], local.project_permissions)) : toset([])
   project  = var.project_id
   role     = each.value
-  member   = format("serviceAccount:%s", google_service_account.service-account.email)
+  member   = format("serviceAccount:%s", google_service_account.service-account[0].email)
+}
+
+resource "google_project_iam_member" "existing-service-account-project" {
+  for_each = !var.create_service_account ? toset(concat(["roles/serviceusage.serviceUsageConsumer"], local.project_permissions)) : toset([])
+  project  = var.project_id
+  role     = each.value
+  member   = format("serviceAccount:%s", var.service_account)
 }
 
 # Add necessary project permissions to the service account in the organization
 resource "google_organization_iam_member" "service-account-org" {
-  for_each = toset(local.org_permissions)
+  for_each = var.create_service_account ? toset(local.org_permissions) : toset([])
   org_id   = var.organization_id
   role     = each.value
-  member   = format("serviceAccount:%s", google_service_account.service-account.email)
+  member   = format("serviceAccount:%s", google_service_account.service-account[0].email)
 }
 
 # If a helper bucket is specified, grant the service account permissions to it
 resource "google_storage_bucket_iam_member" "service-account-bucket" {
-  for_each = toset(var.helper_bucket_name != "" ? ["roles/storage.objectAdmin"] : [])
+  for_each = toset(var.create_service_account && var.helper_bucket_name != "" ? ["roles/storage.objectAdmin"] : [])
   bucket   = var.helper_bucket_name
   role     = each.value
-  member   = format("serviceAccount:%s", google_service_account.service-account.email)
+  member   = format("serviceAccount:%s", google_service_account.service-account[0].email)
+}
+
+resource "google_storage_bucket_iam_member" "existing-service-account-bucket" {
+  for_each = toset(!var.create_service_account && var.helper_bucket_name != "" ? ["roles/storage.objectAdmin"] : [])
+  bucket   = var.helper_bucket_name
+  role     = each.value
+  member   = format("serviceAccount:%s", var.service_account)
 }
 
 # Allow the service account to create differently scoped tokens
 resource "google_service_account_iam_member" "service-account-actas-self" {
-  service_account_id = google_service_account.service-account.name
+  count              = var.create_service_account ? 1 : 0
+  service_account_id = google_service_account.service-account[0].name
   role               = "roles/iam.serviceAccountTokenCreator"
-  member             = format("serviceAccount:%s", google_service_account.service-account.email)
+  member             = format("serviceAccount:%s", google_service_account.service-account[0].email)
 }
 
 # Allow the service account to access the configuration from the secret
 resource "google_secret_manager_secret_iam_member" "config-secret-iam" {
+  count   = var.create_service_account ? 1 : 0
+  project = var.project_id
+
   secret_id = google_secret_manager_secret.config-secret.secret_id
   role      = "roles/secretmanager.secretAccessor"
-  member    = format("serviceAccount:%s", google_service_account.service-account.email)
+  member    = format("serviceAccount:%s", google_service_account.service-account[0].email)
+}
+
+resource "google_secret_manager_secret_iam_member" "existing-config-secret-iam" {
+  count   = !var.create_service_account ? 1 : 0
+  project = var.project_id
+
+  secret_id = google_secret_manager_secret.config-secret.secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = format("serviceAccount:%s", var.service_account)
 }
 
 ## Cloud Function
@@ -188,6 +226,8 @@ resource "random_id" "bucket-suffix" {
 resource "google_storage_bucket" "function-bucket" {
   count = !var.cloud_run ? 1 : 0
 
+  project = var.project_id
+
   name                        = format("%s-%s", var.bucket_name, random_id.bucket-suffix[0].hex)
   location                    = var.bucket_location
   uniform_bucket_level_access = true
@@ -199,7 +239,6 @@ locals {
   local_files_path     = var.local_files_path == null ? path.module : var.local_files_path
   all_function_files   = var.use_local_files ? setunion([for glob in local.function_files : fileset(local.local_files_path, glob)]...) : []
   function_file_hashes = [for file_path in local.all_function_files : filemd5(format("%s/%s", local.local_files_path, file_path))]
-
 }
 
 data "archive_file" "function-zip" {
@@ -257,13 +296,16 @@ resource "google_storage_bucket_object" "function-archive-release" {
 # Workaround is to use "terraform taint google_cloudfunctions_function.function"
 # before plan/apply.
 resource "google_cloudfunctions_function" "function" {
-  count = !var.cloud_run ? 1 : 0
+  count = !var.cloud_run && !var.cloud_functions_v2 ? 1 : 0
+
+  project = var.project_id
+  region  = var.region
 
   name        = var.function_name
   description = "Pubsub2Inbox"
   runtime     = "python39"
 
-  service_account_email = google_service_account.service-account.email
+  service_account_email = var.create_service_account ? google_service_account.service-account[0].email : var.service_account
 
   available_memory_mb   = 256
   source_archive_bucket = google_storage_bucket.function-bucket[0].name
@@ -288,8 +330,49 @@ resource "google_cloudfunctions_function" "function" {
     # You could also specify latest secret version here, in case you don't want to redeploy
     # and are fine with the function picking up the new config on subsequent runs.
     CONFIG          = google_secret_manager_secret_version.config-secret-version.name
-    LOG_LEVEL       = 10
-    SERVICE_ACCOUNT = google_service_account.service-account.email
+    LOG_LEVEL       = var.log_level
+    SERVICE_ACCOUNT = var.create_service_account ? google_service_account.service-account[0].email : var.service_account
+  }
+}
+
+resource "google_cloudfunctions2_function" "function" {
+  count = !var.cloud_run && var.cloud_functions_v2 ? 1 : 0
+
+  project = var.project_id
+
+  name        = var.function_name
+  location    = var.region
+  description = "Pubsub2Inbox"
+
+  build_config {
+    runtime     = "python310"
+    entry_point = "process_pubsub_v2"
+    source {
+      storage_source {
+        bucket = google_storage_bucket.function-bucket[0].name
+        object = var.use_local_files ? google_storage_bucket_object.function-archive[0].name : google_storage_bucket_object.function-archive-release[0].name
+      }
+    }
+  }
+
+  service_config {
+    service_account_email = var.create_service_account ? google_service_account.service-account[0].email : var.service_account
+    max_instance_count    = var.instance_limits.max_instances
+    available_memory      = "256M"
+    timeout_seconds       = var.function_timeout
+    vpc_connector         = var.vpc_connector
+    environment_variables = {
+      CONFIG          = google_secret_manager_secret_version.config-secret-version.name
+      LOG_LEVEL       = var.log_level
+      SERVICE_ACCOUNT = var.create_service_account ? google_service_account.service-account[0].email : var.service_account
+    }
+  }
+
+  event_trigger {
+    trigger_region = var.region
+    event_type     = "google.cloud.pubsub.topic.v1.messagePublished"
+    pubsub_topic   = var.pubsub_topic
+    retry_policy   = "RETRY_POLICY_RETRY"
   }
 }
 
@@ -297,7 +380,8 @@ resource "google_cloudfunctions_function" "function" {
 
 # Service account for Pub/Sub invoker
 resource "google_service_account" "invoker-service-account" {
-  count = var.cloud_run ? 1 : 0
+  count   = var.cloud_run ? 1 : 0
+  project = var.project_id
 
   account_id   = var.service_account != "" ? format("%s-invoker", var.service_account) : format("%s-invoker", var.function_name)
   display_name = format("%s Cloud Run invoker Service Account", title(var.function_name))
@@ -305,7 +389,8 @@ resource "google_service_account" "invoker-service-account" {
 
 # Allow the invoker service account to run the Cloud Run function
 resource "google_cloud_run_service_iam_member" "pubsub-invoker" {
-  count = var.cloud_run ? 1 : 0
+  count   = var.cloud_run ? 1 : 0
+  project = var.project_id
 
   location = google_cloud_run_service.function[0].location
   service  = google_cloud_run_service.function[0].name
@@ -324,7 +409,8 @@ resource "google_service_account_iam_member" "pubsub-token-creator" {
 
 # Create a Pub/Sub push subscription that calls the Cloud Run function
 resource "google_pubsub_subscription" "pubsub-subscription" {
-  count = var.cloud_run ? 1 : 0
+  count   = var.cloud_run ? 1 : 0
+  project = var.project_id
 
   name  = format("%s-subscription", var.function_name)
   topic = var.pubsub_topic
@@ -348,7 +434,8 @@ resource "google_pubsub_subscription" "pubsub-subscription" {
 }
 
 resource "google_cloud_run_service" "function" {
-  count = var.cloud_run ? 1 : 0
+  count   = var.cloud_run ? 1 : 0
+  project = var.project_id
 
   name     = var.function_name
   location = var.region
@@ -364,14 +451,14 @@ resource "google_cloud_run_service" "function" {
         }
         env {
           name  = "LOG_LEVEL"
-          value = 10
+          value = var.log_level
         }
         env {
           name  = "SERVICE_ACCOUNT"
-          value = google_service_account.service-account.email
+          value = var.create_service_account ? google_service_account.service-account[0].email : var.service_account
         }
       }
-      service_account_name  = google_service_account.service-account.email
+      service_account_name  = var.create_service_account ? google_service_account.service-account[0].email : var.service_account
       container_concurrency = 8
       timeout_seconds       = var.function_timeout
     }

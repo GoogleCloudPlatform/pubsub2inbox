@@ -13,7 +13,11 @@
 #   limitations under the License.
 
 output "service_account" {
-  value = google_service_account.service-account.email
+  value = var.create_service_account ? google_service_account.service-account[0].email : var.service_account
+}
+
+output "service_account_name" {
+  value = var.create_service_account ? google_service_account.service-account[0].name : null
 }
 
 output "name" {

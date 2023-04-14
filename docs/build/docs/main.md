@@ -85,6 +85,20 @@ Function that is triggered by Pub/Sub incoming message.
 :param timestamp field contains the publish time.:
 
 
+### main.process_pubsub_v2(event, context, message_too_old_exception=False)
+Function that is triggered by Pub/Sub incoming message for functions V2.
+:type event: 
+:param event: The dictionary with data specific to this type of
+:type event: dict
+:param event. The data field contains the PubsubMessage message. The:
+:param attributes field will contain custom attributes if there are any.:
+:type context: 
+:param context: The Cloud Functions event
+:type context: google.cloud.functions.Context
+:param metadata. The event_id field contains the Pub/Sub message ID. The:
+:param timestamp field contains the publish time.:
+
+
 ### main.run_webserver(run_locally=False)
 
 ### main.setup_logging()

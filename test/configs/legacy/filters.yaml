@@ -162,3 +162,11 @@ outputs:
       {{ "Hello World"|regex_replace("World", "Python") }}
     expected: |
       Hello Python
+
+  - type: test
+    strip: true
+    name: parse_string
+    result: |
+      {{ "release hellotest-app version release-005"|parse_string("release {app} version {release}") }}
+    expected: |
+      {'app': 'hellotest-app', 'release': 'release-005'}

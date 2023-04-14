@@ -53,12 +53,6 @@ class ChatOutput(Output):
         chat_response = chat_service.spaces().messages().create(
             parent=chat_parent, body=chat_body).execute()
 
-        self.logger.debug('Chat message sent to: %s' % (chat_parent),
-                          extra={
-                              "response": chat_response,
-                              "chat_message": chat_body
-                          })
-
         # Redact message contents from response for logging
         if 'argumentText' in chat_response:
             del chat_response['argumentText']

@@ -1,0 +1,489 @@
+#   Copyright 2023 Google LLC
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+# This example sends notifications Cloud Deploy events to a Google Chat
+# space. For more information, see this Medium article: <link>
+#
+# This covers a simple example of notifying on new releases being created.
+# 
+globals:
+  chatSpace: "spaces/AAAA1234567"
+  serviceAccountEmail: cloud-deploy-bot@project.iam.gserviceaccount.com
+  buildBucket: project-build-bucket
+  statusToText:
+    Start: "started"
+    Succeed: "succeeded"
+    Failure: "failed"
+    Terminated: "was terminated"
+    Cancelled: "was cancelled"
+    Create: "was created"
+    Update: "was updated"
+    Delete: "was deleted"
+
+pipeline:
+  - type: processor.genericjson
+    runIf: '{% if event.attributes.DeliveryPipelineId is not defined %}1{% endif %}'
+  - type: processor.setvariable # setvariable is a helper for complex evaluations
+    output: command
+    config:
+      value: |
+        {%- if (data.type is defined and data.type == "MESSAGE" and
+                data.message.annotations and 
+                (data.message.annotations|first).type == "SLASH_COMMAND" and
+                (data.message.annotations|first).slashCommand.commandName == "/release"
+            )
+        -%}create{%- endif -%}
+        {%- if (data.type is defined and data.type == "MESSAGE" and
+                data.message.annotations and 
+                (data.message.annotations|first).type == "SLASH_COMMAND" and
+                (data.message.annotations|first).slashCommand.commandName == "/promote"
+            )
+        -%}promote{%- endif -%}
+        {%- if (data.type is defined and data.type == "MESSAGE" and
+                data.message.annotations and 
+                (data.message.annotations|first).type == "SLASH_COMMAND" and
+                (data.message.annotations|first).slashCommand.commandName == "/rollback"
+            )
+        -%}rollback{%- endif -%}
+        {%- if (data.type is defined and data.type == "MESSAGE" and
+                data.message.annotations and 
+                (data.message.annotations|first).type == "SLASH_COMMAND" and
+                (data.message.annotations|first).slashCommand.commandName == "/approve"
+            )
+        -%}approve{%- endif -%}
+        {%- if (data.type is defined and data.type == "MESSAGE" and
+                data.message.annotations and 
+                (data.message.annotations|first).type == "SLASH_COMMAND" and
+                (data.message.annotations|first).slashCommand.commandName == "/reject"
+            )
+        -%}reject{%- endif -%}
+        {%- if (data.type is not defined and 
+                event.attributes.ResourceType is defined and 
+                event.attributes.ResourceType == "Release" and
+                event.attributes.Action == "Create")
+        -%}notify-release{%- endif -%}
+        {%- if (data.type is not defined and 
+                event.attributes.ResourceType is defined and 
+                event.attributes.ResourceType == "Rollout" and
+                event.attributes.Action is in(["Succeed", "Failure", "Terminated", "Cancelled"]))
+        -%}notify-rollout{%- endif -%}
+        {%- if (data.type is not defined and 
+                event.attributes.Action is defined and
+                event.attributes.Action == "Required")
+        -%}notify-approval-required{%- endif -%}
+        {%- if (data.type is not defined and 
+                event.attributes.Action is defined and
+                event.attributes.Action == "Rejected")
+        -%}notify-approval-rejected{%- endif -%}
+        {%- if (data.type is not defined and 
+                event.attributes.Action is defined and
+                event.attributes.Action == "Approved")
+        -%}notify-approval-approved{%- endif -%}
+
+  # This file combines both notification handling from Cloud Deploy and incoming
+  # messages from Google Chat. It could be also split into 2 or 3 functions (eg. 
+  # one for chat commands, one for releases and one for rollouts). 
+
+  ## CREATE RELEASE (/release)
+  - type: processor.git # Download repository containing Skaffold files
+    runIf: |
+      {% if command == 'create' %}1{% endif %}
+    output: git
+    config:
+      url: 'https://github.com/your-org/your-repo.git' # You need to set a SSH private key if you have a private repository, see Git processor documentation
+      directory: 'build'
+      depth: 1
+  - type: processor.compress # Create a tar.gz archive of the Skaffold files
+    runIf: |
+      {% if command == 'create' %}1{% endif %}
+    output: release_archive
+    config:
+      glob: 'build/*.yaml'
+      format: 'tar.gz'
+      output: 'deploy-{{ req_random_uuid }}.tar.gz'
+      strip: 1
+      exclude:
+        - build/clouddeploy.yaml
+  - type: output.gcs # Upload created archive to GCS
+    runIf: |
+      {% if command == 'create' %}1{% endif %}
+    config:
+      bucket: '{{ buildBucket }}'
+      object: '{{ release_archive.filename }}'
+      file: '{{ release_archive.path }}'
+  - type: processor.clouddeploy # Create a new release
+    runIf: |
+      {% if command == 'create' %}1{% endif %}
+    output: create_release
+    config:
+      region: europe-west1
+      name: helloworld-app
+      mode: releases.create
+      releaseId: |
+        {{ (data.message.text|parse_string("/release {releaseId}")).releaseId }}
+      release: 
+        description: |
+          Release created by {{ data.message.sender.displayName }}.
+        skaffoldConfigUri: 'gs://{{ buildBucket }}/{{ release_archive.filename }}'
+        buildArtifacts: 
+          - image: helloworld-image
+            tag: gcr.io/cloudrun/hello
+  - type: processor.clouddeploy # Create the initial rollout to dev
+    runIf: |
+      {% if command == 'create' %}1{% endif %}
+    output: create_rollout
+    config:
+      region: europe-west1
+      name: helloworld-app
+      mode: releases.rollouts.create
+      releaseId: |
+        {{ create_release.name }}
+      rolloutId: |
+        {{ (create_release.name|parse_url).name }}-to-qsdev
+      rollout: 
+        description: |
+          Rollout created by {{ data.message.sender.displayName }}.
+        targetId: run-qsdev
+  - type: output.logger
+    runIf: |
+      {% if command == 'create' %}1{% endif %}
+    config:
+      message: |
+        Release: {{ create_release|json_encode }}
+        Rollout: {{ create_rollout|json_encode }}
+        
+  ## PROMOTE RELEASE (/promote)
+  - type: processor.clouddeploy
+    runIf: |
+      {% if command == 'promote' %}1{% endif %}
+    output: promote_release
+    variables:
+      releaseId: '{{ (data.message.text|parse_string("/promote {releaseId} to {targetId}")).releaseId }}'
+      targetId: '{{ (data.message.text|parse_string("/promote {releaseId} to {targetId}")).targetId }}'
+    config:
+      region: europe-west1
+      name: helloworld-app
+      mode: releases.rollouts.create
+      releaseId: |
+        {{ releaseId }}
+      rolloutId: |
+        {{ releaseId }}-to-{{ targetId }}
+      rollout: 
+        description: |
+          Promotion created by {{ data.message.sender.displayName }}.
+        targetId: '{{ targetId }}'
+  - type: output.logger
+    runIf: |
+      {% if command == 'promote' %}1{% endif %}
+    config:
+      message: |
+        {{ promote_release|json_encode }}
+
+  ## ROLLBACK RELEASE (/rollback)
+  - type: processor.clouddeploy
+    runIf: |
+      {% if command == 'rollback' %}1{% endif %}
+    output: rollback_release
+    variables:
+      releaseId: '{{ (data.message.text|parse_string("/rollback {releaseId} to {targetId}")).releaseId }}'
+      targetId: '{{ (data.message.text|parse_string("/rollback {releaseId} to {targetId}")).targetId }}'
+    config:
+      region: europe-west1
+      name: helloworld-app
+      mode: releases.rollouts.create
+      releaseId: |
+        {{ releaseId }}
+      rolloutId: |
+        {{ releaseId }}-rollback-to-{{ targetId }}
+      rollout: 
+        description: |
+          Rollback created by {{ data.message.sender.displayName }}.
+        targetId: '{{ targetId }}'
+  - type: output.logger
+    runIf: |
+      {% if command == 'rollback' %}1{% endif %}
+    config:
+      message: |
+        {{ rollback_release|json_encode }}
+
+  ## APPROVE RELEASE (/approve)
+  - type: processor.clouddeploy
+    runIf: |
+      {% if command == 'approve' %}1{% endif %}
+    output: approve_rollout
+    variables:
+      releaseId: '{{ (data.message.text|parse_string("/approve {releaseId} rollout {rolloutId}")).releaseId }}'
+      rolloutId: '{{ (data.message.text|parse_string("/approve {releaseId} rollout {rolloutId}")).rolloutId }}'
+    config:
+      region: europe-west1
+      name: helloworld-app
+      mode: releases.rollouts.approve
+      releaseId: |
+        {{ releaseId }}
+      rolloutId: |
+        {{ rolloutId }}
+  - type: output.logger
+    runIf: |
+      {% if command == 'approve' %}1{% endif %}
+    config:
+      message: |
+        {{ approve_rollout|json_encode }}
+
+  ## REJECT RELEASE (/reject)
+  - type: processor.clouddeploy
+    runIf: |
+      {% if command == 'reject' %}1{% endif %}
+    output: reject_rollout
+    variables:
+      releaseId: '{{ (data.message.text|parse_string("/reject {releaseId} rollout {rolloutId}")).releaseId }}'
+      rolloutId: '{{ (data.message.text|parse_string("/reject {releaseId} rollout {rolloutId}")).rolloutId }}'
+    config:
+      region: europe-west1
+      name: helloworld-app
+      mode: releases.rollouts.reject
+      releaseId: |
+        {{ releaseId }}
+      rolloutId: |
+        {{ rolloutId }}
+  - type: output.logger
+    runIf: |
+      {% if command == 'reject' %}1{% endif %}
+    config:
+      message: |
+        {{ reject_rollout|json_encode }}
+
+  ## NOTIFICATIONS 
+
+  # Notify on creation of a new release
+  - type: output.chat
+    runIf: |
+      {% if command == 'notify-release' %}1{% endif %}
+    config:
+      parent: "{{ chatSpace }}"
+      serviceAccountEmail: "{{ serviceAccountEmail }}"
+      message:
+        cardsV2:
+          - cardId: new-release
+            card:
+              header:
+                title: A new release has been created!
+                subtitle: Google Cloud Deploy
+                imageUrl: https://lh3.googleusercontent.com/9E-FDrxYH-Q8I-eLLDljpdbpXd5Gt3oJqH1eN1vkV168sdFt1C2DwnVXzTaJb7ruqU35_RTPKQ=e14-rw-lo-sc0xffffff-h260-w204
+                imageType: CIRCLE
+                imageAltText: Google Cloud Deploy                
+              sections:
+                - header: "Release details"
+                  collapsible: true
+                  uncollapsibleWidgetsCount: 4
+                  widgets:
+                    - decoratedText:
+                        topLabel: "Release pipeline"
+                        text: "{{ event.attributes.DeliveryPipelineId }}"
+                    - decoratedText:
+                        topLabel: "Release ID"
+                        text: "{{ event.attributes.ReleaseId }}"
+                    - decoratedText:
+                        topLabel: "Location"
+                        text: "{{ event.attributes.Location }}"
+                    - buttonList:
+                        buttons: 
+                          - text: View in console
+                            onClick:
+                              openLink:
+                                url: |
+                                  https://console.cloud.google.com/deploy/delivery-pipelines/{{ event.attributes.Location }}/{{ event.attributes.DeliveryPipelineId }}/releases/{{ event.attributes.ReleaseId }}/rollouts?project={{ event.attributes.ProjectId }}
+        #text: |
+        #  🚀 A new release has been created for *`{{ event.attributes.DeliveryPipelineId }}`*: `{{ event.attributes.ReleaseId }}` 🚀 
+  
+  # Notify for rollout of a release (eg. a deploy), appears in the clouddeploy-operations topic
+  - type: output.chat
+    runIf: |
+      {% if command == 'notify-rollout' %}1{% endif %}
+    config:
+      parent: "{{ chatSpace }}"
+      serviceAccountEmail: "{{ serviceAccountEmail }}"
+      message:
+        cardsV2:
+          - cardId: new-rollout
+            card:
+              header:
+                title: A rollout operation {{ statusToText[event.attributes.Action] }}.
+                subtitle: Google Cloud Deploy
+                imageUrl: https://lh3.googleusercontent.com/9E-FDrxYH-Q8I-eLLDljpdbpXd5Gt3oJqH1eN1vkV168sdFt1C2DwnVXzTaJb7ruqU35_RTPKQ=e14-rw-lo-sc0xffffff-h260-w204
+                imageType: CIRCLE
+                imageAltText: Google Cloud Deploy                
+              sections:
+                - header: "Deployment details"
+                  collapsible: true
+                  uncollapsibleWidgetsCount: 6
+                  widgets:
+                    - decoratedText:
+                        topLabel: "Target"
+                        text: "{{ event.attributes.TargetId }}"
+                    - decoratedText:
+                        topLabel: "Rollout ID"
+                        text: "{{ event.attributes.RolloutId }}"
+                    - decoratedText:
+                        topLabel: "Release pipeline"
+                        text: "{{ event.attributes.DeliveryPipelineId }}"
+                    - decoratedText:
+                        topLabel: "Release ID"
+                        text: "{{ event.attributes.ReleaseId }}"
+                    - decoratedText:
+                        topLabel: "Location"
+                        text: "{{ event.attributes.Location }}"
+                    - buttonList:
+                        buttons: 
+                          - text: View in console
+                            onClick:
+                              openLink:
+                                url: |
+                                  https://console.cloud.google.com/deploy/delivery-pipelines/{{ event.attributes.Location }}/{{ event.attributes.DeliveryPipelineId }}/releases/{{ event.attributes.ReleaseId }}/rollouts?project={{ event.attributes.ProjectId }}
+        #text: |
+        #  🚀 A new release has been created for *`{{ event.attributes.DeliveryPipelineId }}`*: `{{ event.attributes.ReleaseId }}` 🚀 
+  
+
+  # Notify that approval is required for a release
+  - type: output.chat
+    runIf: |
+      {% if command == 'notify-approval-required' %}1{% endif %}
+    config:
+      parent: "{{ chatSpace }}"
+      serviceAccountEmail: "{{ serviceAccountEmail }}"
+      message:
+        cardsV2:
+          - cardId: rollout-approval
+            card:
+              header:
+                title: A rollout requires approval.
+                subtitle: Google Cloud Deploy
+                imageUrl: https://lh3.googleusercontent.com/9E-FDrxYH-Q8I-eLLDljpdbpXd5Gt3oJqH1eN1vkV168sdFt1C2DwnVXzTaJb7ruqU35_RTPKQ=e14-rw-lo-sc0xffffff-h260-w204
+                imageType: CIRCLE
+                imageAltText: Google Cloud Deploy                
+              sections:
+                - header: "Rollout details"
+                  collapsible: true
+                  uncollapsibleWidgetsCount: 5
+                  widgets:
+                    - decoratedText:
+                        topLabel: "Target"
+                        text: "{{ event.attributes.TargetId }}"
+                    - decoratedText:
+                        topLabel: "Rollout ID"
+                        text: "{{ event.attributes.RolloutId }}"
+                    - decoratedText:
+                        topLabel: "Release pipeline"
+                        text: "{{ event.attributes.DeliveryPipelineId }}"
+                    - decoratedText:
+                        topLabel: "Release ID"
+                        text: "{{ event.attributes.ReleaseId }}"
+                    - decoratedText:
+                        topLabel: "Location"
+                        text: "{{ event.attributes.Location }}"
+        #text: |
+        #  🚀 A new rollout (`{{ event.attributes.RolloutId }}`) requires approval in *`{{ event.attributes.DeliveryPipelineId }}`*: `{{ event.attributes.ReleaseId }}` to `{{ event.attributes.TargetId }}` 🚀 
+
+
+  # Notify that approval was rejected
+  - type: output.chat
+    runIf: |
+      {% if command == 'notify-approval-rejected' %}1{% endif %}
+    config:
+      parent: "{{ chatSpace }}"
+      serviceAccountEmail: "{{ serviceAccountEmail }}"
+      message:
+        cardsV2:
+          - cardId: rollout-rejection
+            card:
+              header:
+                title: A rollout was rejected.
+                subtitle: Google Cloud Deploy
+                imageUrl: https://lh3.googleusercontent.com/9E-FDrxYH-Q8I-eLLDljpdbpXd5Gt3oJqH1eN1vkV168sdFt1C2DwnVXzTaJb7ruqU35_RTPKQ=e14-rw-lo-sc0xffffff-h260-w204
+                imageType: CIRCLE
+                imageAltText: Google Cloud Deploy                
+              sections:
+                - header: "Rollout details"
+                  collapsible: true
+                  uncollapsibleWidgetsCount: 5
+                  widgets:
+                    - decoratedText:
+                        topLabel: "Target"
+                        text: "{{ event.attributes.TargetId }}"
+                    - decoratedText:
+                        topLabel: "Rollout ID"
+                        text: "{{ event.attributes.RolloutId }}"
+                    - decoratedText:
+                        topLabel: "Release pipeline"
+                        text: "{{ event.attributes.DeliveryPipelineId }}"
+                    - decoratedText:
+                        topLabel: "Release ID"
+                        text: "{{ event.attributes.ReleaseId }}"
+                    - decoratedText:
+                        topLabel: "Location"
+                        text: "{{ event.attributes.Location }}"
+        #text: |
+        #  🚀 A rollout (`{{ event.attributes.RolloutId }}`) in *`{{ event.attributes.DeliveryPipelineId }}`* for release `{{ event.attributes.ReleaseId }}` to `{{ event.attributes.TargetId }}` was rejected. 🚀 
+
+  # Notify that approval was approved
+  - type: output.chat
+    runIf: |
+      {% if command == 'notify-approval-approved' %}1{% endif %}
+    config:
+      parent: "{{ chatSpace }}"
+      serviceAccountEmail: "{{ serviceAccountEmail }}"
+      message:
+        cardsV2:
+          - cardId: rollout-approved
+            card:
+              header:
+                title: A rollout was approved!
+                subtitle: Google Cloud Deploy
+                imageUrl: https://lh3.googleusercontent.com/9E-FDrxYH-Q8I-eLLDljpdbpXd5Gt3oJqH1eN1vkV168sdFt1C2DwnVXzTaJb7ruqU35_RTPKQ=e14-rw-lo-sc0xffffff-h260-w204
+                imageType: CIRCLE
+                imageAltText: Google Cloud Deploy                
+              sections:
+                - header: "Rollout details"
+                  collapsible: true
+                  uncollapsibleWidgetsCount: 5
+                  widgets:
+                    - decoratedText:
+                        topLabel: "Target"
+                        text: "{{ event.attributes.TargetId }}"
+                    - decoratedText:
+                        topLabel: "Rollout ID"
+                        text: "{{ event.attributes.RolloutId }}"
+                    - decoratedText:
+                        topLabel: "Release pipeline"
+                        text: "{{ event.attributes.DeliveryPipelineId }}"
+                    - decoratedText:
+                        topLabel: "Release ID"
+                        text: "{{ event.attributes.ReleaseId }}"
+                    - decoratedText:
+                        topLabel: "Location"
+                        text: "{{ event.attributes.Location }}"
+        #text: |
+        #  🚀 A rollout (`{{ event.attributes.RolloutId }}`) in *`{{ event.attributes.DeliveryPipelineId }}`* for release `{{ event.attributes.ReleaseId }}` to `{{ event.attributes.TargetId }}` was approved. 🚀 
+
+canFail: true
+onError:
+  type: output.chat
+  config:
+    parent: "{{ chatSpace }}"
+    serviceAccountEmail: "{{ serviceAccountEmail }}"
+    message:
+      text: |
+        Sorry, something went wrong. The error was:
+        ```
+        {{ exception }}
+        ```
