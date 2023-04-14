@@ -21,8 +21,9 @@ import google_auth_httplib2
 import google.auth
 from googleapiclient import http
 from google.cloud import resourcemanager_v3
+import json_fix
 
-PUBSUB2INBOX_VERSION = '1.4.6'
+PUBSUB2INBOX_VERSION = '1.5.2'
 
 
 class NoCredentialsException(Exception):
@@ -36,6 +37,14 @@ class Context(object):
         self.timestamp = timestamp
         self.event_type = eventType
         self.resource = resource
+
+    def __json__(self):
+        return "{\"event_id\": \"%s\", \"timestamp\": \"%s\", \"event_type\": \"%s\", \"resource\": \"%s\"}" % (
+            self.event_id,
+            self.timestamp,
+            self.event_type,
+            self.resource,
+        )
 
     def __str__(self):
         return "{event_id: %s, timestamp: %s, event_type: %s, resource: %s}" % (
@@ -205,8 +214,8 @@ class BaseHelper:
                             _var[k][idx] = self._jinja_expand_dict_all(lv)
                         if isinstance(lv, str):
                             _var[k][idx] = self._jinja_expand_string(lv)
-                else:
-                    _var[k] = self._jinja_expand_dict_all(_var[k])
+            else:
+                _var[k] = self._jinja_expand_dict_all(_var[k])
         return _var
 
     def _jinja_expand_list(self, _var, _tpl='config'):

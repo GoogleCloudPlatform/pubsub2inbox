@@ -154,6 +154,9 @@
             * [`BaseHelper.project_number_cache`](helpers.md#helpers.base.BaseHelper.project_number_cache)
 
 
+        * [`Context`](helpers.md#helpers.base.Context)
+
+
         * [`NoCredentialsException`](helpers.md#helpers.base.NoCredentialsException)
 
 
@@ -182,6 +185,9 @@
 
 
     * [`InvalidMessageFormatException`](main.md#main.InvalidMessageFormatException)
+
+
+    * [`MalformedGlobalsException`](main.md#main.MalformedGlobalsException)
 
 
     * [`MalformedTypeInPipelineException`](main.md#main.MalformedTypeInPipelineException)
@@ -293,6 +299,18 @@
 
 
         * [`InvalidJobOptionException`](output.md#output.bigquery.InvalidJobOptionException)
+
+
+    * [output.chat module](output.md#module-output.chat)
+
+
+        * [`ChatOutput`](output.md#output.chat.ChatOutput)
+
+
+            * [`ChatOutput.context`](output.md#output.chat.ChatOutput.context)
+
+
+            * [`ChatOutput.output()`](output.md#output.chat.ChatOutput.output)
 
 
     * [output.delay module](output.md#module-output.delay)

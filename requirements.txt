@@ -89,6 +89,10 @@ charset-normalizer==2.0.12 \
     --hash=sha256:2857e29ff0d34db842cd7ca3230549d1a697f96ee6d3fb071cfa6c7393832597 \
     --hash=sha256:6881edbebdb17b39b4eaaa821b438bf6eddffb4468cf344f09f89def34a8b1df
     # via requests
+click==7.1.2 \
+    --hash=sha256:d2b5255c7c6349bc1bd1e59e08cd12acbbd63ce649f2588755783aa94dfb6b1a \
+    --hash=sha256:dacca89f4bfadd5de3d7489b7c8a566eee0d3676333fbb50030263894c38c0dc
+    # via flask
 cryptography==40.0.1 \
     --hash=sha256:0a4e3406cfed6b1f6d6e87ed243363652b2586b2d917b0609ca4f97072994405 \
     --hash=sha256:1e0af458515d5e4028aad75f3bb3fe7a31e46ad920648cd59b64d3da842e4356 \
@@ -162,6 +166,10 @@ falcon==3.1.1 \
 filemagic==1.6 \
     --hash=sha256:e684359ef40820fe406f0ebc5bf8a78f89717bdb7fed688af68082d991d6dbf3
     # via -r requirements.txt.in
+flask==1.1.4 \
+    --hash=sha256:0fbeb6180d383a9186d0d6ed954e0042ad9f18e0e8de088b2b419d526927d196 \
+    --hash=sha256:c34f04500f2cbbea882b1acb02002ad6fe6b7ffa64a6164577995657f50aed22
+    # via -r requirements.txt.in
 google-api-core[grpc]==1.34.0 \
     --hash=sha256:6fb380f49d19ee1d09a9722d0379042b7edb06c0112e4796c7a395078a043e71 \
     --hash=sha256:7421474c39d396a74dfa317dddbc69188f2336835f526087c7648f91105e32ff
@@ -232,9 +240,9 @@ google-cloud-logging==2.7.2 \
     --hash=sha256:1ecc36a5a232b5561ac067023ad27bdea83f40cada4190e141a8bb802644bd0a \
     --hash=sha256:a35707c44afb940fa6a1a07ba20014a0417257ff64a477e7d44abcb86b5b86a2
     # via google-cloud-error-reporting
-google-cloud-pubsub==2.8.0 \
-    --hash=sha256:255ec64e520a51547d6bf9e2574e4ddf08d295c87cffc689898414ee870ae421 \
-    --hash=sha256:2653c11615480141d359938a4efe9d131425171ec9cec26b6bf1c1231e1ac470
+google-cloud-pubsub==2.16.0 \
+    --hash=sha256:587da7d535ca858ceeed7036205355e5a6dd3e44ea4abc96f4e50d1abfd8843b \
+    --hash=sha256:e41ec9635cc68dbd238f572f295b3d0bae6340c66ba31a70dfb890950ab33c2b
     # via -r requirements.txt.in
 google-cloud-recommender==2.3.4 \
     --hash=sha256:4912e90cb2bf171a1758688967201d66af5d8afe2896d71fd82c87169e375029 \
@@ -328,9 +336,9 @@ google-resumable-media==2.4.0 \
     # via
     #   google-cloud-bigquery
     #   google-cloud-storage
-googleapis-common-protos==1.58.0 \
-    --hash=sha256:c727251ec025947d545184ba17e3578840fc3a24a0516a020479edab660457df \
-    --hash=sha256:ca3befcd4580dab6ad49356b46bf165bb68ff4b32389f028f1abd7c10ab9519a
+googleapis-common-protos[grpc]==1.59.0 \
+    --hash=sha256:4168fcb568a826a52f23510412da405abd93f4d23ba544bb68d943b14ba3cb44 \
+    --hash=sha256:b287dc48449d1d41af0c69f4ea26242b5ae4c3d7249a38b0984c86a4caffff1f
     # via
     #   -r requirements.txt.in
     #   google-api-core
@@ -402,7 +410,9 @@ grpcio==1.51.1 \
 grpcio-status==1.41.1 \
     --hash=sha256:640d4f7e2bba3647711e9e88988276fc786ae3b00ace4ca6339655789205c1d3 \
     --hash=sha256:6c37cf353902143e22c69a9c44a8a584ebbe84f373fba9e298679e6db63421f4
-    # via google-api-core
+    # via
+    #   google-api-core
+    #   google-cloud-pubsub
 httplib2==0.21.0 \
     --hash=sha256:987c8bb3eb82d3fa60c68699510a692aa2ad9c4bd4f123e51dfb1488c14cdd01 \
     --hash=sha256:fc144f091c7286b82bec71bdbd9b27323ba709cc612568d3000893bfd9cb4b34
@@ -414,9 +424,19 @@ idna==3.4 \
     --hash=sha256:814f528e8dead7d329833b91c5faa87d60bf71824cd12a7530b5526063d02cb4 \
     --hash=sha256:90b77e79eaa3eba6de819a0c442c0b4ceefc341a7a2ab77d7562bf49f425c5c2
     # via requests
+itsdangerous==1.1.0 \
+    --hash=sha256:321b033d07f2a4136d3ec762eac9f16a10ccd60f53c0c91af90217ace7ba1f19 \
+    --hash=sha256:b12271b2047cb23eeb98c8b5622e2e5c5e9abd9784a153e9d8ef9cb4dd09d749
+    # via flask
 jinja2==2.11.3 \
     --hash=sha256:03e47ad063331dd6a3f04a43eddca8a966a26ba0c5b7207a9a9e4e08f1b29419 \
     --hash=sha256:a6d58433de0ae800347cab1fa3043cebbabe8baa9d29e668f1c768cb87a333c6
+    # via
+    #   -r requirements.txt.in
+    #   flask
+json-fix==0.5.2 \
+    --hash=sha256:5e65c8fd5fc674dd7141374968175c660d1af20481ca0d936a16a1633377a583 \
+    --hash=sha256:6d85ba545622603e2662afbd5cdb3b4af1f2992aa473b76cf58d7ed768e0efc8
     # via -r requirements.txt.in
 libcst==0.4.9 \
     --hash=sha256:01786c403348f76f274dbaf3888ae237ffb73e6ed6973e65eba5c1fc389861dd \
@@ -449,9 +469,7 @@ libcst==0.4.9 \
     --hash=sha256:f4487608258109f774300466d4ca97353df29ae6ac23d1502e13e5509423c9d5 \
     --hash=sha256:f6ce794483d4c605ef0f5b199a49fb6996f9586ca938b7bfef213bd13858d7ab \
     --hash=sha256:f9679177391ccb9b0cdde3185c22bf366cb672457c4b7f4031fcb3b5e739fbd6
-    # via
-    #   google-cloud-pubsub
-    #   google-cloud-secret-manager
+    # via google-cloud-secret-manager
 lxml==4.9.1 \
     --hash=sha256:04da965dfebb5dac2619cb90fcf93efdb35b3c6994fea58a157a834f2f94b318 \
     --hash=sha256:0538747a9d7827ce3e16a8fdd201a99e661c7dee3c96c885d8ecba3c35d1032c \
@@ -625,7 +643,6 @@ packaging==21.3 \
     #   google-cloud-billing-budgets
     #   google-cloud-error-reporting
     #   google-cloud-iam
-    #   google-cloud-pubsub
     #   google-cloud-recommender
     #   google-cloud-secret-manager
 parsedatetime==2.6 \
@@ -681,6 +698,7 @@ protobuf==3.20.3 \
     #   google-cloud-audit-log
     #   google-cloud-bigquery
     #   google-cloud-logging
+    #   google-cloud-pubsub
     #   google-cloud-resource-manager
     #   google-cloud-storage
     #   googleapis-common-protos
@@ -841,3 +859,7 @@ waitress==2.1.2 \
     --hash=sha256:7500c9625927c8ec60f54377d590f67b30c8e70ef4b8894214ac6e4cad233d2a \
     --hash=sha256:780a4082c5fbc0fde6a2fcfe5e26e6efc1e8f425730863c04085769781f51eba
     # via -r requirements.txt.in
+werkzeug==1.0.1 \
+    --hash=sha256:2de2a5db0baeae7b2d2664949077c2ac63fbd16d98da0ff71837f7d1dea3fd43 \
+    --hash=sha256:6c80b1e5ad3665290ea39320b91e1be1e0d5f60652b964a3070216de83d2e47c
+    # via flask

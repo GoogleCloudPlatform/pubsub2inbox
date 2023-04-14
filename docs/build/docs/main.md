@@ -13,6 +13,10 @@ Bases: `object`
 Bases: `Exception`
 
 
+### _exception_ main.MalformedGlobalsException()
+Bases: `Exception`
+
+
 ### _exception_ main.MalformedTypeInPipelineException()
 Bases: `Exception`
 

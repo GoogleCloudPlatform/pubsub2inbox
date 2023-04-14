@@ -15,7 +15,7 @@ Bases: [`BaseHelper`](helpers.md#helpers.base.BaseHelper)
 
 #### config(_ = Non_ )
 
-#### context(_: Contex_ )
+#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### data(_ = Non_ )
 
@@ -52,13 +52,44 @@ BigQuery output processors can write data into BigQuery tables.
 
 
 
-#### context(_: Contex_ )
+#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### output()
 
 ### _exception_ output.bigquery.InvalidJobOptionException()
 Bases: `Exception`
 
+## output.chat module
+
+
+### _class_ output.chat.ChatOutput(config, output_config, jinja_environment, data, event, context)
+Bases: `Output`
+
+Sends message to a Google Chat space.
+
+
+* **Parameters**
+
+    
+    * **serviceAccountEmail** (*str*) – A service account email for which a scoped token will be requested.
+    You should invite this service account to the space. The Cloud Functions has to has Service
+    Account Token Creator to this service account. Can also be specified via SERVICE_ACCOUNT
+    environment variable.
+
+
+    * **parent** (*str*) – A Google Chat space (spaces/XYZ).
+
+
+    * **message** (*dict*) – A Message object (see: [https://developers.google.com/chat/api/reference/rest/v1/spaces.messages#Message](https://developers.google.com/chat/api/reference/rest/v1/spaces.messages#Message)).
+
+
+    * **project** (*str**, **optional*) – Google Cloud project to issue Chat API calls against.
+
+
+
+#### context(_: [Context](helpers.md#helpers.base.Context_ )
+
+#### output()
 ## output.delay module
 
 
@@ -66,7 +97,7 @@ Bases: `Exception`
 Bases: `Output`
 
 
-#### context(_: Contex_ )
+#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### output()
 ## output.gcs module
@@ -76,7 +107,7 @@ Bases: `Output`
 Bases: `Output`
 
 
-#### context(_: Contex_ )
+#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### output()
 ## output.gcscopy module
@@ -86,7 +117,7 @@ Bases: `Output`
 Bases: `Output`
 
 
-#### context(_: Contex_ )
+#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### output()
 ## output.groupssettings module
@@ -96,7 +127,7 @@ Bases: `Output`
 Bases: `Output`
 
 
-#### context(_: Contex_ )
+#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### output()
 ## output.logger module
@@ -106,7 +137,7 @@ Bases: `Output`
 Bases: `Output`
 
 
-#### context(_: Contex_ )
+#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### output()
 ## output.mail module
@@ -132,7 +163,7 @@ Bases: `Exception`
 Bases: `Output`
 
 
-#### context(_: Contex_ )
+#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### embed_images(config)
 
@@ -164,7 +195,7 @@ Bases: `Output`
 
 #### callback(future)
 
-#### context(_: Contex_ )
+#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### output()
 ## output.scc module
@@ -174,7 +205,7 @@ Bases: `Output`
 Bases: `Output`
 
 
-#### context(_: Contex_ )
+#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### output()
 ## output.test module
@@ -188,7 +219,7 @@ Bases: `Exception`
 Bases: `Output`
 
 
-#### context(_: Contex_ )
+#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### output()
 ## output.twilio module
@@ -198,7 +229,7 @@ Bases: `Output`
 Bases: `Output`
 
 
-#### context(_: Contex_ )
+#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### output()
 ## output.webhook module
@@ -208,7 +239,7 @@ Bases: `Output`
 Bases: `Output`
 
 
-#### context(_: Contex_ )
+#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### output()
 ## Module contents

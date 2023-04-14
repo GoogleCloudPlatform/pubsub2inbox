@@ -1,0 +1,16 @@
+[{
+    "ackId": "UAYWLF1GSFE3GQhoUQ5PXiM_NSAoRREEC08CKF15MEo1QVl3Aj4NGXJ9YXRiXRRQCxBXd11YEQ1iXE5EB0nv_KbsV1dKXRcHAEJQd1pYHw9vWF1zAXnIouu0tvPVZwk9Oqe2qs5tO5yJl9hEZiI9XhJLLD5-IDBFQV5AEkwrBURJUytDCypYEU4EISE-MD5FU0Q",
+    "message": {
+      "attributes": {
+        "Action": "Start",
+        "DeliveryPipelineId": "helloworld-app",
+        "Location": "europe-west1",
+        "ProjectNumber": "1041277533937",
+        "ReleaseId": "test-release-002",
+        "Resource": "projects/1041277533937/locations/europe-west1/deliveryPipelines/helloworld-app/releases/test-release-002",
+        "ResourceType": "Release"
+      },
+      "messageId": "7462739534274166",
+      "publishTime": "2023-04-13T12:36:46.504Z"
+    }
+}]

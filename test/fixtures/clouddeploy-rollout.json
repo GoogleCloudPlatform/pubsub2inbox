@@ -1,0 +1,24 @@
+[
+  {
+    "ackId": "RFAGFixdRkhRNxkIaFEOT14jPzUgKEURBAtPAihdeTBKPUFYcQc-DRlyfWF0Yl0UUAsQBSoOXxENYlxORAdJpKun7FdXSl0XBwBNUXxeXB0NbVxVcwJ5yKLrtLbz1WcJOjrs4avObTuArMBCZiI9XhJLLD5-IDBFQV5AEkwrBURJUytDCypYEU4EISE-MD5FUw",
+    "message": {
+      "attributes": {
+        "Action": "Succeed",
+        "DeliveryPipelineId": "helloworld-app",
+        "JobId": "deploy",
+        "JobRunId": "280f5f57-5157-4ae3-8adc-072183e702ef",
+        "JobType": "Deploy",
+        "Location": "europe-west1",
+        "PhaseId": "stable",
+        "ProjectNumber": "1041277533937",
+        "ReleaseId": "test-release-002",
+        "Resource": "projects/1041277533937/locations/europe-west1/deliveryPipelines/helloworld-app/releases/test-release-002/rollouts/test-release-002-to-run-qsdev-0001/jobRuns/280f5f57-5157-4ae3-8adc-072183e702ef",
+        "ResourceType": "JobRun",
+        "RolloutId": "test-release-002-to-run-qsdev-0001",
+        "TargetId": "run-qsdev"
+      },
+      "messageId": "7462822176050965",
+      "publishTime": "2023-04-13T12:37:32.714Z"
+    }
+  }
+]
