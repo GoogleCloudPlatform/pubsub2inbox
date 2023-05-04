@@ -16,3 +16,19 @@ import re
 
 def regex_replace(s, find, replace):
     return re.sub(find, replace, s)
+
+
+def regex_match(s, find):
+    match = re.match(find, s)
+    if match:
+        return match.groupdict()
+    else:
+        return None
+
+
+def regex_search(s, find):
+    match = re.search(find, s)
+    if match:
+        return match.groupdict()
+    else:
+        return None

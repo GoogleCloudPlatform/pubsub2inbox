@@ -11,7 +11,7 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-from .regex import regex_replace
+from .regex import regex_replace, regex_match, regex_search
 from .lists import split, index, merge_dict
 from .strings import add_links, urlencode, generate_signed_url, json_encode, json_decode, b64decode, csv_encode, re_escape, html_table_to_xlsx, make_list, read_gcs_object, filemagic, hash_string, yaml_encode, yaml_decode
 from .date import strftime, utc_strftime, recurring_date
@@ -26,6 +26,8 @@ def get_jinja_tests():
 def get_jinja_filters():
     return {
         'regex_replace': regex_replace,
+        'regex_match': regex_match,
+        'regex_search': regex_search,
         'split': split,
         'index': index,
         'merge_dict': merge_dict,

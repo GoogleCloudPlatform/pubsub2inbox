@@ -1,0 +1,89 @@
+#   Copyright 2023 Google LLC
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+# This is an example how to interact with GitHub.
+#
+# You'll need a properly scoped GitHub access token.
+
+globals:
+  githubToken: 'sample token'
+  repository: 'your-org/your-repo'
+
+pipeline:
+  - type: processor.genericjson
+  - type: processor.github
+    output: github_issues
+    config:
+      githubToken: '{{ githubToken }}'
+      repository: '{{ repository }}'
+      mode: issues.list
+  - type: output.logger
+    config:
+      message: "Github issues: {{ github_issues|json_encode }}"
+  - type: processor.github
+    output: github_issue
+    config:
+      githubToken: '{{ githubToken }}'
+      repository: '{{ repository }}'
+      mode: issues.get
+      issueId: '{{ (github_issues|first).number }}'
+  - type: output.logger
+    config:
+      message: "Github issue {{ (github_issues|first).number }}: {{ github_issue|json_encode }}"
+  - type: processor.github
+    output: github_issue_create
+    config:
+      githubToken: '{{ githubToken }}'
+      repository: '{{ repository }}'
+      mode: issues.create
+      issue:
+        title: "Automatically created issue"
+        body: |
+          We have create an issue for you. How about that!
+  - type: output.logger
+    config:
+      message: "Github created issue: {{ github_issue_create|json_encode }}"
+  - type: processor.github
+    output: github_comments
+    config:
+      githubToken: '{{ githubToken }}'
+      repository: '{{ repository }}'
+      mode: comments.list
+      issueId: '{{ (github_issues|first).number }}'
+  - type: output.logger
+    config:
+      message: "Github comments:{{ github_comments|json_encode }}"
+  - type: processor.github
+    output: github_comment
+    config:
+      githubToken: '{{ githubToken }}'
+      repository: '{{ repository }}'
+      mode: comments.get
+      issueId: '{{ (github_issues|first).number }}'
+      commentId: '{{ (github_comments|first).id }}'
+  - type: output.logger
+    config:
+      message: "Github comment: {{ github_comment|json_encode }}"
+  - type: processor.github
+    output: github_comment_create
+    config:
+      githubToken: '{{ githubToken }}'
+      repository: '{{ repository }}'
+      mode: comments.create
+      issueId: '{{ (github_issues|first).number }}'
+      comment: |
+        This is a comment that was automatically created.
+  - type: output.logger
+    config:
+      message: "Github comment created: {{ github_comment_create|json_encode }}"
