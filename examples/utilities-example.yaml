@@ -1,0 +1,72 @@
+#   Copyright 2023 Google LLC
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+# Examples of various utilities you can use, such as downloading objects,
+# checking out Git repositories.
+
+pipeline:
+  - type: processor.genericjson
+  - type: processor.git
+    output: git
+    config:
+      url: 'git@github.com:your-org/your-repo.git'
+      directory: 'your-repo'
+      # depth: 1
+      # branch: your-branch
+      privateKey: 
+        # You can also use the `secret` processor to fetch the private key from a Secret Manager secret,
+        # however, the function configuration is in a Secret Manager secret by itself.
+        # You could also retrieve it from GCS using read_gcs_object.
+        key: 'insert private key here'
+  - type: output.logger
+    config:
+      message: "Clone repository: {{ git|json_encode }}"
+  - type: processor.download
+    output: readme
+    config:
+      url: 'https://postman-echo.com/get'
+      filename: 'path/to/response-headers.txt'
+      headers: 
+        X-Custom-Header: custom-value
+  - type: output.logger
+    config:
+      message: "Downloaded file: {{ readme|json_encode }}"
+  - type: output.logger
+    config:
+      message: "File contents: {{ readme.filename|read_file }}"
+  - type: processor.download
+    output: ftp
+    config:
+      url: 'ftp://ftp.tudelft.nl/pub/Linux/centos.org/timestamp.txt'
+  - type: output.logger
+    config:
+      message: "File contents: {{ ftp.filename|read_file }}"
+  - type: processor.download
+    output: sftp
+    config:
+      url: 'sftp://username@ssh.server:22/filename.txt'
+      # Unquote to enforce host key checking.
+      #hostKey:
+      #  host: '[ssh.server]:22'
+      #  keytype: ed25519
+      #  key: AAAA.....x
+      privateKey: 
+        # You can also use the `secret` processor to fetch the private key from a Secret Manager secret,
+        # however, the function configuration is in a Secret Manager secret by itself.
+        # You could also retrieve it from GCS using read_gcs_object.
+        key: 'insert private key here'
+        type: ed25519 # or rsa, ecdsa
+  - type: output.logger
+    config:
+      message: "Downloaded file: {{ sftp|json_encode }}"

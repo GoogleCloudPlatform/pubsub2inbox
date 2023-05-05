@@ -36,6 +36,14 @@ processors.cai module
    :undoc-members:
    :show-inheritance:
 
+processors.containeranalysis module
+-----------------------------------
+
+.. automodule:: processors.containeranalysis
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 processors.directory module
 ---------------------------
 
@@ -52,10 +60,34 @@ processors.dns module
    :undoc-members:
    :show-inheritance:
 
+processors.download module
+--------------------------
+
+.. automodule:: processors.download
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 processors.genericjson module
 -----------------------------
 
 .. automodule:: processors.genericjson
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+processors.git module
+---------------------
+
+.. automodule:: processors.git
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+processors.github module
+------------------------
+
+.. automodule:: processors.github
    :members:
    :undoc-members:
    :show-inheritance:

@@ -22,8 +22,10 @@ import google.auth
 from googleapiclient import http
 from google.cloud import resourcemanager_v3
 import json_fix
+import tempfile
 
-PUBSUB2INBOX_VERSION = '1.5.2'
+PUBSUB2INBOX_VERSION = '1.6.0'
+TEMPORARY_DIRECTORY = None
 
 
 class NoCredentialsException(Exception):
@@ -81,6 +83,15 @@ class BaseHelper:
     def __init__(self, jinja_environment):
         self.jinja_environment = jinja_environment
         self.logger = logging.getLogger('pubsub2inbox')
+
+    def _init_tempdir(self):
+        global TEMPORARY_DIRECTORY
+        if not TEMPORARY_DIRECTORY:
+            TEMPORARY_DIRECTORY = tempfile.TemporaryDirectory(
+                ignore_cleanup_errors=True)
+            self.logger.debug('Created temporary directory: %s' %
+                              (TEMPORARY_DIRECTORY.name))
+            os.chdir(TEMPORARY_DIRECTORY.name)
 
     def _get_user_agent(self):
         return get_user_agent()

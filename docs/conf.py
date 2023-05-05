@@ -22,7 +22,7 @@ author = 'Google Professional Services'
 release = '1.4.1'
 
 extensions = [
-    'sphinxcontrib.napoleon', 'sphinx_markdown_builder', 'sphinx.ext.autodoc',
+    'sphinx.ext.napoleon', 'sphinx_markdown_builder', 'sphinx.ext.autodoc',
     'sphinx_autodoc_typehints', 'sphinx.ext.autosummary'
 ]
 

@@ -37,7 +37,11 @@ Bases: `Exception`
 ## filters.regex module
 
 
+### filters.regex.regex_match(s, find)
+
 ### filters.regex.regex_replace(s, find, replace)
+
+### filters.regex.regex_search(s, find)
 ## filters.strings module
 
 
@@ -76,6 +80,10 @@ Returns a signed URL to a GCS object. URL should be in format “gs://bucket/fil
 ### filters.strings.make_list(s)
 
 ### filters.strings.re_escape(s)
+
+### filters.strings.read_file(filename)
+
+### filters.strings.read_file_b64(filename)
 
 ### filters.strings.read_gcs_object(url, start=None, end=None)
 

@@ -37,6 +37,7 @@ Out of the box, you'll have the following functionality:
 | Resource Manager              | List and search for GCP projects.                                                                                                                                                                                                             | [GCP projects](examples/projects-example.yaml)                                                                                                                                                                                                                                                                                                 |
 | Secret Manager                | Fetch secrets from Secret Manager.                                                                                                                                                                                                            | [Retrieve secret](examples/secret-example.yaml)                                                                                                                                                                                                                                                                                                |
 | Scripting                     | Run any binary or shell script and parse the output (supports JSON, YAML, CSV, etc.)                                                                                                                                                          | [Shell processor](examples/shellscript-config.yaml)                                                                                                                                                                                                                                                                                            |
+| Utilities                     | Download files using HTTP, FTP or SFTP. Clone Git repositories.                                                                                                                                                                               | [Utilities](examples/utilities-config.yaml)                                                                                                                                                                                                                                                                                                    |
 | Transcoder                    | Transcode video and audio using [Transcoder API](https://cloud.google.com/transcoder).                                                                                                                                                        | [Transcoding a video](examples/transcode-example.yaml)                                                                                                                                                                                                                                                                                         |
 | Messaging                     | Send messages to Google Chat or SMS messages.                                                                                                                                                                                                 | [Send SMS messages using Twilio](examples/twilio-example.yaml)<br />[Cloud Deploy notifications to Google Chat](examples/chat-example.yaml)                                                                                                                                                                                                    |
 |                               |
@@ -64,6 +65,9 @@ Available input processors are:
   - [transcode.py](processors/transcode.py): Transcode media using Transcoder API.
   - [dns.py](processors/dns.py): Issue change requests to Cloud DNS.
   - [secret.py](processor/secret.py): Fetches (additional) secrets from Secret Manager.
+  - [github.py](processor/github.py): List, get or create issues and comments in GitHub.
+  - [download.py](processor/download.py): Download files using HTTP, FTP and SFTP.
+  - [git.py](processor/git.py): Clone repositories via HTTP or SSH.
 
 For full documentation of permissions, processor input and output parameters, see [PROCESSORS.md](PROCESSORS.md).
 
@@ -92,6 +96,7 @@ Available output processors are:
   - [twilio.py](output/twilio.py): Sends SMS messages via Twilio API.
   - [groupssettings.py](output/groupssettings.py): Updates Google Groups settings.
   - [chat.py](output/chat.py): Send messages to Google Chat.
+  - [delay.py](output/delay.py): Delay processing by pausing execution for specified time.
 
 Please note that the output processors have some IAM requirements to be able to
 pull information from GCP:
