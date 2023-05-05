@@ -219,9 +219,9 @@ google-cloud-audit-log==0.2.4 \
     --hash=sha256:29ed77fe0b21eb2d5dfb998edb59ee2adc65fea5d5ac9fcf17828d60d25b58b3 \
     --hash=sha256:aabe5543671e4f8a9c7a4c0e3ea9a87ba2ba2b96f9ffad6faa02209900e1f308
     # via google-cloud-logging
-google-cloud-bigquery==2.34.4 \
-    --hash=sha256:14a4f996411556757b5d32f11a0ebf34257d6fc5c60d53fb66e674a63a7bf9ca \
-    --hash=sha256:7c6dc11e6bd65a5981a8bc18a472e6132e9aaa1fa5363f1680a9425dd3868660
+google-cloud-bigquery==3.9.0 \
+    --hash=sha256:39b055087a8471b0ebab7a4bf54decda845b6087b104ef0be078ced1e1dccb26 \
+    --hash=sha256:c7b539c6a020cd662fef950b3367ab1c33a4ba07e008bccf2e9cb09a516d0de9
     # via -r requirements.txt.in
 google-cloud-billing-budgets==1.4.4 \
     --hash=sha256:2bfc5e607a2c9e2b11b13ed9809d385e3e74d96c523949aa6c2ffd2206c9b27c \
