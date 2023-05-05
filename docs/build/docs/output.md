@@ -15,7 +15,7 @@ Bases: [`BaseHelper`](helpers.md#helpers.base.BaseHelper)
 
 #### config(_ = Non_ )
 
-#### context(_: [Context](helpers.md#helpers.base.Context_ )
+#### context(_: [`Context`](helpers.md#helpers.base.Context_ )
 
 #### data(_ = Non_ )
 
@@ -52,8 +52,6 @@ BigQuery output processors can write data into BigQuery tables.
 
 
 
-#### context(_: [Context](helpers.md#helpers.base.Context_ )
-
 #### output()
 
 ### _exception_ output.bigquery.InvalidJobOptionException()
@@ -87,8 +85,6 @@ Sends message to a Google Chat space.
 
 
 
-#### context(_: [Context](helpers.md#helpers.base.Context_ )
-
 #### output()
 ## output.delay module
 
@@ -96,8 +92,6 @@ Sends message to a Google Chat space.
 ### _class_ output.delay.DelayOutput(config, output_config, jinja_environment, data, event, context)
 Bases: `Output`
 
-
-#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### output()
 ## output.gcs module
@@ -107,8 +101,6 @@ Bases: `Output`
 Bases: `Output`
 
 
-#### context(_: [Context](helpers.md#helpers.base.Context_ )
-
 #### output()
 ## output.gcscopy module
 
@@ -116,8 +108,6 @@ Bases: `Output`
 ### _class_ output.gcscopy.GcscopyOutput(config, output_config, jinja_environment, data, event, context)
 Bases: `Output`
 
-
-#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### output()
 ## output.groupssettings module
@@ -127,8 +117,6 @@ Bases: `Output`
 Bases: `Output`
 
 
-#### context(_: [Context](helpers.md#helpers.base.Context_ )
-
 #### output()
 ## output.logger module
 
@@ -136,8 +124,6 @@ Bases: `Output`
 ### _class_ output.logger.LoggerOutput(config, output_config, jinja_environment, data, event, context)
 Bases: `Output`
 
-
-#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### output()
 ## output.mail module
@@ -162,8 +148,6 @@ Bases: `Exception`
 ### _class_ output.mail.MailOutput(config, output_config, jinja_environment, data, event, context)
 Bases: `Output`
 
-
-#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### embed_images(config)
 
@@ -195,8 +179,6 @@ Bases: `Output`
 
 #### callback(future)
 
-#### context(_: [Context](helpers.md#helpers.base.Context_ )
-
 #### output()
 ## output.scc module
 
@@ -204,8 +186,6 @@ Bases: `Output`
 ### _class_ output.scc.SccOutput(config, output_config, jinja_environment, data, event, context)
 Bases: `Output`
 
-
-#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### output()
 ## output.test module
@@ -219,8 +199,6 @@ Bases: `Exception`
 Bases: `Output`
 
 
-#### context(_: [Context](helpers.md#helpers.base.Context_ )
-
 #### output()
 ## output.twilio module
 
@@ -229,8 +207,6 @@ Bases: `Output`
 Bases: `Output`
 
 
-#### context(_: [Context](helpers.md#helpers.base.Context_ )
-
 #### output()
 ## output.webhook module
 
@@ -238,8 +214,6 @@ Bases: `Output`
 ### _class_ output.webhook.WebhookOutput(config, output_config, jinja_environment, data, event, context)
 Bases: `Output`
 
-
-#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### output()
 ## Module contents

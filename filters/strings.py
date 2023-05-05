@@ -28,6 +28,7 @@ import logging
 import hashlib
 import yaml
 import json_fix
+from pathlib import Path
 
 
 def make_list(s):
@@ -118,6 +119,14 @@ def read_gcs_object(url, start=None, end=None):
             (parsed_url.netloc, parsed_url.path[1:]))
     contents = blob.download_as_bytes(start=start, end=end)
     return base64.encodebytes(contents).decode('utf-8')
+
+
+def read_file(filename):
+    return Path(filename).read_text()
+
+
+def read_file_b64(filename):
+    return base64.b64encode(Path(filename).read_bytes())
 
 
 def filemagic(contents):

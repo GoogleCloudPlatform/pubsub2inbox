@@ -25,6 +25,21 @@ class CommandFailedException(Exception):
 
 
 class ShellscriptProcessor(Processor):
+    """
+    Runs any shellscript as a command and exposes the output in Jinja.
+
+    Args:
+        command (str): Command to execute.
+        args (list, optional): List of arguments.
+        enviroment (dict, optional): Additional environment variables to set.
+        stdin (str, optional): Contents to pass via stdin to the process.
+        json (bool, optional): Interpret the output as JSON.
+        jsonMultiline (bool, optional): Interpret the output as multiline JSON.
+        yaml (bool, optional): Interpret the output as YAML.
+        csv (bool, optional): Interpret the output as CSV.
+        tsv (bool, optional): Interpret the output as TSV.
+        exitcodes (list, optional): List of allowed exit codes that are interpreted as successful run.
+    """
 
     def get_default_config_key():
         return 'shellscript'

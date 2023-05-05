@@ -52,7 +52,13 @@
     * [filters.regex module](filters.md#module-filters.regex)
 
 
+        * [`regex_match()`](filters.md#filters.regex.regex_match)
+
+
         * [`regex_replace()`](filters.md#filters.regex.regex_replace)
+
+
+        * [`regex_search()`](filters.md#filters.regex.regex_search)
 
 
     * [filters.strings module](filters.md#module-filters.strings)
@@ -98,6 +104,12 @@
 
 
         * [`re_escape()`](filters.md#filters.strings.re_escape)
+
+
+        * [`read_file()`](filters.md#filters.strings.read_file)
+
+
+        * [`read_file_b64()`](filters.md#filters.strings.read_file_b64)
 
 
         * [`read_gcs_object()`](filters.md#filters.strings.read_gcs_object)
@@ -292,9 +304,6 @@
         * [`BigqueryOutput`](output.md#output.bigquery.BigqueryOutput)
 
 
-            * [`BigqueryOutput.context`](output.md#output.bigquery.BigqueryOutput.context)
-
-
             * [`BigqueryOutput.output()`](output.md#output.bigquery.BigqueryOutput.output)
 
 
@@ -307,9 +316,6 @@
         * [`ChatOutput`](output.md#output.chat.ChatOutput)
 
 
-            * [`ChatOutput.context`](output.md#output.chat.ChatOutput.context)
-
-
             * [`ChatOutput.output()`](output.md#output.chat.ChatOutput.output)
 
 
@@ -317,9 +323,6 @@
 
 
         * [`DelayOutput`](output.md#output.delay.DelayOutput)
-
-
-            * [`DelayOutput.context`](output.md#output.delay.DelayOutput.context)
 
 
             * [`DelayOutput.output()`](output.md#output.delay.DelayOutput.output)
@@ -331,9 +334,6 @@
         * [`GcsOutput`](output.md#output.gcs.GcsOutput)
 
 
-            * [`GcsOutput.context`](output.md#output.gcs.GcsOutput.context)
-
-
             * [`GcsOutput.output()`](output.md#output.gcs.GcsOutput.output)
 
 
@@ -341,9 +341,6 @@
 
 
         * [`GcscopyOutput`](output.md#output.gcscopy.GcscopyOutput)
-
-
-            * [`GcscopyOutput.context`](output.md#output.gcscopy.GcscopyOutput.context)
 
 
             * [`GcscopyOutput.output()`](output.md#output.gcscopy.GcscopyOutput.output)
@@ -355,9 +352,6 @@
         * [`GroupssettingsOutput`](output.md#output.groupssettings.GroupssettingsOutput)
 
 
-            * [`GroupssettingsOutput.context`](output.md#output.groupssettings.GroupssettingsOutput.context)
-
-
             * [`GroupssettingsOutput.output()`](output.md#output.groupssettings.GroupssettingsOutput.output)
 
 
@@ -365,9 +359,6 @@
 
 
         * [`LoggerOutput`](output.md#output.logger.LoggerOutput)
-
-
-            * [`LoggerOutput.context`](output.md#output.logger.LoggerOutput.context)
 
 
             * [`LoggerOutput.output()`](output.md#output.logger.LoggerOutput.output)
@@ -389,9 +380,6 @@
 
 
         * [`MailOutput`](output.md#output.mail.MailOutput)
-
-
-            * [`MailOutput.context`](output.md#output.mail.MailOutput.context)
 
 
             * [`MailOutput.embed_images()`](output.md#output.mail.MailOutput.embed_images)
@@ -427,9 +415,6 @@
             * [`PubsubOutput.callback()`](output.md#output.pubsub.PubsubOutput.callback)
 
 
-            * [`PubsubOutput.context`](output.md#output.pubsub.PubsubOutput.context)
-
-
             * [`PubsubOutput.output()`](output.md#output.pubsub.PubsubOutput.output)
 
 
@@ -437,9 +422,6 @@
 
 
         * [`SccOutput`](output.md#output.scc.SccOutput)
-
-
-            * [`SccOutput.context`](output.md#output.scc.SccOutput.context)
 
 
             * [`SccOutput.output()`](output.md#output.scc.SccOutput.output)
@@ -454,9 +436,6 @@
         * [`TestOutput`](output.md#output.test.TestOutput)
 
 
-            * [`TestOutput.context`](output.md#output.test.TestOutput.context)
-
-
             * [`TestOutput.output()`](output.md#output.test.TestOutput.output)
 
 
@@ -466,9 +445,6 @@
         * [`TwilioOutput`](output.md#output.twilio.TwilioOutput)
 
 
-            * [`TwilioOutput.context`](output.md#output.twilio.TwilioOutput.context)
-
-
             * [`TwilioOutput.output()`](output.md#output.twilio.TwilioOutput.output)
 
 
@@ -476,9 +452,6 @@
 
 
         * [`WebhookOutput`](output.md#output.webhook.WebhookOutput)
-
-
-            * [`WebhookOutput.context`](output.md#output.webhook.WebhookOutput.context)
 
 
             * [`WebhookOutput.output()`](output.md#output.webhook.WebhookOutput.output)
@@ -535,9 +508,6 @@
         * [`BigqueryProcessor`](processors.md#processors.bigquery.BigqueryProcessor)
 
 
-            * [`BigqueryProcessor.context`](processors.md#processors.bigquery.BigqueryProcessor.context)
-
-
             * [`BigqueryProcessor.get_default_config_key()`](processors.md#processors.bigquery.BigqueryProcessor.get_default_config_key)
 
 
@@ -548,9 +518,6 @@
 
 
         * [`BudgetProcessor`](processors.md#processors.budget.BudgetProcessor)
-
-
-            * [`BudgetProcessor.context`](processors.md#processors.budget.BudgetProcessor.context)
 
 
             * [`BudgetProcessor.get_default_config_key()`](processors.md#processors.budget.BudgetProcessor.get_default_config_key)
@@ -568,22 +535,28 @@
         * [`CaiProcessor`](processors.md#processors.cai.CaiProcessor)
 
 
-            * [`CaiProcessor.context`](processors.md#processors.cai.CaiProcessor.context)
-
-
             * [`CaiProcessor.get_default_config_key()`](processors.md#processors.cai.CaiProcessor.get_default_config_key)
 
 
             * [`CaiProcessor.process()`](processors.md#processors.cai.CaiProcessor.process)
 
 
+    * [processors.containeranalysis module](processors.md#module-processors.containeranalysis)
+
+
+        * [`ContaineranalysisProcessor`](processors.md#processors.containeranalysis.ContaineranalysisProcessor)
+
+
+            * [`ContaineranalysisProcessor.get_default_config_key()`](processors.md#processors.containeranalysis.ContaineranalysisProcessor.get_default_config_key)
+
+
+            * [`ContaineranalysisProcessor.process()`](processors.md#processors.containeranalysis.ContaineranalysisProcessor.process)
+
+
     * [processors.directory module](processors.md#module-processors.directory)
 
 
         * [`DirectoryProcessor`](processors.md#processors.directory.DirectoryProcessor)
-
-
-            * [`DirectoryProcessor.context`](processors.md#processors.directory.DirectoryProcessor.context)
 
 
             * [`DirectoryProcessor.get_default_config_key()`](processors.md#processors.directory.DirectoryProcessor.get_default_config_key)
@@ -598,13 +571,22 @@
         * [`DnsProcessor`](processors.md#processors.dns.DnsProcessor)
 
 
-            * [`DnsProcessor.context`](processors.md#processors.dns.DnsProcessor.context)
-
-
             * [`DnsProcessor.get_default_config_key()`](processors.md#processors.dns.DnsProcessor.get_default_config_key)
 
 
             * [`DnsProcessor.process()`](processors.md#processors.dns.DnsProcessor.process)
+
+
+    * [processors.download module](processors.md#module-processors.download)
+
+
+        * [`DownloadProcessor`](processors.md#processors.download.DownloadProcessor)
+
+
+            * [`DownloadProcessor.get_default_config_key()`](processors.md#processors.download.DownloadProcessor.get_default_config_key)
+
+
+            * [`DownloadProcessor.process()`](processors.md#processors.download.DownloadProcessor.process)
 
 
     * [processors.genericjson module](processors.md#module-processors.genericjson)
@@ -613,22 +595,40 @@
         * [`GenericjsonProcessor`](processors.md#processors.genericjson.GenericjsonProcessor)
 
 
-            * [`GenericjsonProcessor.context`](processors.md#processors.genericjson.GenericjsonProcessor.context)
-
-
             * [`GenericjsonProcessor.get_default_config_key()`](processors.md#processors.genericjson.GenericjsonProcessor.get_default_config_key)
 
 
             * [`GenericjsonProcessor.process()`](processors.md#processors.genericjson.GenericjsonProcessor.process)
 
 
+    * [processors.git module](processors.md#module-processors.git)
+
+
+        * [`GitProcessor`](processors.md#processors.git.GitProcessor)
+
+
+            * [`GitProcessor.get_default_config_key()`](processors.md#processors.git.GitProcessor.get_default_config_key)
+
+
+            * [`GitProcessor.process()`](processors.md#processors.git.GitProcessor.process)
+
+
+    * [processors.github module](processors.md#module-processors.github)
+
+
+        * [`GithubProcessor`](processors.md#processors.github.GithubProcessor)
+
+
+            * [`GithubProcessor.get_default_config_key()`](processors.md#processors.github.GithubProcessor.get_default_config_key)
+
+
+            * [`GithubProcessor.process()`](processors.md#processors.github.GithubProcessor.process)
+
+
     * [processors.groups module](processors.md#module-processors.groups)
 
 
         * [`GroupsProcessor`](processors.md#processors.groups.GroupsProcessor)
-
-
-            * [`GroupsProcessor.context`](processors.md#processors.groups.GroupsProcessor.context)
 
 
             * [`GroupsProcessor.get_default_config_key()`](processors.md#processors.groups.GroupsProcessor.get_default_config_key)
@@ -643,9 +643,6 @@
         * [`MonitoringProcessor`](processors.md#processors.monitoring.MonitoringProcessor)
 
 
-            * [`MonitoringProcessor.context`](processors.md#processors.monitoring.MonitoringProcessor.context)
-
-
             * [`MonitoringProcessor.get_default_config_key()`](processors.md#processors.monitoring.MonitoringProcessor.get_default_config_key)
 
 
@@ -658,9 +655,6 @@
         * [`ProjectsProcessor`](processors.md#processors.projects.ProjectsProcessor)
 
 
-            * [`ProjectsProcessor.context`](processors.md#processors.projects.ProjectsProcessor.context)
-
-
             * [`ProjectsProcessor.get_default_config_key()`](processors.md#processors.projects.ProjectsProcessor.get_default_config_key)
 
 
@@ -671,9 +665,6 @@
 
 
         * [`RecommendationsProcessor`](processors.md#processors.recommendations.RecommendationsProcessor)
-
-
-            * [`RecommendationsProcessor.context`](processors.md#processors.recommendations.RecommendationsProcessor.context)
 
 
             * [`RecommendationsProcessor.get_default_config_key()`](processors.md#processors.recommendations.RecommendationsProcessor.get_default_config_key)
@@ -745,9 +736,6 @@
         * [`SccProcessor`](processors.md#processors.scc.SccProcessor)
 
 
-            * [`SccProcessor.context`](processors.md#processors.scc.SccProcessor.context)
-
-
             * [`SccProcessor.get_default_config_key()`](processors.md#processors.scc.SccProcessor.get_default_config_key)
 
 
@@ -758,9 +746,6 @@
 
 
         * [`SecretProcessor`](processors.md#processors.secret.SecretProcessor)
-
-
-            * [`SecretProcessor.context`](processors.md#processors.secret.SecretProcessor.context)
 
 
             * [`SecretProcessor.get_default_config_key()`](processors.md#processors.secret.SecretProcessor.get_default_config_key)
@@ -778,9 +763,6 @@
         * [`ShellscriptProcessor`](processors.md#processors.shellscript.ShellscriptProcessor)
 
 
-            * [`ShellscriptProcessor.context`](processors.md#processors.shellscript.ShellscriptProcessor.context)
-
-
             * [`ShellscriptProcessor.get_default_config_key()`](processors.md#processors.shellscript.ShellscriptProcessor.get_default_config_key)
 
 
@@ -793,9 +775,6 @@
         * [`StorageProcessor`](processors.md#processors.storage.StorageProcessor)
 
 
-            * [`StorageProcessor.context`](processors.md#processors.storage.StorageProcessor.context)
-
-
             * [`StorageProcessor.get_default_config_key()`](processors.md#processors.storage.StorageProcessor.get_default_config_key)
 
 
@@ -806,9 +785,6 @@
 
 
         * [`SttProcessor`](processors.md#processors.stt.SttProcessor)
-
-
-            * [`SttProcessor.context`](processors.md#processors.stt.SttProcessor.context)
 
 
             * [`SttProcessor.get_default_config_key()`](processors.md#processors.stt.SttProcessor.get_default_config_key)
@@ -824,9 +800,6 @@
 
 
         * [`TranscodeProcessor`](processors.md#processors.transcode.TranscodeProcessor)
-
-
-            * [`TranscodeProcessor.context`](processors.md#processors.transcode.TranscodeProcessor.context)
 
 
             * [`TranscodeProcessor.get_default_config_key()`](processors.md#processors.transcode.TranscodeProcessor.get_default_config_key)

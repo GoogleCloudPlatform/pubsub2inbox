@@ -19,7 +19,7 @@ Bases: [`BaseHelper`](helpers.md#helpers.base.BaseHelper)
 
 #### config(_ = Non_ )
 
-#### context(_: [Context](helpers.md#helpers.base.Context_ )
+#### context(_: [`Context`](helpers.md#helpers.base.Context_ )
 
 #### data(_ = Non_ )
 
@@ -41,8 +41,6 @@ Bases: `Exception`
 Bases: `Processor`
 
 
-#### context(_: [Context](helpers.md#helpers.base.Context_ )
-
 #### get_default_config_key()
 
 #### process(output_var='records')
@@ -52,8 +50,6 @@ Bases: `Processor`
 ### _class_ processors.budget.BudgetProcessor(config, jinja_environment, data, event, context)
 Bases: `Processor`
 
-
-#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### get_default_config_key()
 
@@ -69,19 +65,37 @@ Bases: `Exception`
 Bases: `Processor`
 
 
-#### context(_: [Context](helpers.md#helpers.base.Context_ )
-
 #### get_default_config_key()
 
 #### process(output_var='assets')
+## processors.containeranalysis module
+
+
+### _class_ processors.containeranalysis.ContaineranalysisProcessor(config, jinja_environment, data, event, context)
+Bases: `Processor`
+
+Fetch occurrences and notes from Container Analysis API.
+
+
+* **Parameters**
+
+    
+    * **project** (*str**, **optional*) – Google Cloud project ID.
+
+
+    * **name** (*str*) – Occurrence/note name (projects/…/occurrents/…).
+
+
+
+#### get_default_config_key()
+
+#### process(output_var='containeranalysis')
 ## processors.directory module
 
 
 ### _class_ processors.directory.DirectoryProcessor(config, jinja_environment, data, event, context)
 Bases: `Processor`
 
-
-#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### get_default_config_key()
 
@@ -109,11 +123,43 @@ Submit changes to Cloud DNS API. For more information, see:
 
 
 
-#### context(_: [Context](helpers.md#helpers.base.Context_ )
-
 #### get_default_config_key()
 
 #### process(output_var='dns')
+## processors.download module
+
+
+### _class_ processors.download.DownloadProcessor(config, jinja_environment, data, event, context)
+Bases: `Processor`
+
+Downloads files to “local filesystem”. Supports: HTTP, HTTPS, FTP, SFTP.
+
+
+* **Parameters**
+
+    
+    * **url** (*str*) – URL to download.
+
+
+    * **filename** (*str**, **optional*) – Filename to save.
+
+
+    * **body** (*str**, **optional*) – Specify request body to issue a POST call.
+
+
+    * **headers** (*dict**, **optional*) – Specify request headers.
+
+
+    * **privateKey** (*dict**, **optional*) – Private key for SFTP (keys: key, type (rsa, ecdsa, ed25519), passphrase (optional))
+
+
+    * **hostKey** (*dict**, **optional*) – Remote host public key, otherwise auto-accept (keys: hostname, keytype, key)
+
+
+
+#### get_default_config_key()
+
+#### process(output_var='download')
 ## processors.genericjson module
 
 
@@ -121,19 +167,80 @@ Submit changes to Cloud DNS API. For more information, see:
 Bases: `Processor`
 
 
-#### context(_: [Context](helpers.md#helpers.base.Context_ )
-
 #### get_default_config_key()
 
 #### process(output_var='data')
+## processors.git module
+
+
+### _class_ processors.git.GitProcessor(config, jinja_environment, data, event, context)
+Bases: `Processor`
+
+Clones Git repositories via HTTPS or SSH.
+
+
+* **Parameters**
+
+    
+    * **url** (*str*) – Repository URL to download.
+
+
+    * **branch** (*str**, **optional*) – Branch to check out.
+
+
+    * **directory** (*str**, **optional*) – Directory to clone into.
+
+
+    * **depth** (*int**, **optional*) – Depth to check out.
+
+
+
+#### get_default_config_key()
+
+#### process(output_var='git')
+## processors.github module
+
+
+### _class_ processors.github.GithubProcessor(config, jinja_environment, data, event, context)
+Bases: `Processor`
+
+Creates GitHub issues or comments.
+
+
+* **Parameters**
+
+    
+    * **githubToken** (*str*) – A token for accessing GitHub (note: you can use the secret processor to retrieve it from Secrets Manager).
+
+
+    * **baseUrl** (*str**, **optional*) – GitHub URL (defaults to [https://github.com](https://github.com))
+
+
+    * **repository** (*str*) – GitHub repository to use.
+
+
+    * **mode** (*str*) – One of: issues.list, issues.get, issues.create, comments.list, comments.get, comments.create.
+
+
+    * **issueId** (*int**, **optional*) – Issue ID.
+
+
+    * **commentId** (*int**, **optional*) – Comment ID.
+
+
+    * **state** (*str**, **optional*) – Issue state.
+
+
+
+#### get_default_config_key()
+
+#### process(output_var='github')
 ## processors.groups module
 
 
 ### _class_ processors.groups.GroupsProcessor(config, jinja_environment, data, event, context)
 Bases: `Processor`
 
-
-#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### get_default_config_key()
 
@@ -145,8 +252,6 @@ Bases: `Processor`
 Bases: `Processor`
 
 
-#### context(_: [Context](helpers.md#helpers.base.Context_ )
-
 #### get_default_config_key()
 
 #### process(output_var='time_series')
@@ -157,8 +262,6 @@ Bases: `Processor`
 Bases: `Processor`
 
 
-#### context(_: [Context](helpers.md#helpers.base.Context_ )
-
 #### get_default_config_key()
 
 #### process(output_var='projects')
@@ -168,8 +271,6 @@ Bases: `Processor`
 ### _class_ processors.recommendations.RecommendationsProcessor(config, jinja_environment, data, event, context)
 Bases: `Processor`
 
-
-#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### get_default_config_key()
 
@@ -229,8 +330,6 @@ Bases: `Exception`
 Bases: `Processor`
 
 
-#### context(_: [Context](helpers.md#helpers.base.Context_ )
-
 #### get_default_config_key()
 
 #### process(output_var={'finding': 'finding', 'organization': 'organization', 'projects': 'projects'})
@@ -261,8 +360,6 @@ environment.
 
 
 
-#### context(_: [Context](helpers.md#helpers.base.Context_ )
-
 #### get_default_config_key()
 
 #### process(output_var='secret')
@@ -276,8 +373,42 @@ Bases: `Exception`
 ### _class_ processors.shellscript.ShellscriptProcessor(config, jinja_environment, data, event, context)
 Bases: `Processor`
 
+Runs any shellscript as a command and exposes the output in Jinja.
 
-#### context(_: [Context](helpers.md#helpers.base.Context_ )
+
+* **Parameters**
+
+    
+    * **command** (*str*) – Command to execute.
+
+
+    * **args** (*list**, **optional*) – List of arguments.
+
+
+    * **enviroment** (*dict**, **optional*) – Additional environment variables to set.
+
+
+    * **stdin** (*str**, **optional*) – Contents to pass via stdin to the process.
+
+
+    * **json** (*bool**, **optional*) – Interpret the output as JSON.
+
+
+    * **jsonMultiline** (*bool**, **optional*) – Interpret the output as multiline JSON.
+
+
+    * **yaml** (*bool**, **optional*) – Interpret the output as YAML.
+
+
+    * **csv** (*bool**, **optional*) – Interpret the output as CSV.
+
+
+    * **tsv** (*bool**, **optional*) – Interpret the output as TSV.
+
+
+    * **exitcodes** (*list**, **optional*) – List of allowed exit codes that are interpreted as successful run.
+
+
 
 #### get_default_config_key()
 
@@ -288,8 +419,6 @@ Bases: `Processor`
 ### _class_ processors.storage.StorageProcessor(config, jinja_environment, data, event, context)
 Bases: `Processor`
 
-
-#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### get_default_config_key()
 
@@ -318,8 +447,6 @@ Generate text from speech from video or audio.
     * **outputConfig** (*dict*) – Output configuration.
 
 
-
-#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### get_default_config_key()
 
@@ -353,8 +480,6 @@ Transcode media using Transcoder API. For more information, see:
     * **job** (*dict*) – Transcoding job configuration.
 
 
-
-#### context(_: [Context](helpers.md#helpers.base.Context_ )
 
 #### get_default_config_key()
 

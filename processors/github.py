@@ -12,11 +12,6 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 from .base import Processor, NotConfiguredException
-import google.auth
-from helpers.base import get_grpc_client_info
-import base64
-import json
-import yaml
 from github import Github
 
 
