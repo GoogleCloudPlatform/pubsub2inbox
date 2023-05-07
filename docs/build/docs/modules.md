@@ -100,6 +100,9 @@
         * [`json_encode()`](filters.md#filters.strings.json_encode)
 
 
+        * [`ltrim()`](filters.md#filters.strings.ltrim)
+
+
         * [`make_list()`](filters.md#filters.strings.make_list)
 
 
@@ -119,6 +122,12 @@
 
 
         * [`read_gcs_object()`](filters.md#filters.strings.read_gcs_object)
+
+
+        * [`rtrim()`](filters.md#filters.strings.rtrim)
+
+
+        * [`trim()`](filters.md#filters.strings.trim)
 
 
         * [`urlencode()`](filters.md#filters.strings.urlencode)
@@ -434,6 +443,15 @@
 
 
             * [`SccOutput.output()`](output.md#output.scc.SccOutput.output)
+
+
+    * [output.slack module](output.md#module-output.slack)
+
+
+        * [`SlackOutput`](output.md#output.slack.SlackOutput)
+
+
+            * [`SlackOutput.output()`](output.md#output.slack.SlackOutput.output)
 
 
     * [output.test module](output.md#module-output.test)
@@ -830,18 +848,6 @@
 
 
             * [`StorageProcessor.process()`](processors.md#processors.storage.StorageProcessor.process)
-
-
-    * [processors.stt module](processors.md#module-processors.stt)
-
-
-        * [`SttProcessor`](processors.md#processors.stt.SttProcessor)
-
-
-            * [`SttProcessor.get_default_config_key()`](processors.md#processors.stt.SttProcessor.get_default_config_key)
-
-
-            * [`SttProcessor.process()`](processors.md#processors.stt.SttProcessor.process)
 
 
     * [processors.transcode module](processors.md#module-processors.transcode)

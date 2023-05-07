@@ -77,6 +77,8 @@ Returns a signed URL to a GCS object. URL should be in format “gs://bucket/fil
 
 ### filters.strings.json_encode(v)
 
+### filters.strings.ltrim(v)
+
 ### filters.strings.make_list(s)
 
 ### filters.strings.parse_string(v, spec)
@@ -90,6 +92,10 @@ Returns a signed URL to a GCS object. URL should be in format “gs://bucket/fil
 ### filters.strings.read_file_b64(filename)
 
 ### filters.strings.read_gcs_object(url, start=None, end=None)
+
+### filters.strings.rtrim(v)
+
+### filters.strings.trim(v)
 
 ### filters.strings.urlencode(s)
 

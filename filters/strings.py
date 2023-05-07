@@ -196,3 +196,15 @@ def parse_url(v):
     res['name'] = os.path.basename(res['path'])
     res['prefix'] = os.path.dirname(res['path'])
     return res
+
+
+def trim(v):
+    return v.strip()
+
+
+def ltrim(v):
+    return v.lstrip()
+
+
+def rtrim(v):
+    return v.rstrip()

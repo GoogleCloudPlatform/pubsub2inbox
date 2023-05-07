@@ -1,0 +1,84 @@
+#   Copyright 2023 Google LLC
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+# This is an example on how to fetch occurrences from Container Analysis API
+# and post them on a Slack channel.
+#
+# You'll need a proper permissions to Container Analysis, a Slack app that
+# has the correct scopes (chat:write). You also have to put the bot into a channel
+
+globals:
+  slackToken: xoxb-...
+  slackChannel: C12345678A
+  artifactRegistryRegion: europe-west4
+
+pipeline:
+  - type: processor.genericjson
+      
+  - type: processor.containeranalysis
+    output: analysis
+    config:
+      name: '{{ data.name }}'
+  - type: output.logger
+    config:
+      message: "Container Analysis results: {{ analysis|json_encode }}"
+
+  - type: output.slack
+    variables:
+      container_name: |
+        {{ (analysis.resourceUri|regex_match('https://[^/]*/(?P<container>[^@]+)')).container }}
+      container_hash: |
+        {{ (analysis.resourceUri|regex_match('https://[^/]*/[^@]+(?P<hash>.+)$')).hash[8:16] }}…
+      container_console: |
+        {{ (analysis.resourceUri|regex_match('https://[^/]*/(?P<url>.+)$')).url }}
+      container_project: |
+        {{ container_console.split('/')|first }}
+      container_rest: |
+        {% set rest = container_console.split('/') %}{{ rest[1:]|join('/') }}
+    config:
+      token: '{{ slackToken }}'
+      api: chat.postMessage
+      request:
+        channel: '{{ slackChannel }}'
+        text: |
+          :rotating_light: New vulnerability found in {{ container_name }}@{{ container_hash }}: {{ analysis.vulnerability.shortDescription }}
+        blocks:
+          - type: header
+            text:
+              type: plain_text
+              text: |
+                :rotating_light: New vulnerability found in {{ container_name }}@{{ container_hash }}: {{ analysis.vulnerability.shortDescription }}
+          - type: divider
+          - type: section
+            fields:
+              - type: mrkdwn
+                text: |
+                  *Type:*
+                  {{ analysis.kind }}
+                  *Severity:*
+                  {{ analysis.vulnerability.effectiveSeverity }}
+                  *CVSS score:*
+                  {{ analysis.vulnerability.cvssScore }}
+                  *Fix available?*
+                  {% if analysis.fixAvailable %}Yes!{% else %}No{% endif %}
+              - type: mrkdwn
+                text: |
+                  {{ analysis.vulnerability.shortDescription }}
+
+                  {{ analysis.vulnerability.longDescription }}
+          - type: section
+            text:
+              type: mrkdwn
+              text: |
+                <https://console.cloud.google.com/artifacts/docker/{{ container_project }}/{{ artifactRegistryRegion }}/{{ container_rest|replace('@', '/') }};tab=vulnerabilities|View in console>

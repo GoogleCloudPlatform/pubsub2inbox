@@ -514,34 +514,6 @@ Bases: `Processor`
 #### get_default_config_key()
 
 #### process(output_var='object')
-## processors.stt module
-
-
-### _class_ processors.stt.SttProcessor(config, jinja_environment, data, event, context)
-Bases: `Processor`
-
-Generate text from speech from video or audio.
-
-
-* **Parameters**
-
-    
-    * **project** (*str**, **optional*) – Google Cloud project ID.
-
-
-    * **config** (*dict*) – Recognition configuration.
-
-
-    * **audio** (*dict*) – Input audio configuration.
-
-
-    * **outputConfig** (*dict*) – Output configuration.
-
-
-
-#### get_default_config_key()
-
-#### process(output_var='stt')
 ## processors.transcode module
 
 

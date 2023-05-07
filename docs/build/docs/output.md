@@ -213,6 +213,29 @@ Bases: `Output`
 
 
 #### output()
+## output.slack module
+
+
+### _class_ output.slack.SlackOutput(config, output_config, jinja_environment, data, event, context)
+Bases: `Output`
+
+Sends messages to Slack and call other Slack APIs too.
+
+
+* **Parameters**
+
+    
+    * **token** (*str*) – A Slack Bot User OAuth Token.
+
+
+    * **api** (*str*) – A Slack API call, such as chat.postMessage.
+
+
+    * **request** (*dict*) – The API call body.
+
+
+
+#### output()
 ## output.test module
 
 
