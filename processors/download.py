@@ -26,6 +26,7 @@ class DownloadProcessor(Processor):
     Args:
         url (str): URL to download.
         filename (str, optional): Filename to save.
+        strip (int, optional): Strip N components from the save path.
         body (str, optional): Specify request body to issue a POST call.
         headers (dict, optional): Specify request headers.
         privateKey (dict, optional): Private key for SFTP (keys: key, type (rsa, ecdsa, ed25519), passphrase (optional))
@@ -49,6 +50,16 @@ class DownloadProcessor(Processor):
 
         self._init_tempdir()
         directory = os.path.dirname(filename)
+        if 'strip' in self.config:
+            strip_components = self._jinja_expand_int(self.config['strip'],
+                                                      'strip')
+            path_parts = os.path.split(filename)
+            path_components = path_parts[0].split(os.sep)
+            directory = os.sep.join(path_components[strip_components:])
+            filename = path_parts[1]
+            self.logger.debug('Removed %d path parts, saving file to: %s/%s' %
+                              (strip_components, directory, filename))
+
         if directory and not os.path.exists(directory):
             self.logger.debug(
                 'Creating directory under temporary directory: %s' %

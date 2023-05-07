@@ -73,6 +73,12 @@ variable "service_account" {
   default = ""
 }
 
+variable "create_service_account" {
+  type        = bool
+  description = "Create a service account, set false to use service_account as-is."
+  default     = true
+}
+
 variable "bucket_name" {
   type        = string
   description = "Bucket for storing the Cloud Function"
@@ -150,7 +156,7 @@ variable "local_files_path" {
 variable "release_version" {
   type        = string
   description = "When not using local files, the release version to download"
-  default     = "v1.4.7"
+  default     = "v1.7.0"
 }
 
 variable "cloud_run" {
@@ -159,8 +165,20 @@ variable "cloud_run" {
   default     = false
 }
 
+variable "cloud_functions_v2" {
+  type        = bool
+  description = "Deploy via Cloud Functions v2"
+  default     = false
+}
+
 variable "cloud_run_container" {
   type        = string
   description = "Container URL when deploying via Cloud Run"
   default     = "ghcr.io/googlecloudplatform/pubsub2inbox:v1.4.5"
+}
+
+variable "log_level" {
+  type        = number
+  description = "Set log level (10 equals debug)"
+  default     = 10
 }

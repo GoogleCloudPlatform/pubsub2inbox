@@ -14,9 +14,22 @@
 from .base import Output, NotConfiguredException
 from google.cloud import storage
 import base64
+import os
 
 
 class GcsOutput(Output):
+    """
+    Writes contents to Google Cloud Storage.
+
+    Args:
+        bucket (str): Target bucket name.
+        object (str, optional): Target object name. Either specify object or objects.
+        objects (list, optional): Target objects when writing multiple files. Contents template will be 
+          called multiple times with `filename` and `key` variables.
+        contents (str, optional): Contents to write to target file. Either specify contents or file.
+        file (str, optional): File to write. 
+        project (str, optional): Google Cloud project to issue Cloud Storage API calls against.
+    """
 
     def output(self):
         if 'bucket' not in self.output_config:
@@ -25,7 +38,7 @@ class GcsOutput(Output):
         if 'object' not in self.output_config and 'objects' not in self.output_config:
             raise NotConfiguredException(
                 'No destination object(s) defined in GCS output.')
-        if 'contents' not in self.output_config:
+        if 'contents' not in self.output_config and 'file' not in self.output_config:
             raise NotConfiguredException('No GCS contents defined in output.')
 
         bucket_template = self.jinja_environment.from_string(
@@ -88,22 +101,42 @@ class GcsOutput(Output):
                                       (destination_bucket, destination_object)
                               })
 
-            contents_template = self.jinja_environment.from_string(
-                self.output_config['contents'])
-            contents_template.name = 'contents'
-            contents = contents_template.render()
-            if 'base64decode' in self.output_config and self.output_config[
-                    'base64decode']:
-                contents = base64.decodebytes(contents.encode('ascii'))
-
             blob = bucket.blob(destination_object)
-            blob.upload_from_string(contents)
+            if 'contents' in self.output_config:
+                contents_template = self.jinja_environment.from_string(
+                    self.output_config['contents'])
+                contents_template.name = 'contents'
+                contents = contents_template.render()
+                if 'base64decode' in self.output_config and self.output_config[
+                        'base64decode']:
+                    contents = base64.decodebytes(contents.encode('ascii'))
 
-            self.logger.info('Object created in Cloud Storage bucket.',
-                             extra={
-                                 'url':
-                                     'gs://%s/%s' %
-                                     (destination_bucket, destination_object),
-                                 'size':
-                                     len(contents)
-                             })
+                blob.upload_from_string(contents)
+
+                self.logger.info(
+                    'Object created in Cloud Storage bucket.',
+                    extra={
+                        'url':
+                            'gs://%s/%s' %
+                            (destination_bucket, destination_object),
+                        'size':
+                            len(contents)
+                    })
+            else:
+                filename = self._jinja_expand_string(self.output_config['file'],
+                                                     'file')
+                blob.upload_from_filename(filename)
+
+                file_stats = os.stat(filename)
+
+                self.logger.info(
+                    'Object created in Cloud Storage bucket.',
+                    extra={
+                        'url':
+                            'gs://%s/%s' %
+                            (destination_bucket, destination_object),
+                        'file_name':
+                            filename,
+                        'size':
+                            file_stats.st_size,
+                    })

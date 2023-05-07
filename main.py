@@ -30,11 +30,14 @@ from google.cloud import secretmanager, storage
 from pythonjsonlogger import jsonlogger
 import traceback
 from helpers.base import get_grpc_client_info, Context, BaseHelper
+import random
+import uuid
 
 config_file_name = 'config.yaml'
 execution_count = 0
 configuration = None
 logger = None
+extra_vars = []
 
 
 def load_configuration(file_name):
@@ -71,6 +74,21 @@ def get_jinja_environment():
     env = Environment(autoescape=get_jinja_escaping,
                       extensions=['jinja2.ext.do'])
     env.globals = {**env.globals, **{'env': os.environ}}
+    env.globals['req_random_int'] = random.randrange(0, 9223372036854775807)
+    request_uuid = uuid.uuid4()
+    env.globals['req_random_uuid_hex'] = request_uuid.hex
+    env.globals['req_random_uuid_int'] = request_uuid.int
+    nice_uuid = base64.urlsafe_b64encode(request_uuid.bytes)
+    env.globals['req_random_uuid'] = nice_uuid.decode('utf-8').rstrip(
+        '=').lower(
+        )  # This is not as unique as raw UUID, but still pretty unique
+
+    if extra_vars and len(extra_vars) > 0:
+        for v in extra_vars:
+            if v[1].startswith('[') or v[1].startswith('{'):
+                env.globals[v[0]] = json.loads(v[1])
+            else:
+                env.globals[v[0]] = v[1]
     env.filters.update(get_jinja_filters())
     env.tests.update(get_jinja_tests())
     return env
@@ -442,12 +460,12 @@ def process_message_pipeline(logger, config, data, event, context):
         **template_variables
     }
 
+    helper = BaseHelper(jinja_environment)
     if 'globals' in config:
         if not isinstance(config['globals'], dict):
             raise MalformedGlobalsException(
                 '"globals" in configuration should be a dictionary.')
 
-        helper = BaseHelper(jinja_environment)
         template_globals = helper._jinja_expand_dict_all(
             config['globals'], 'globals')
         jinja_environment.globals = {
@@ -485,9 +503,11 @@ def process_message_pipeline(logger, config, data, event, context):
             stopif_template.name = 'stopif'
             stopif_contents = stopif_template.render()
             if stopif_contents.strip() != '':
+                jinja_environment.globals['previous_run'] = False
                 logger.info(
-                    'Pipeline task #%d (%s) stop-if condition evaluated to true, stopping processing.'
+                    'Pipeline task #%d (%s) stop-if condition evaluated to true (non-empty), stopping processing.'
                     % (task_number, task['type']))
+                helper._clean_tempdir()
                 return
 
         # Handle conditional execution mechanism
@@ -496,10 +516,28 @@ def process_message_pipeline(logger, config, data, event, context):
             runif_template.name = 'runif'
             runif_contents = runif_template.render()
             if runif_contents.strip() == '':
+                jinja_environment.globals['previous_run'] = False
                 logger.info(
-                    'Pipeline task #%d (%s) run-if condition evaluated to true, skipping task.'
+                    'Pipeline task #%d (%s) run-if condition evaluated to false (empty), skipping task.'
                     % (task_number, task['type']))
+                task_number += 1
                 continue
+
+        # Process task wide variables
+        if 'variables' in task:
+            for k, v in task['variables'].items():
+                if isinstance(v, dict):
+                    jinja_environment.globals[
+                        k] = helper._jinja_expand_dict_all(v, 'variable')
+                elif isinstance(v, list):
+                    jinja_environment.globals[k] = helper._jinja_expand_list(
+                        v, 'variable')
+                elif isinstance(v, int):
+                    jinja_environment.globals[k] = helper._jinja_expand_int(
+                        v, 'variable')
+                else:
+                    jinja_environment.globals[k] = helper._jinja_expand_string(
+                        v, 'variable')
 
         try:
             # Handle output variable expansion
@@ -538,6 +576,7 @@ def process_message_pipeline(logger, config, data, event, context):
                 else:
                     processor_variables = processor_instance.process()
                 template_variables.update(processor_variables)
+                template_variables['previous_run'] = True
                 jinja_environment.globals = {
                     **jinja_environment.globals,
                     **template_variables
@@ -554,13 +593,54 @@ def process_message_pipeline(logger, config, data, event, context):
                                                jinja_environment, data, event,
                                                context)
                 output_instance.output()
+                jinja_environment.globals['previous_run'] = True
         except Exception as exc:
+            jinja_environment.globals['previous_run'] = False
             if 'canFail' not in task or not task['canFail']:
+
+                # Global output if a task fails
+                if 'onError' in config:
+                    error_task = config['onError']
+                    if 'type' not in error_task or not error_task['type']:
+                        raise NoTypeInPipelineException(
+                            'No type in pipeline onError task')
+
+                    jinja_environment.globals['exception'] = str(exc)
+
+                    error_task_type, error_task_handler = error_task[
+                        'type'].split('.', 2)
+
+                    error_task_config = {}
+                    if 'config' in error_task:
+                        error_task_config = error_task['config']
+
+                    output_type = error_task_handler
+                    logger.debug(
+                        'Pipeline onError task (%s), running output: %s' %
+                        (error_task['type'], output_type))
+                    mod = __import__('output.%s' % output_type)
+                    output_module = getattr(mod, output_type)
+                    output_class = getattr(
+                        output_module, '%sOutput' % output_type.capitalize())
+                    output_instance = output_class(error_task_config,
+                                                   error_task_config,
+                                                   jinja_environment, data,
+                                                   event, context)
+                    output_instance.output()
+
                 logger.error(
                     'Pipeline task #%d (%s) failed, stopping processing.' %
                     (task_number, task['type']),
                     extra={'exception': traceback.format_exc()})
-                raise exc
+                if 'canFail' in config and config['canFail']:
+                    logger.warn(
+                        'Pipeline failed, but it is allowed to fail. Message processed.'
+                    )
+                    helper._clean_tempdir()
+                    return
+                else:
+                    helper._clean_tempdir()
+                    raise exc
             else:
                 logger.warning(
                     'Pipeline task #%d (%s) failed, but continuing...' %
@@ -568,6 +648,7 @@ def process_message_pipeline(logger, config, data, event, context):
                     extra={'exception': traceback.format_exc()})
 
         task_number += 1
+    helper._clean_tempdir()
 
 
 def process_message(config, data, event, context):
@@ -592,7 +673,10 @@ def decode_and_process(logger, config, event, context):
                      'hostname': socket.gethostname(),
                      'pid': os.getpid()
                  })
-    data = base64.b64decode(event['data']).decode('raw_unicode_escape')
+    if event['data'] != '':
+        data = base64.b64decode(event['data']).decode('raw_unicode_escape')
+    else:
+        data = None
 
     logger.debug('Starting Pub/Sub message processing...',
                  extra={
@@ -645,6 +729,32 @@ def process_pubsub(event, context, message_too_old_exception=False):
             pass
         else:
             raise (mtoe)
+
+
+def process_pubsub_v2(event, context, message_too_old_exception=False):
+    """Function that is triggered by Pub/Sub incoming message for functions V2.
+    Args:
+         event (dict):  The dictionary with data specific to this type of
+         event. The `data` field contains the PubsubMessage message. The
+         `attributes` field will contain custom attributes if there are any.
+         context (google.cloud.functions.Context): The Cloud Functions event
+         metadata. The `event_id` field contains the Pub/Sub message ID. The
+         `timestamp` field contains the publish time.
+    """
+    global logger
+
+    if not logger:
+        logger = setup_logging()
+
+    new_context = Context(eventId=context.event_id,
+                          timestamp=context.timestamp,
+                          eventType=context.event_type,
+                          resource=context.resource)
+    if 'attributes' not in event:
+        event['attributes'] = {}
+    if 'data' not in event:
+        event['data'] = ''
+    process_pubsub(event, new_context)
 
 
 class CloudRunServer:
@@ -763,9 +873,15 @@ if __name__ == '__main__':
                             type=str,
                             nargs='?',
                             help='JSON file containing the message(s)')
+    arg_parser.add_argument('--set',
+                            nargs='*',
+                            type=lambda s: tuple(s.split('=', 2)),
+                            help='Set a Jinja variable from command line')
     args = arg_parser.parse_args()
     if args.config:
         config_file_name = args.config
+    if args.set:
+        extra_vars = args.set
     if args.webserver or os.getenv('WEBSERVER') == '1':
         run_webserver(True)
     else:

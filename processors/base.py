@@ -31,6 +31,10 @@ class NoConfigKeySetException(Exception):
     pass
 
 
+class ProcessorException(Exception):
+    pass
+
+
 class Processor(BaseHelper):
     config = None
     data = None

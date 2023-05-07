@@ -31,6 +31,10 @@ Bases: [`BaseHelper`](helpers.md#helpers.base.BaseHelper)
 
 #### _abstract_ process(output_var=None)
 
+### _exception_ processors.base.ProcessorException()
+Bases: `Exception`
+
+
 ### _exception_ processors.base.UnknownProjectException()
 Bases: `Exception`
 
@@ -68,6 +72,71 @@ Bases: `Processor`
 #### get_default_config_key()
 
 #### process(output_var='assets')
+## processors.clouddeploy module
+
+
+### _class_ processors.clouddeploy.ClouddeployProcessor(config, jinja_environment, data, event, context)
+Bases: `Processor`
+
+Operate Cloud Deploy applications, releases and other such things.
+
+
+* **Parameters**
+
+    
+    * **project** (*str**, **optional*) – Google Cloud project ID.
+
+
+    * **name** (*str*) – Name of the delivery pipeline.
+
+
+    * **region** (*str*) – Google Cloud Deploy reiog.n
+
+
+    * **mode** (*str*) – One of: releases.get, releases.create, releases.rollouts.create, releases.rollouts.get,
+    releases.rollouts.approve, releases.rollouts.reject
+
+
+
+#### get_default_config_key()
+
+#### process(output_var='clouddeploy')
+
+#### wait_for_operation_done(deploy_service, operation_name)
+## processors.compress module
+
+
+### _class_ processors.compress.CompressProcessor(config, jinja_environment, data, event, context)
+Bases: `Processor`
+
+Compress files to zip/tar/tgz formats.
+
+
+* **Parameters**
+
+    
+    * **glob** (*str*) – Files to include, recursive. See Python glob().
+
+
+    * **exclude** (*list**, **optional*) – List of files to exclude. See python fnmatch().
+
+
+    * **output** (*str*) – Target file.
+
+
+    * **format** (*str*) – One of: zip, tar, tar.gz, tar.bz2.
+
+
+    * **compression** (*str**, **optional*) – Compression for ZIP: stored, bzip2, lzma. (default deflate)
+
+
+    * **strip** (*int**, **optional*) – Remove N path parts in the archive.
+
+
+
+#### get_default_config_key()
+
+#### process(output_var='compress')
 ## processors.containeranalysis module
 
 
@@ -142,6 +211,9 @@ Downloads files to “local filesystem”. Supports: HTTP, HTTPS, FTP, SFTP.
 
 
     * **filename** (*str**, **optional*) – Filename to save.
+
+
+    * **strip** (*int**, **optional*) – Strip N components from the save path.
 
 
     * **body** (*str**, **optional*) – Specify request body to issue a POST call.
@@ -363,6 +435,25 @@ environment.
 #### get_default_config_key()
 
 #### process(output_var='secret')
+## processors.setvariable module
+
+
+### _class_ processors.setvariable.SetvariableProcessor(config, jinja_environment, data, event, context)
+Bases: `Processor`
+
+Outputs the contents of value. Control the execution via runIf and
+the variable set with output.
+
+
+* **Parameters**
+
+    **value** (*any*) – Value to set.
+
+
+
+#### get_default_config_key()
+
+#### process(output_var='variable')
 ## processors.shellscript module
 
 

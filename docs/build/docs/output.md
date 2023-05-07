@@ -100,6 +100,31 @@ Bases: `Output`
 ### _class_ output.gcs.GcsOutput(config, output_config, jinja_environment, data, event, context)
 Bases: `Output`
 
+Writes contents to Google Cloud Storage.
+
+
+* **Parameters**
+
+    
+    * **bucket** (*str*) – Target bucket name.
+
+
+    * **object** (*str**, **optional*) – Target object name. Either specify object or objects.
+
+
+    * **objects** (*list**, **optional*) – Target objects when writing multiple files. Contents template will be
+    called multiple times with filename and key variables.
+
+
+    * **contents** (*str**, **optional*) – Contents to write to target file. Either specify contents or file.
+
+
+    * **file** (*str**, **optional*) – File to write.
+
+
+    * **project** (*str**, **optional*) – Google Cloud project to issue Cloud Storage API calls against.
+
+
 
 #### output()
 ## output.gcscopy module

@@ -24,7 +24,7 @@ from google.cloud import resourcemanager_v3
 import json_fix
 import tempfile
 
-PUBSUB2INBOX_VERSION = '1.6.0'
+PUBSUB2INBOX_VERSION = '1.7.0'
 TEMPORARY_DIRECTORY = None
 
 
@@ -87,11 +87,17 @@ class BaseHelper:
     def _init_tempdir(self):
         global TEMPORARY_DIRECTORY
         if not TEMPORARY_DIRECTORY:
-            TEMPORARY_DIRECTORY = tempfile.TemporaryDirectory(
-                ignore_cleanup_errors=True)
+            TEMPORARY_DIRECTORY = tempfile.TemporaryDirectory()
             self.logger.debug('Created temporary directory: %s' %
                               (TEMPORARY_DIRECTORY.name))
             os.chdir(TEMPORARY_DIRECTORY.name)
+
+    def _clean_tempdir(self):
+        global TEMPORARY_DIRECTORY
+        if TEMPORARY_DIRECTORY:
+            self.logger.debug('Cleaning temporary directory: %s' %
+                              (TEMPORARY_DIRECTORY.name))
+            TEMPORARY_DIRECTORY = None
 
     def _get_user_agent(self):
         return get_user_agent()

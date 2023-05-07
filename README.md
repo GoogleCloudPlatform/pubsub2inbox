@@ -8,7 +8,7 @@ and output processors. Input processors can enrich the incoming messages with de
 (for example, fetching the budget from Cloud Billing Budgets API). Multiple output
 processors can be chained together. 
 
-Pubsub2Inbox is written in Python 3.8+ and can be deployed as a Cloud Function or as a 
+Pubsub2Inbox is written in Python 3.8+ and can be deployed as a Cloud Function v1/v2 or as a 
 Cloud Run function easily. To guard credentials and other sensitive information, the tool can 
 fetch its YAML configuration from Google Cloud Secret Manager.
 
@@ -67,6 +67,9 @@ Available input processors are:
   - [github.py](processor/github.py): List, get or create issues and comments in GitHub.
   - [download.py](processor/download.py): Download files using HTTP, FTP and SFTP.
   - [git.py](processor/git.py): Clone repositories via HTTP or SSH.
+  - [clouddeploy.py](processor/clouddeploy.py): Work with releases and rollouts on Cloud Deploy.
+  - [setvariable.py](processor/setvariable.py): Set global variables.
+
 
 For full documentation of permissions, processor input and output parameters, see [PROCESSORS.md](PROCESSORS.md).
 
@@ -118,6 +121,7 @@ The YAML file is structured of the following top level keys:
 
   - `pipeline`: a list of processors and/or outputs to run in sequence.
     - `type`: what processor or output to run (eg. `processor.genericjson` or `output.logger`)
+    - `variables`: Additional variables to set before invoking this processor/output.
     - `config`: configuration of the processor or output
     - `runIf`: if this evaluates to empty, the processor/output is not run
     - `stopIf`: if this evalues to non-empty, the processing is stopped immediately (before the processor/output is run)
@@ -128,6 +132,8 @@ The YAML file is structured of the following top level keys:
         otherwise you can specify a Jinja expression
     - `canFail`: if set to true, the task can fail but processing will still continue
     - `output`: the output variable for processors (some processors accept a single string, some a list of keys and values)
+  - `onError`: allows you to call one output if any of the pipeline tasks fail fatally
+  - `canFail`: any task in the pipeline can fail fatally, but the message will still be marked processed
   - `maximumMessageAge`: a textual representation of maximum age of a message that can be processed (set to `skip` to ignore)
   - `globals`: a dictionary of variables that is evaluated before starting the pipeline, useful for things like localization, 
     or other configuration parameters that get repeatedly used in the pipeline configuration
@@ -174,7 +180,11 @@ parameters in when using as a module:
   - `vpc_connector` (string, optional): ID of the serverless VPC Connector for the Cloud Function
   - `cloud_run` (boolean, optional): deploy via Cloud Run instead of Cloud Function. Defaults to `false`. If set to `true`, also specify `cloud_run_container`.
   - `cloud_run_container` (string, optional): container image to deploy on Cloud Run. See previous parameter.
-
+  - `cloud_functions_v2` (boolean, optional): deploy using Cloud Functions V2. Defaults to `false`. Recommended to set `true`.
+  - `use_local_files` (boolean, optional): use local files when deploying. Defaults to `true`.
+  - `local_files_path` (str, optional): sets the path where to fetch the function files.
+  - `log_level` (int, optional): set log level, defaults to `10` (debug).
+  
 ## Deploying manually
 
 First, we have the configuration in `config.yaml` and we're going to store the configuration for
@@ -302,6 +312,8 @@ module "pubsub2inbox" {
   bucket_name        = format("pubsub2inbox-source-%s", module.pubsub2inbox.name)
   bucket_location    = local.region
   helper_bucket_name = local.helper_bucket ? module.helper-bucket.0.bucket.name : ""
+
+  cloud_functions_v2 = true
 
   # Add additional permissions for the service account here
   function_roles = []

@@ -17,21 +17,6 @@
 
 pipeline:
   - type: processor.genericjson
-  - type: processor.git
-    output: git
-    config:
-      url: 'git@github.com:your-org/your-repo.git'
-      directory: 'your-repo'
-      # depth: 1
-      # branch: your-branch
-      privateKey: 
-        # You can also use the `secret` processor to fetch the private key from a Secret Manager secret,
-        # however, the function configuration is in a Secret Manager secret by itself.
-        # You could also retrieve it from GCS using read_gcs_object.
-        key: 'insert private key here'
-  - type: output.logger
-    config:
-      message: "Clone repository: {{ git|json_encode }}"
   - type: processor.download
     output: readme
     config:
@@ -49,9 +34,46 @@ pipeline:
     output: ftp
     config:
       url: 'ftp://ftp.tudelft.nl/pub/Linux/centos.org/timestamp.txt'
+      strip: 100
   - type: output.logger
     config:
       message: "File contents: {{ ftp.filename|read_file }}"
+  - type: processor.compress
+    output: zip_file
+    config:
+      format: zip
+      output: timestamp.zip
+      glob: 'timestamp.*'
+  - type: output.logger
+    config:
+      message: "ZIP file: {{ zip_file|json_encode }}"
+  - type: processor.compress
+    output: tar_file
+    config:
+      format: tar
+      output: timestamp.tar
+      glob: 'timestamp.*'
+  - type: output.logger
+    config:
+      message: "TAR file: {{ tar_file|json_encode }}"
+  - type: processor.compress
+    output: targz_file
+    config:
+      format: tar.gz
+      output: timestamp.tar.gz
+      glob: 'timestamp.*'
+  - type: output.logger
+    config:
+      message: "TAR gzipped file: {{ targz_file|json_encode }}"
+  - type: processor.compress
+    output: tarbz2_file
+    config:
+      format: tar.bz2
+      output: timestamp.tar.bz2
+      glob: 'timestamp.*'
+  - type: output.logger
+    config:
+      message: "TAR bzip2 file: {{ tarbz2_file|json_encode }}"
   - type: processor.download
     output: sftp
     config:
@@ -70,3 +92,18 @@ pipeline:
   - type: output.logger
     config:
       message: "Downloaded file: {{ sftp|json_encode }}"
+  - type: processor.git
+    output: git
+    config:
+      url: 'git@github.com:your-org/your-repo.git'
+      directory: 'your-repo'
+      # depth: 1
+      # branch: your-branch
+      privateKey: 
+        # You can also use the `secret` processor to fetch the private key from a Secret Manager secret,
+        # however, the function configuration is in a Secret Manager secret by itself.
+        # You could also retrieve it from GCS using read_gcs_object.
+        key: 'insert private key here'
+  - type: output.logger
+    config:
+      message: "Clone repository: {{ git|json_encode }}"

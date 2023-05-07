@@ -29,6 +29,8 @@ import hashlib
 import yaml
 import json_fix
 from pathlib import Path
+import parse
+import os
 
 
 def make_list(s):
@@ -176,3 +178,21 @@ def hash_string(v, hash_type='md5'):
     h = hashlib.new(hash_type)
     h.update(v.encode('utf-8'))
     return h.hexdigest()
+
+
+def parse_string(v, spec):
+    r = parse.parse(spec, v)
+    if r is not None:
+        return r.named
+    return None
+
+
+def parse_url(v):
+    parsed_url = urllib.parse.urlparse(v)
+    res = {}
+    for k in dir(parsed_url):
+        if not k.startswith('_'):
+            res[k] = getattr(parsed_url, k)
+    res['name'] = os.path.basename(res['path'])
+    res['prefix'] = os.path.dirname(res['path'])
+    return res

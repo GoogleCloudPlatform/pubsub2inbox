@@ -79,6 +79,10 @@ Returns a signed URL to a GCS object. URL should be in format “gs://bucket/fil
 
 ### filters.strings.make_list(s)
 
+### filters.strings.parse_string(v, spec)
+
+### filters.strings.parse_url(v)
+
 ### filters.strings.re_escape(s)
 
 ### filters.strings.read_file(filename)

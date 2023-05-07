@@ -36,6 +36,22 @@ processors.cai module
    :undoc-members:
    :show-inheritance:
 
+processors.clouddeploy module
+-----------------------------
+
+.. automodule:: processors.clouddeploy
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+processors.compress module
+--------------------------
+
+.. automodule:: processors.compress
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 processors.containeranalysis module
 -----------------------------------
 
@@ -136,6 +152,14 @@ processors.secret module
 ------------------------
 
 .. automodule:: processors.secret
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+processors.setvariable module
+-----------------------------
+
+.. automodule:: processors.setvariable
    :members:
    :undoc-members:
    :show-inheritance:

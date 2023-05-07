@@ -263,6 +263,10 @@ https://github.com/GoogleCloudPlatform/pubsub2inbox/blob/main/docs/build/docs/pr
 
 [Documentation](docs/build/docs/processors.md#processorsgit-module)
 
+## Compress
+
+[Documentation](docs/build/docs/processors.md#processorscompress-module)
+
 ## Common
 
 ### Expanded project list

@@ -226,9 +226,9 @@ google-api-core[grpc]==1.34.0 \
     #   google-cloud-resource-manager
     #   google-cloud-secret-manager
     #   google-cloud-storage
-google-api-python-client==2.23.0 \
-    --hash=sha256:a7b364eff63ca75d827cfb241a0f8567157976e879046c1ff20ddf735bad618e \
-    --hash=sha256:f117a595717fc384446f6235019e6a83fc9df821bd9d05dba7ff14aa96c70f52
+google-api-python-client==2.86.0 \
+    --hash=sha256:0f320190ab9d5bd2fdb0cb894e8e53bb5e17d4888ee8dc4d26ba65ce378409e2 \
+    --hash=sha256:3ca4e93821f4e9ac29b91ab0d9df168b42c8ad0fb8bff65b8c2ccb2d462b0464
     # via -r requirements.txt.in
 google-auth==2.14.1 \
     --hash=sha256:ccaa901f31ad5cbb562615eb8b664b3dd0bf5404a67618e642307f00613eda4d \
@@ -686,6 +686,9 @@ packaging==21.3 \
 paramiko==3.1.0 \
     --hash=sha256:6950faca6819acd3219d4ae694a23c7a87ee38d084f70c1724b0c0dbb8b75769 \
     --hash=sha256:f0caa660e797d9cd10db6fc6ae81e2c9b2767af75c3180fcd0e46158cd368d7f
+    # via -r requirements.txt.in
+parse==1.19.0 \
+    --hash=sha256:9ff82852bcb65d139813e2a5197627a94966245c897796760a3a2a8eb66f020b
     # via -r requirements.txt.in
 parsedatetime==2.6 \
     --hash=sha256:4cb368fbb18a0b7231f4d76119165451c8d2e35951455dfee97c62a87b04d455 \

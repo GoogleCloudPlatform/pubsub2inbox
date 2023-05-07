@@ -1,0 +1,19 @@
+[
+  {
+    "ackId": "U0RQBhYsXUZIUTcZCGhRDk9eIz81IChFFAkIFAV8fXFcUHVbXBoHUQ0ZcnxpcjxbFwgBTQd-VVsRDXptXG2P0-SLRF9BcmxeEAgBRFR2XF0fBW1cVF2urfGNxJ-QSHBmK4mArMFIf8bv0pFuZiA9XxJLLD5-IDNFQV5AEkwrBkRJUytDCypYEU4EISE-MD5F",
+    "message": {
+      "attributes": {
+        "Action": "Required",
+        "DeliveryPipelineId": "helloworld-app",
+        "Location": "europe-west1",
+        "ProjectNumber": "1041277533937",
+        "ReleaseId": "bot-release-008",
+        "Rollout": "projects/1041277533937/locations/europe-west1/deliveryPipelines/helloworld-app/releases/bot-release-008/rollouts/bot-release-006-to-run-qsprod-3",
+        "RolloutId": "bot-release-006-to-run-qsprod-3",
+        "TargetId": "run-qsprod"
+      },
+      "messageId": "7643931783648508",
+      "publishTime": "2023-05-06T13:38:40.482Z"
+    }
+  }
+]
