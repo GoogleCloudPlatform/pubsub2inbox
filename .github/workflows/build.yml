@@ -75,7 +75,7 @@ jobs:
             org.opencontainers.image.version=${{ env.VERSION }}
 
       - name: Build and push Json2Pubsub
-        id: build
+        id: build-json2pubsub
         uses: docker/build-push-action@v3
         with:
           context: cmd/json2pubsub
