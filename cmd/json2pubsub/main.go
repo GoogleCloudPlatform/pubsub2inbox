@@ -58,15 +58,13 @@ func getEnvironmentVariable(name string, required bool) (string, error) {
 		defer client.Close()
 
 		accessRequest := &secretmanagerpb.AccessSecretVersionRequest{
-			Name: envVar[3:],
+			Name: envVar[4:],
 		}
 
 		result, err := client.AccessSecretVersion(ctx, accessRequest)
 		if err != nil {
-			log.Fatalf("Failed to access Secret %s: %v", envVar[3:], err)
+			log.Fatalf("Failed to access Secret %s: %v", envVar[4:], err)
 		}
-
-		log.Printf("Plaintext: %s", result.Payload.Data)
 		return string(result.Payload.Data), nil
 	}
 	return envVar, nil
