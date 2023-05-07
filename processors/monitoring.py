@@ -58,13 +58,13 @@ class MonitoringProcessor(Processor):
                     'pageSize': page_size,
                 }
                 while True:
-                    if not page_token is None:
+                    if page_token is not None:
                         request_body['pageToken'] = page_token
                     request = monitoring_service.projects().timeSeries().query(
                         name=project_str, body=request_body)
                     response = request.execute()
                     if 'timeSeriesDescriptor' in response:
-                        if not key_str in results:
+                        if key_str not in results:
                             results[key_str] = {
                                 'timeSeriesDescriptor':
                                     response['timeSeriesDescriptor']

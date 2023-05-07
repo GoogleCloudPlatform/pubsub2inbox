@@ -21,7 +21,7 @@ import google_auth_httplib2
 import google.auth
 from googleapiclient import http
 from google.cloud import resourcemanager_v3
-import json_fix
+import json_fix  # noqa: F401
 import tempfile
 
 PUBSUB2INBOX_VERSION = '1.7.0'

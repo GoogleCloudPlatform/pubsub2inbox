@@ -16,7 +16,8 @@ import os
 import email
 import base64
 from email import encoders
-import smtplib, ssl
+import smtplib
+import ssl
 import urllib
 from googleapiclient import discovery, errors
 from email.mime.base import MIMEBase
@@ -86,7 +87,7 @@ class MailOutput(Output):
                                             authority=authority)
         result = app.acquire_token_for_client(
             ['https://graph.microsoft.com/.default'])
-        if not 'access_token' in result:
+        if 'access_token' not in result:
             raise OAuthTokenFetchException(result.get('error_description'))
         return result['access_token']
 
@@ -145,7 +146,7 @@ class MailOutput(Output):
                     if u_response:
                         new_emails.append(e[1])
                 except errors.HttpError as exc:
-                    if not 'ignoreNonexistentGroups' in config or not config[
+                    if 'ignoreNonexistentGroups' not in config or not config[
                             'ignoreNonexistentGroups']:
                         raise GroupNotFoundException(
                             'Failed to find group %s in Cloud Identity!' % e[1])
@@ -182,7 +183,7 @@ class MailOutput(Output):
 
         server = None
         if 'verifyCertificate' in transport and transport[
-                'verifyCertificate'] == False:
+                'verifyCertificate'] is False:
             context = ssl._create_unverified_context()
         else:
             context = ssl.create_default_context()

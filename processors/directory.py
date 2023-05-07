@@ -139,5 +139,5 @@ class DirectoryProcessor(Processor):
                     break
                 group_unique_id = groups.pop()
 
-        res = {output_v: results}
+        res = {output_var: results}
         return res

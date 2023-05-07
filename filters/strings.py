@@ -27,7 +27,7 @@ import re
 import logging
 import hashlib
 import yaml
-import json_fix
+import json_fix  # noqa: F401
 from pathlib import Path
 import parse
 import os
