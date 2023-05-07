@@ -92,6 +92,14 @@ output.scc module
    :undoc-members:
    :show-inheritance:
 
+output.slack module
+-------------------
+
+.. automodule:: output.slack
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 output.test module
 ------------------
 
