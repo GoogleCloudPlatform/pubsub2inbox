@@ -45,11 +45,11 @@ jobs:
         run: |
           pip install --require-hashes --no-cache-dir --no-deps -r requirements.txt
           pip install --no-cache-dir --no-deps -r requirements-dev.txt
-          pip install yapf
 
       - name: Run lint check
         run: |
-          yapf --style google --diff --recursive .
+          make fmt
+          make lint
 
       - name: Run unit tests
         env:
@@ -58,6 +58,6 @@ jobs:
         run: |
           echo "Starting unit tests..."
 
-          python3 -m unittest discover -v
+          make test
 
           echo "Unit testing finished."

@@ -61,7 +61,7 @@ def utc_strftime(timestamp_string, strftime_format):
 
 
 def recurring_date(event, now_date=None, strftime_format='%Y-%m-%d'):
-    if now_date != None:
+    if now_date is not None:
         time_struct, parse_status = parsedatetime.Calendar(
             version=parsedatetime.VERSION_CONTEXT_STYLE).parse(now_date)
         if not parse_status:

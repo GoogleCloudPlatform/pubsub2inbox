@@ -17,7 +17,6 @@ from contextlib import redirect_stdout
 from .helpers import fixture_to_pubsub, load_config
 import unittest
 import logging
-import os
 
 
 class TestHandling(unittest.TestCase):

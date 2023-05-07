@@ -663,7 +663,7 @@ def process_message(config, data, event, context):
 
 
 def decode_and_process(logger, config, event, context):
-    if not 'data' in event:
+    if 'data' not in event:
         raise NoDataFieldException('No data field in Pub/Sub message!')
 
     logger.debug('Decoding Pub/Sub message...',

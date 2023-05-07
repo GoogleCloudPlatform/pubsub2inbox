@@ -333,7 +333,7 @@ Run the command:
 Run the command:
 
 ```
-# python3 -m unittest discover
+# make test
 ```
 
 To set against a real cloud project, set `PROJECT_ID` environment variable. 
