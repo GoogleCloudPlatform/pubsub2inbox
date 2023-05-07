@@ -28,6 +28,7 @@ permissions:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: pubsub2inbox
+  JSON_IMAGE_NAME: json2pubsub
 
 jobs:
   build-push-container-image:
@@ -49,6 +50,7 @@ jobs:
             echo "VERSION=latest" >> $GITHUB_ENV
           fi
           echo "IMAGE_TAG=${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}" | tr '[:upper:]' '[:lower:]' >> $GITHUB_ENV
+          echo "JSON_IMAGE_TAG=${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.JSON_IMAGE_NAME }}" | tr '[:upper:]' '[:lower:]' >> $GITHUB_ENV
 
       - name: Login to GHCR
         uses: docker/login-action@v2
@@ -72,8 +74,30 @@ jobs:
             org.opencontainers.image.vendor=Google LLC
             org.opencontainers.image.version=${{ env.VERSION }}
 
+      - name: Build and push Json2Pubsub
+        id: build
+        uses: docker/build-push-action@v3
+        with:
+          context: cmd/json2pubsub
+          push: true
+          tags: |
+            ${{ env.json_image_tag }}:${{ env.VERSION }}
+          labels: |
+            org.opencontainers.image.licenses=Apache-2.0
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.title=Json2Pubsub
+            org.opencontainers.image.vendor=Google LLC
+            org.opencontainers.image.version=${{ env.VERSION }}
+
       - name: Sign image
         env:
           COSIGN_KEY: ${{ secrets.COSIGN_KEY }}
         run: |
           /usr/local/bin/cosign sign --key env://COSIGN_KEY ${{ env.image_tag }}@${{ steps.build.outputs.digest }}
+  
+      - name: Sign Json2Pubsub image
+        env:
+          COSIGN_KEY: ${{ secrets.COSIGN_KEY }}
+        run: |
+          /usr/local/bin/cosign sign --key env://COSIGN_KEY ${{ env.json_image_tag }}@${{ steps.build.outputs.digest }}
