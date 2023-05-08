@@ -1,21 +1,20 @@
 # Json2Pubsub
 
 Json2Pubsub is another versatile tool for turning many types of incoming requests,
-such as webhooks to Pub/Sub messages. It supports Common Expression Language,
+such as webhooks, to Pub/Sub messages. It supports Common Expression Language,
 CEL, both for validating that incoming requests are valid and for extracting the
 Pub/Sub message payload.
 
-Currently it has been tested with Slack incoming events. Currently the function
-only accepts `POST` requests (both `application/x-www-form-urlencoded` and
-`application/json` are supported).
+Currently it has been tested with Slack incoming events. The function only accepts 
+`POST` requests (both `application/x-www-form-urlencoded` and `application/json` are supported).
 
-The only permission on Google Cloud that is requires is `roles/pubsub.publisher`
-on the target queue.
+The only permission on Google Cloud that it requires is `roles/pubsub.publisher`
+on the target Pub/Sub topic.
 
 ## Deploying
 
 The main Pubsub2Inbox [Terraform code](../../variables.tf) supports automatically
-deploying Json2Pubsub alongside with a Pubsub2Inbox function. Simply define the 
+deploying Json2Pubsub alongside with a Pubsub2Inbox function. Simply add the 
 following variable in the module:
 
 ```hcl
@@ -30,6 +29,9 @@ following variable in the module:
     max_instances   = 10
   }
 ```
+
+If you are deploying via Cloud Run, a `Dockerfile` is supplied. Remember to
+point `container_image` to the correct container image then.
 
 ## Running locally
 
