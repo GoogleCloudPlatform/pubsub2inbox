@@ -1,4 +1,4 @@
-package main
+package function
 
 //    Copyright 2023 Google LLC
 //
@@ -16,6 +16,7 @@ package main
 
 import (
 	"fmt"
+	"net"
 	"reflect"
 
 	"crypto/hmac"
@@ -28,7 +29,7 @@ import (
 	"github.com/google/cel-go/common/types/ref"
 	"github.com/google/cel-go/ext"
 
-	jwt "github.com/dgrijalva/jwt-go"
+	jwt "github.com/golang-jwt/jwt/v5"
 )
 
 type CelLib struct{}
@@ -36,7 +37,42 @@ type CelLib struct{}
 func GetCelEnv() (*cel.Env, error) {
 	env, err := cel.NewEnv(
 		ext.Strings(),
+		ext.Encoders(),
 		cel.Variable("request", cel.MapType(cel.StringType, cel.DynType)),
+		cel.Variable("origin", cel.MapType(cel.StringType, cel.DynType)),
+		cel.Function("ipInRange",
+			cel.Overload("string_ipInRange_string",
+				[]*cel.Type{cel.StringType, cel.StringType},
+				cel.BoolType,
+				cel.BinaryBinding(func(ipAddr, ipRange ref.Val) ref.Val {
+					_ipAddr, err := ipAddr.ConvertToNative(reflect.TypeOf(""))
+					if err != nil {
+						return types.NewErr("IP address is not a string")
+					}
+					_ipRange, err := ipRange.ConvertToNative(reflect.TypeOf(""))
+					if err != nil {
+						return types.NewErr("IP range is not a string")
+					}
+
+					ipAddrParsed := net.ParseIP(_ipAddr.(string))
+					if ipAddrParsed == nil {
+						return types.NewErr("Invalid IP address")
+					}
+
+					_, ipRangeParsed, err := net.ParseCIDR(_ipRange.(string))
+					if err != nil {
+						return types.NewErr("Invalid IP range")
+					}
+
+					if ipRangeParsed.Contains(ipAddrParsed) {
+						return types.Bool(true)
+					}
+					return types.Bool(false)
+
+				},
+				),
+			),
+		),
 		cel.Function("parseJWT",
 			cel.Overload("string_parseJWT_string",
 				[]*cel.Type{cel.StringType, cel.StringType},
@@ -53,15 +89,12 @@ func GetCelEnv() (*cel.Env, error) {
 					claims := jwt.MapClaims{}
 					token, err := jwt.ParseWithClaims(_jwtValue.(string), claims, func(token *jwt.Token) (interface{}, error) {
 						return []byte(_jwtKey.(string)), nil
-					})
+					}, jwt.WithIssuedAt())
 					if err != nil {
 						return types.NewErr("Failed to parse JWT")
 					}
 					if !token.Valid {
 						return types.NewErr("JWT is not valid")
-					}
-					if err = claims.Valid(); err != nil {
-						return types.NewErr(fmt.Sprintf("JWT no longer is valid: %v", err))
 					}
 
 					claimsOut := make(map[string]interface{}, 0)

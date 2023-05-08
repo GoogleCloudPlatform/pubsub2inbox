@@ -9,6 +9,35 @@ Currently it has been tested with Slack incoming events. Currently the function
 only accepts `POST` requests (both `application/x-www-form-urlencoded` and
 `application/json` are supported).
 
+The only permission on Google Cloud that is requires is `roles/pubsub.publisher`
+on the target queue.
+
+## Deploying
+
+The main Pubsub2Inbox [Terraform code](../../variables.tf) supports automatically
+deploying Json2Pubsub alongside with a Pubsub2Inbox function. Simply define the 
+following variable in the module:
+
+```hcl
+  deploy_json2pubsub = {
+    enabled         = true
+    suffix          = "-json2pubsub"
+    control_cel     = "request.header['x-authorization-token'] == '12345678'"
+    message_cel     = "request.json"
+    public_access   = true 
+    container_image = null # if using Cloud Run
+    min_instances   = 0
+    max_instances   = 10
+  }
+```
+
+## Running locally
+
+```sh
+export FUNCTION_TARGET=Json2Pubsub
+go run cmd/main.go
+```
+
 ## Configuring
 
 The function can be deployed as a Cloud Run or Cloud Functions v2 function.
@@ -18,6 +47,7 @@ environment variables also support fetching the contents from Secret Manager
 
 Configuration variables are:
 
+- `GOOGLE_CLOUD_PROJECT`: the Google Cloud project to use 
 - `PUBSUB_TOPIC`: target topic 
 - `CUSTOM_HANDLER`: specify the URL where message will be submitted (default `/`)
 - `CONTROL_CEL`: request control CEL expression, this will be first evaluated and it has to return `true` for the request to proceed
@@ -31,12 +61,18 @@ Configuration variables are:
 - `request.headers`: contains the request headers
 - `request.unixtime`: unix time for current request
 - `request.time.(year|month|day|hour|minute|second)`: split time for request
-- 
+- `request.scheme`: http or https (generally always https)
+- `request.method`: always POST
+- `request.path`: request path
+- `request.query`: raw query string
+- `origin.ip`: originating IP address
+
 ### Available CEL functions
 
 - `parseJWT(secret, string)`: parses a JWT token
 - `hmacSHA256(secret, string)`: returns HMAC-SHA256
 - `hmacSHA1(secret, string)`: returns HMAC-SHA1
+- `ipInRange(ip, iprange)`: checks if IP is within IP range
 
 ## Example expressions
 

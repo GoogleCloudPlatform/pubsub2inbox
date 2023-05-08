@@ -239,6 +239,10 @@ locals {
   local_files_path     = var.local_files_path == null ? path.module : var.local_files_path
   all_function_files   = var.use_local_files ? setunion([for glob in local.function_files : fileset(local.local_files_path, glob)]...) : []
   function_file_hashes = [for file_path in local.all_function_files : filemd5(format("%s/%s", local.local_files_path, file_path))]
+
+  json2pubsub_files          = ["cmd/json2pubsub/*.go", "cmd/json2pubsub/go.*"]
+  json2pubsub_function_files = var.use_local_files ? setunion([for glob in local.json2pubsub_files : fileset(local.local_files_path, glob)]...) : []
+  json2pubsub_file_hashes    = [for file_path in local.all_function_files : filemd5(format("%s/%s", local.local_files_path, file_path))]
 }
 
 data "archive_file" "function-zip" {
@@ -255,6 +259,20 @@ data "archive_file" "function-zip" {
   }
 }
 
+data "archive_file" "json2pubsub-function-zip" {
+  count = var.deploy_json2pubsub.enabled && var.use_local_files ? 1 : 0
+
+  type        = "zip"
+  output_path = "${path.module}/json2pubsub.zip"
+  dynamic "source" {
+    for_each = local.json2pubsub_function_files
+    content {
+      content  = file(format("%s/%s", path.module, source.value))
+      filename = replace(source.value, "cmd/json2pubsub/", "")
+    }
+  }
+}
+
 resource "google_storage_bucket_object" "function-archive" {
   count = !var.cloud_run && var.use_local_files ? 1 : 0
 
@@ -263,6 +281,17 @@ resource "google_storage_bucket_object" "function-archive" {
   source = var.use_local_files ? format("%s/index.zip", path.module) : null
   depends_on = [
     data.archive_file.function-zip.0
+  ]
+}
+
+resource "google_storage_bucket_object" "json2pubsub-function-archive" {
+  count = var.deploy_json2pubsub.enabled && var.use_local_files ? 1 : 0
+
+  name   = format("json2pubsub-%s.zip", md5(join(",", local.json2pubsub_file_hashes)))
+  bucket = google_storage_bucket.function-bucket[0].name
+  source = var.use_local_files ? format("%s/json2pubsub.zip", path.module) : null
+  depends_on = [
+    data.archive_file.json2pubsub-function-zip.0
   ]
 }
 
@@ -477,4 +506,184 @@ resource "google_cloud_run_service" "function" {
     percent         = 100
     latest_revision = true
   }
+}
+
+# Json2Pubsub resources
+resource "google_service_account" "json2pubsub-service-account" {
+  count   = var.deploy_json2pubsub.enabled ? 1 : 0
+  project = var.project_id
+
+  account_id   = format("%s%s", var.service_account != "" ? var.service_account : var.function_name, var.deploy_json2pubsub.suffix)
+  display_name = format("%s Json2Pubsub Service Account", title(var.service_account))
+}
+
+resource "google_secret_manager_secret" "json2pubsub-message-cel" {
+  count   = var.deploy_json2pubsub.enabled ? 1 : 0
+  project = var.project_id
+
+  secret_id = format("%s%s-message", var.secret_id != "" ? var.secret_id : var.function_name, var.deploy_json2pubsub.suffix)
+
+  replication {
+    automatic = true
+  }
+
+  depends_on = [
+    google_project_service.secret-manager-api
+  ]
+}
+
+resource "google_secret_manager_secret_version" "json2pubsub-message-cel" {
+  count  = var.deploy_json2pubsub.enabled ? 1 : 0
+  secret = google_secret_manager_secret.json2pubsub-message-cel[0].id
+
+  secret_data = var.deploy_json2pubsub.message_cel
+}
+
+resource "google_secret_manager_secret" "json2pubsub-control-cel" {
+  count   = var.deploy_json2pubsub.enabled ? 1 : 0
+  project = var.project_id
+
+  secret_id = format("%s%s-control", var.secret_id != "" ? var.secret_id : var.function_name, var.deploy_json2pubsub.suffix)
+
+  replication {
+    automatic = true
+  }
+
+  depends_on = [
+    google_project_service.secret-manager-api
+  ]
+}
+
+resource "google_secret_manager_secret_version" "json2pubsub-control-cel" {
+  count  = var.deploy_json2pubsub.enabled ? 1 : 0
+  secret = google_secret_manager_secret.json2pubsub-control-cel[0].id
+
+  secret_data = var.deploy_json2pubsub.control_cel
+}
+
+resource "google_secret_manager_secret_iam_member" "json2pubsub-message-cel" {
+  count   = var.create_service_account ? 1 : 0
+  project = var.project_id
+
+  secret_id = google_secret_manager_secret.json2pubsub-message-cel[0].secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = format("serviceAccount:%s", google_service_account.json2pubsub-service-account[0].email)
+}
+
+resource "google_secret_manager_secret_iam_member" "json2pubsub-control-cel" {
+  count   = var.create_service_account ? 1 : 0
+  project = var.project_id
+
+  secret_id = google_secret_manager_secret.json2pubsub-control-cel[0].secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = format("serviceAccount:%s", google_service_account.json2pubsub-service-account[0].email)
+}
+
+resource "google_pubsub_topic_iam_member" "json2pubsub-publisher" {
+  count   = var.create_service_account ? 1 : 0
+  project = var.project_id
+
+  topic  = var.pubsub_topic
+  role   = "roles/pubsub.publisher"
+  member = format("serviceAccount:%s", google_service_account.json2pubsub-service-account[0].email)
+}
+
+resource "google_cloud_run_service" "json2pubsub-function" {
+  count   = var.deploy_json2pubsub.enabled && var.cloud_run ? 1 : 0
+  project = var.project_id
+
+  name     = format("%s%s", var.function_name, var.deploy_json2pubsub.suffix)
+  location = var.region
+
+  template {
+    spec {
+      containers {
+        image = var.deploy_json2pubsub.container_image
+
+        env {
+          name  = "MESSAGE_CEL"
+          value = format("gsm:%s", google_secret_manager_secret_version.json2pubsub-message-cel[0].name)
+        }
+        env {
+          name  = "CONTROL_CEL"
+          value = format("gsm:%s", google_secret_manager_secret_version.json2pubsub-control-cel[0].name)
+        }
+        env {
+          name  = "PUBSUB_TOPIC"
+          value = basename(var.pubsub_topic)
+        }
+        env {
+          name  = "GOOGLE_CLOUD_PROJECT"
+          value = var.project_id
+        }
+      }
+      service_account_name  = google_service_account.json2pubsub-service-account[0].email
+      container_concurrency = 8
+      timeout_seconds       = var.function_timeout
+    }
+    metadata {
+      annotations = {
+        "autoscaling.knative.dev/minScale" = var.deploy_json2pubsub.min_instances
+        "autoscaling.knative.dev/maxScale" = var.deploy_json2pubsub.max_instances
+      }
+    }
+  }
+  traffic {
+    percent         = 100
+    latest_revision = true
+  }
+}
+
+resource "google_cloud_run_service_iam_member" "json2pubsub-public-access" {
+  count   = var.deploy_json2pubsub.enabled && var.cloud_run && var.deploy_json2pubsub.public_access ? 1 : 0
+  project = var.project_id
+
+  location = google_cloud_run_service.json2pubsub-function[0].location
+  service  = google_cloud_run_service.json2pubsub-function[0].name
+  role     = "roles/cloudfunctions.invoker"
+  member   = "allUsers"
+}
+
+resource "google_cloudfunctions2_function" "json2pubsub-function" {
+  count = var.deploy_json2pubsub.enabled && !var.cloud_run && var.cloud_functions_v2 ? 1 : 0
+
+  project = var.project_id
+
+  name        = format("%s%s", var.function_name, var.deploy_json2pubsub.suffix)
+  location    = var.region
+  description = "Json2Pubsub"
+
+  build_config {
+    runtime     = "go120"
+    entry_point = "Json2Pubsub"
+    source {
+      storage_source {
+        bucket = google_storage_bucket.function-bucket[0].name
+        object = var.use_local_files ? google_storage_bucket_object.json2pubsub-function-archive[0].name : null
+      }
+    }
+  }
+
+  service_config {
+    service_account_email = google_service_account.json2pubsub-service-account[0].email
+    max_instance_count    = var.deploy_json2pubsub.max_instances
+    available_memory      = "128Mi"
+    timeout_seconds       = var.function_timeout
+    environment_variables = {
+      GOOGLE_CLOUD_PROJECT = var.project_id
+      PUBSUB_TOPIC         = basename(var.pubsub_topic)
+      MESSAGE_CEL          = format("gsm:%s", google_secret_manager_secret_version.json2pubsub-message-cel[0].name)
+      CONTROL_CEL          = format("gsm:%s", google_secret_manager_secret_version.json2pubsub-control-cel[0].name)
+    }
+  }
+}
+
+resource "google_cloud_run_service_iam_member" "json2pubsub-public-access-v2" {
+  count   = var.deploy_json2pubsub.enabled && !var.cloud_run && var.cloud_functions_v2 && var.deploy_json2pubsub.public_access ? 1 : 0
+  project = var.project_id
+
+  location = google_cloudfunctions2_function.json2pubsub-function[0].location
+  service  = google_cloudfunctions2_function.json2pubsub-function[0].service_config[0].service
+  role     = "roles/run.invoker"
+  member   = "allUsers"
 }
