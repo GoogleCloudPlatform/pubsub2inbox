@@ -5,7 +5,8 @@ go 1.19
 require (
 	cloud.google.com/go/pubsub v1.30.1
 	cloud.google.com/go/secretmanager v1.10.0
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/GoogleCloudPlatform/functions-framework-go v1.7.1
+	github.com/golang-jwt/jwt/v5 v5.0.0
 	github.com/google/cel-go v0.15.1
 	github.com/rs/zerolog v1.29.1
 	github.com/stretchr/testify v1.8.2
@@ -19,11 +20,9 @@ require (
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
 	cloud.google.com/go/functions v1.13.0 // indirect
 	cloud.google.com/go/iam v0.13.0 // indirect
-	github.com/GoogleCloudPlatform/functions-framework-go v1.7.1 // indirect
 	github.com/antlr/antlr4/runtime/Go/antlr/v4 v4.0.0-20230305170008-8188dc5388df // indirect
 	github.com/cloudevents/sdk-go/v2 v2.6.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/golang-jwt/jwt/v5 v5.0.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
