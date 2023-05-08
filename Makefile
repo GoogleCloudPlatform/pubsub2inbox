@@ -34,6 +34,7 @@ check: lint test
 
 test:
 	$(PYTHON) -m unittest discover
+	cd cmd/json2pubsub && go test
 
 fmt: 
 	$(YAPF) --style google --recursive -i .

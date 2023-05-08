@@ -40,3 +40,11 @@ output "secret" {
 output "bucket" {
   value = !var.cloud_run ? google_storage_bucket.function-bucket : null
 }
+
+output "json2pubsub_url" {
+  value = var.deploy_json2pubsub.enabled ? (
+    var.cloud_functions_v2 ?
+    google_cloudfunctions2_function.json2pubsub-function[0].service_config[0].uri :
+    google_cloud_run_service.json2pubsub-function[0].status[0].url
+  ) : null
+}

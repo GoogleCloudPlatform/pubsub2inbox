@@ -182,3 +182,27 @@ variable "log_level" {
   description = "Set log level (10 equals debug)"
   default     = 10
 }
+
+variable "deploy_json2pubsub" {
+  description = "Deploy Json2Pubsub alongside with this function (eg. for incoming webhooks)"
+  type = object({
+    enabled         = bool
+    suffix          = string
+    control_cel     = string
+    message_cel     = string
+    public_access   = bool
+    container_image = string
+    min_instances   = number
+    max_instances   = number
+  })
+  default = {
+    enabled         = false
+    suffix          = "-json2pubsub"
+    control_cel     = "false"
+    message_cel     = "request.json"
+    public_access   = false
+    container_image = null
+    min_instances   = 0
+    max_instances   = 10
+  }
+}
