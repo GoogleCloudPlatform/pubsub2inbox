@@ -172,6 +172,14 @@ processors.shellscript module
    :undoc-members:
    :show-inheritance:
 
+processors.slack module
+-----------------------
+
+.. automodule:: processors.slack
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 processors.storage module
 -------------------------
 
@@ -184,6 +192,14 @@ processors.transcode module
 ---------------------------
 
 .. automodule:: processors.transcode
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+processors.vertexgenai module
+-----------------------------
+
+.. automodule:: processors.vertexgenai
    :members:
    :undoc-members:
    :show-inheritance:

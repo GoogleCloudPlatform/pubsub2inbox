@@ -60,3 +60,10 @@ class SlackOutput(Output):
             self.logger.error('Error when calling Slack API: %s',
                               response_json['error'],
                               extra={'slack_error': response_json['error']})
+        else:
+            self.logger.error('Slack API %s called successfully.' % (api),
+                              extra={
+                                  'slack_api': api,
+                                  'slack_request': request_body,
+                                  'slack_response': response_json
+                              })

@@ -447,7 +447,11 @@ the variable set with output.
 
 * **Parameters**
 
-    **value** (*any*) – Value to set.
+    
+    * **value** (*any*) – Value to set.
+
+
+    * **fromJson** (*bool**, **optional*) – Convert value from JSON.
 
 
 
@@ -504,6 +508,33 @@ Runs any shellscript as a command and exposes the output in Jinja.
 #### get_default_config_key()
 
 #### process(output_var='shellscript')
+## processors.slack module
+
+
+### _class_ processors.slack.SlackProcessor(config, jinja_environment, data, event, context)
+Bases: `Processor`
+
+Slack processor for fetching messages.
+
+
+* **Parameters**
+
+    
+    * **token** (*str*) – A Slack Bot User OAuth Token.
+
+
+    * **api** (*str*) – One of: conversations.list, conversations.history, conversations.replies,
+
+
+    * **request** (*dict*) – The API call body.
+
+
+
+#### call_slack(api, token, request, urlencoded=False)
+
+#### get_default_config_key()
+
+#### process(output_var='slack')
 ## processors.storage module
 
 
@@ -547,4 +578,32 @@ Transcode media using Transcoder API. For more information, see:
 #### get_default_config_key()
 
 #### process(output_var='transcode')
+## processors.vertexgenai module
+
+
+### _class_ processors.vertexgenai.VertexgenaiProcessor(config, jinja_environment, data, event, context)
+Bases: `Processor`
+
+Vertex AI Generative AI processor.
+
+
+* **Parameters**
+
+    
+    * **region** (*str*) – Endpoint to use.
+
+
+    * **modelId** (*str*) – Deployed model to use.
+
+
+    * **project** (*str**, **optional*) – Google Cloud project ID.
+
+
+    * **request** (*dict*) – Request.
+
+
+
+#### get_default_config_key()
+
+#### process(output_var='vertexgenai')
 ## Module contents

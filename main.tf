@@ -126,6 +126,11 @@ locals {
       project = ["roles/clouddeploy.viewer"]
       apis    = ["clouddeploy.googleapis.com"]
     }
+    vertexai-user = {
+      org     = []
+      project = ["roles/aiplatform.user"]
+      apis    = ["aiplatform.googleapis.com"]
+    }
   }
   org_permissions     = flatten([for role in var.function_roles : local.iam_permissions[role].org])
   project_permissions = flatten([for role in var.function_roles : local.iam_permissions[role].project])
@@ -561,8 +566,30 @@ resource "google_secret_manager_secret_version" "json2pubsub-control-cel" {
   secret_data = var.deploy_json2pubsub.control_cel
 }
 
+resource "google_secret_manager_secret" "json2pubsub-response-cel" {
+  count   = var.deploy_json2pubsub.enabled ? 1 : 0
+  project = var.project_id
+
+  secret_id = format("%s%s-response", var.secret_id != "" ? var.secret_id : var.function_name, var.deploy_json2pubsub.suffix)
+
+  replication {
+    automatic = true
+  }
+
+  depends_on = [
+    google_project_service.secret-manager-api
+  ]
+}
+
+resource "google_secret_manager_secret_version" "json2pubsub-response-cel" {
+  count  = var.deploy_json2pubsub.enabled && var.deploy_json2pubsub.enabled  ? 1 : 0
+  secret = google_secret_manager_secret.json2pubsub-response-cel[0].id
+
+  secret_data = var.deploy_json2pubsub.response_cel
+}
+
 resource "google_secret_manager_secret_iam_member" "json2pubsub-message-cel" {
-  count   = var.create_service_account ? 1 : 0
+  count   = var.create_service_account && var.deploy_json2pubsub.enabled  ? 1 : 0
   project = var.project_id
 
   secret_id = google_secret_manager_secret.json2pubsub-message-cel[0].secret_id
@@ -571,7 +598,7 @@ resource "google_secret_manager_secret_iam_member" "json2pubsub-message-cel" {
 }
 
 resource "google_secret_manager_secret_iam_member" "json2pubsub-control-cel" {
-  count   = var.create_service_account ? 1 : 0
+  count   = var.create_service_account && var.deploy_json2pubsub.enabled  ? 1 : 0
   project = var.project_id
 
   secret_id = google_secret_manager_secret.json2pubsub-control-cel[0].secret_id
@@ -579,8 +606,17 @@ resource "google_secret_manager_secret_iam_member" "json2pubsub-control-cel" {
   member    = format("serviceAccount:%s", google_service_account.json2pubsub-service-account[0].email)
 }
 
+resource "google_secret_manager_secret_iam_member" "json2pubsub-response-cel" {
+  count   = var.create_service_account && var.deploy_json2pubsub.enabled  ? 1 : 0
+  project = var.project_id
+
+  secret_id = google_secret_manager_secret.json2pubsub-response-cel[0].secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = format("serviceAccount:%s", google_service_account.json2pubsub-service-account[0].email)
+}
+
 resource "google_pubsub_topic_iam_member" "json2pubsub-publisher" {
-  count   = var.create_service_account ? 1 : 0
+  count   = var.create_service_account && var.deploy_json2pubsub.enabled ? 1 : 0
   project = var.project_id
 
   topic  = var.pubsub_topic
@@ -607,6 +643,10 @@ resource "google_cloud_run_service" "json2pubsub-function" {
         env {
           name  = "CONTROL_CEL"
           value = format("gsm:%s", google_secret_manager_secret_version.json2pubsub-control-cel[0].name)
+        }
+        env {
+          name  = "RESPONSE_CEL"
+          value = format("gsm:%s", google_secret_manager_secret_version.json2pubsub-response-cel[0].name)
         }
         env {
           name  = "PUBSUB_TOPIC"
@@ -674,6 +714,7 @@ resource "google_cloudfunctions2_function" "json2pubsub-function" {
       PUBSUB_TOPIC         = basename(var.pubsub_topic)
       MESSAGE_CEL          = format("gsm:%s", google_secret_manager_secret_version.json2pubsub-message-cel[0].name)
       CONTROL_CEL          = format("gsm:%s", google_secret_manager_secret_version.json2pubsub-control-cel[0].name)
+      RESPONSE_CEL         = format("gsm:%s", google_secret_manager_secret_version.json2pubsub-response-cel[0].name)
     }
   }
 }

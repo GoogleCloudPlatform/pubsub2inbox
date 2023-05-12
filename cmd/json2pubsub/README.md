@@ -54,6 +54,7 @@ Configuration variables are:
 - `CUSTOM_HANDLER`: specify the URL where message will be submitted (default `/`)
 - `CONTROL_CEL`: request control CEL expression, this will be first evaluated and it has to return `true` for the request to proceed
 - `MESSAGE_CEL`: message extraction CEL expression
+- `RESPONSE_CEL`: for returning a response
 
 ### Available CEL variables
 
@@ -75,10 +76,52 @@ Configuration variables are:
 - `hmacSHA256(secret, string)`: returns HMAC-SHA256
 - `hmacSHA1(secret, string)`: returns HMAC-SHA1
 - `ipInRange(ip, iprange)`: checks if IP is within IP range
-
+- `parseJSON(string)`: parses a string format JSON (supports only map-style output)
+- 
 ## Example expressions
 
-### Example of Slack incoming message processing
+### Example of Slack incoming event processing
+
+CEL expression for request verification:
+```
+'x-slack-signature' in request.headers && 
+'x-slack-request-timestamp' in request.headers &&
+(request.unixtime - int(request.headers['x-slack-request-timestamp'])) < 300 &&
+('v0='+hmacSHA256('8f742231b10e8888abcd99yyyzzz85a5', 'v0:'+request.headers['x-slack-request-timestamp']+':'+request.body)) == request.headers['x-slack-signature']
+```
+
+CEL expression for extracting payload:
+
+```
+request.json
+```
+
+CEL expression for returning the response body (used for challenge):
+
+```
+'challenge' in request.json ? request.json.challenge : 'OK'
+```
+
+Testing:
+```sh
+curl -XPOST -H 'Content-Type: application/x-www-form-urlencoded' \
+  -H 'X-Slack-Request-Timestamp: 1531420618' \
+  -H 'X-Slack-Signature: v0=a2114d57b48eac39b9ad189dd8316235a7b4a8d21a10bd27519666489c69b503' \
+  -d 'token=xyzz0WbapA4vBCDEFasx0q6G&team_id=T1DC2JH3J&team_domain=testteamnow&channel_id=G8PSS9T3V&channel_name=foobar&user_id=U2CERLKJA&user_name=roadrunner&command=%2Fwebhook-collect&text=&response_url=https%3A%2F%2Fhooks.slack.com%2Fcommands%2FT1DC2JH3J%2F397700885554%2F96rGlfmibIGlgcZRskXaIFfN&trigger_id=398738663015.47445629121.803a0bc887a14d10d2c447fce8b6703c' \
+  http://localhost:8080
+```
+
+JSON body (not valid request):
+
+```sh
+curl -i -XPOST -H 'Content-Type: application/json' \
+  -H 'X-Slack-Request-Timestamp: 1531420618' \
+  -H 'X-Slack-Signature: v0=a2114d57b48eac39b9ad189dd8316235a7b4a8d21a10bd27519666489c69b503' \
+  -d '{"token":"Jhj5dZrVaK7ZwHHjRyZWjbDl","challenge":"3eZbrw1aBm2rZgRNFdxV2595E9CY3gmdALWMmHkvFXO7tYXAYM8P", "type":"url_verification"}' \
+  http://localhost:8080
+```
+
+### Example of Slack incoming event processing (legacy)
 
 CEL expression for request verification:
 ```
@@ -92,6 +135,12 @@ CEL expression for extracting payload:
 
 ```
 request.json.payload
+```
+
+CEL expression for returning the response body (used for challenge):
+
+```
+'challenge' in parseJSON(request.json.payload) ? parseJSON(request.json.payload).challenge : 'OK'
 ```
 
 Testing:

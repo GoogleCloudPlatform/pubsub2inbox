@@ -190,6 +190,7 @@ variable "deploy_json2pubsub" {
     suffix          = string
     control_cel     = string
     message_cel     = string
+    response_cel    = string
     public_access   = bool
     container_image = string
     min_instances   = number
@@ -200,6 +201,7 @@ variable "deploy_json2pubsub" {
     suffix          = "-json2pubsub"
     control_cel     = "false"
     message_cel     = "request.json"
+    response_cel    = ""
     public_access   = false
     container_image = null
     min_instances   = 0
