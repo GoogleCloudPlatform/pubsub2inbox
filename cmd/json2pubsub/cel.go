@@ -23,6 +23,7 @@ import (
 	"crypto/sha1"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/common/types"
@@ -69,6 +70,26 @@ func GetCelEnv() (*cel.Env, error) {
 					}
 					return types.Bool(false)
 
+				},
+				),
+			),
+		),
+		cel.Function("parseJSON",
+			cel.Overload("dynmap_parseJSON_string",
+				[]*cel.Type{cel.StringType},
+				cel.MapType(cel.StringType, cel.DynType),
+				cel.UnaryBinding(func(jsonValue ref.Val) ref.Val {
+					_jsonValue, err := jsonValue.ConvertToNative(reflect.TypeOf(""))
+					if err != nil {
+						return types.NewErr("JSON value is not a string")
+					}
+					var jsonParsed map[string]interface{}
+					if !json.Valid([]byte(_jsonValue.(string))) {
+						return types.NewErr("JSON value is not valid")
+					}
+					json.Unmarshal([]byte(_jsonValue.(string)), &jsonParsed)
+
+					return types.NewStringInterfaceMap(types.DefaultTypeAdapter, jsonParsed)
 				},
 				),
 			),

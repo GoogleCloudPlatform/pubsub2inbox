@@ -838,6 +838,21 @@
             * [`ShellscriptProcessor.process()`](processors.md#processors.shellscript.ShellscriptProcessor.process)
 
 
+    * [processors.slack module](processors.md#module-processors.slack)
+
+
+        * [`SlackProcessor`](processors.md#processors.slack.SlackProcessor)
+
+
+            * [`SlackProcessor.call_slack()`](processors.md#processors.slack.SlackProcessor.call_slack)
+
+
+            * [`SlackProcessor.get_default_config_key()`](processors.md#processors.slack.SlackProcessor.get_default_config_key)
+
+
+            * [`SlackProcessor.process()`](processors.md#processors.slack.SlackProcessor.process)
+
+
     * [processors.storage module](processors.md#module-processors.storage)
 
 
@@ -863,6 +878,18 @@
 
 
             * [`TranscodeProcessor.process()`](processors.md#processors.transcode.TranscodeProcessor.process)
+
+
+    * [processors.vertexgenai module](processors.md#module-processors.vertexgenai)
+
+
+        * [`VertexgenaiProcessor`](processors.md#processors.vertexgenai.VertexgenaiProcessor)
+
+
+            * [`VertexgenaiProcessor.get_default_config_key()`](processors.md#processors.vertexgenai.VertexgenaiProcessor.get_default_config_key)
+
+
+            * [`VertexgenaiProcessor.process()`](processors.md#processors.vertexgenai.VertexgenaiProcessor.process)
 
 
     * [Module contents](processors.md#module-processors)

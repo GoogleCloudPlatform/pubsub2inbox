@@ -137,6 +137,11 @@ class BaseHelper:
         response = client.generate_access_token(name=name, scope=scopes)
         return response.access_token
 
+    def _jinja_expand_expr(self, contents, _tpl='config'):
+        expr = self.jinja_environment.compile_expression(contents,
+                                                         undefined_to_none=True)
+        return expr()
+
     def _jinja_expand_bool(self, contents, _tpl='config'):
         if isinstance(contents, bool):
             return contents
@@ -162,6 +167,14 @@ class BaseHelper:
         var_template.name = _tpl
         val_str = var_template.render()
         return int(val_str)
+
+    def _jinja_expand_float(self, contents, _tpl='config'):
+        if isinstance(contents, float):
+            return contents
+        var_template = self.jinja_environment.from_string(contents)
+        var_template.name = _tpl
+        val_str = var_template.render()
+        return float(val_str)
 
     def _jinja_var_to_list(self, _var, _tpl='config'):
         if isinstance(_var, list):
@@ -234,6 +247,33 @@ class BaseHelper:
             else:
                 _var[k] = self._jinja_expand_dict_all(_var[k])
         return _var
+
+    def _jinja_expand_dict_all_expr(self, _var, _tpl='config'):
+        _new_var = {}
+        if not isinstance(_var, dict):
+            return _var
+        for k, v in _var.items():
+            if not isinstance(v, dict):
+                if isinstance(v, str):
+                    if k.endswith('Expr'):
+                        _new_var[k[0:len(k) - 4]] = self._jinja_expand_expr(v)
+                    else:
+                        _new_var[k] = self._jinja_expand_string(v)
+                if isinstance(v, int):
+                    _new_var[k] = self._jinja_expand_int(v)
+                if isinstance(v, float):
+                    _new_var[k] = self._jinja_expand_float(v)
+                if isinstance(v, list):
+                    _new_var[k] = []
+                    for idx, lv in enumerate(_var[k]):
+                        if isinstance(lv, dict):
+                            _new_var[k].append(
+                                self._jinja_expand_dict_all_expr(lv))
+                        if isinstance(lv, str):
+                            _new_var[k].append(self._jinja_expand_string(lv))
+            else:
+                _new_var[k] = self._jinja_expand_dict_all_expr(_var[k])
+        return _new_var
 
     def _jinja_expand_list(self, _var, _tpl='config'):
         if not isinstance(_var, list):

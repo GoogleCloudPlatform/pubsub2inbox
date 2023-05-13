@@ -42,6 +42,8 @@ var VERSION string = "0.2.0"
 
 var requestControlExpr cel.Program
 var extractMessage cel.Program
+var responseBody cel.Program
+var defaultResponseBody = true
 
 var pubsubTopic string
 var cloudProjectId string
@@ -103,6 +105,19 @@ func setMessageCel(celEnv *cel.Env, messageCel string) (err error) {
 	return nil
 }
 
+func setResponseBodyCel(celEnv *cel.Env, bodyCel string) (err error) {
+	if bodyCel != "" {
+		responseBody, err = GetCelProgram(celEnv, bodyCel, false)
+		if err != nil {
+			return err
+		}
+		defaultResponseBody = false
+	} else {
+		defaultResponseBody = true
+	}
+	return nil
+}
+
 func Startup() (port string) {
 	port = os.Getenv("PORT")
 	if port == "" {
@@ -160,6 +175,18 @@ func Startup() (port string) {
 	err = setMessageCel(celEnv, messageCel)
 	if err != nil {
 		log.Fatal().Err(err).Msgf("Failed to compile message extract CEL program (%s): %v", messageCel, err)
+	}
+
+	responseCel, err := getEnvironmentVariable("RESPONSE_CEL", false)
+	if err != nil {
+		log.Fatal().Err(err).Msgf("Failed to get RESPONCE_CEL: %v", err)
+	}
+	err = setResponseBodyCel(celEnv, responseCel)
+	if err != nil {
+		log.Fatal().Err(err).Msgf("Failed to compile message extract CEL program (%s): %v", messageCel, err)
+	}
+	if responseCel == "" {
+		log.Info().Msg("No response body CEL specified, using empty responses.")
 	}
 	return port
 }
@@ -290,7 +317,7 @@ func RequestHandler(w http.ResponseWriter, r *http.Request) {
 		if json.Valid([]byte(_messageOut.(string))) {
 			json.Unmarshal([]byte(_messageOut.(string)), &messageJson)
 		} else {
-			log.Error().Str("RemoteAddr", r.RemoteAddr).Msg("Invalid JSON string.")
+			log.Error().Str("RemoteAddr", r.RemoteAddr).Str("json", _messageOut.(string)).Msg("Invalid JSON string from message CEL.")
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
@@ -341,5 +368,57 @@ func RequestHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusServiceUnavailable)
 		return
 	}
-	w.WriteHeader(http.StatusOK)
+
+	if !defaultResponseBody {
+		bodyOut, _, err := responseBody.Eval(celParams)
+		if err != nil || bodyOut == nil {
+			log.Error().Err(err).Str("RemoteAddr", r.RemoteAddr).Msgf("Failed to evaluate response boy: %v", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		if bodyOut.Type() == celtypes.StringType {
+			_bodyOut, err := bodyOut.ConvertToNative(reflect.TypeOf(""))
+			if err != nil {
+				log.Error().Err(err).Str("RemoteAddr", r.RemoteAddr).Msgf("Failed to convert response body to string: %v", err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(_bodyOut.(string)))
+		} else if bodyOut.Type() == celtypes.MapType {
+			_bodyOut, err := bodyOut.ConvertToNative(reflect.TypeOf(map[string]interface{}{}))
+			if err != nil {
+				log.Error().Err(err).Str("RemoteAddr", r.RemoteAddr).Msgf("Failed to convert response body to map: %v", err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			_bodyAsMap := _bodyOut.(map[string]interface{})
+			_bodyJson, err := json.Marshal(_bodyAsMap)
+			if err != nil {
+				log.Error().Err(err).Str("RemoteAddr", r.RemoteAddr).Msgf("Failed to convert response body map to JSON: %v", err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			w.WriteHeader(http.StatusOK)
+			w.Write(_bodyJson)
+		} else if bodyOut.Type() == celtypes.ListType {
+			_bodyOut, err := bodyOut.ConvertToNative(reflect.TypeOf([]interface{}{}))
+			if err != nil {
+				log.Error().Err(err).Str("RemoteAddr", r.RemoteAddr).Msgf("Failed to convert response body to list: %v", err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			_bodyAsList := _bodyOut.([]interface{})
+			_bodyJson, err := json.Marshal(_bodyAsList)
+			if err != nil {
+				log.Error().Err(err).Str("RemoteAddr", r.RemoteAddr).Msgf("Failed to convert response body list to JSON: %v", err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			w.WriteHeader(http.StatusOK)
+			w.Write(_bodyJson)
+		}
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
 }
