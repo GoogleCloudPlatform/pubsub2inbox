@@ -18,7 +18,7 @@ from google.cloud import bigquery
 
 class BigqueryProcessor(Processor):
 
-    def get_default_config_key(elf):
+    def get_default_config_key():
         return 'bigquery'
 
     def process(self, output_var='records'):

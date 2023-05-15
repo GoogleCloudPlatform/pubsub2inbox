@@ -77,10 +77,9 @@ def get_grpc_client_info():
 
 class BaseHelper:
     logger = None
-    jinja_environment = None
-    project_number_cache = {}
 
     def __init__(self, jinja_environment):
+        self.project_number_cache = {}
         self.jinja_environment = jinja_environment
         self.logger = logging.getLogger('pubsub2inbox')
 

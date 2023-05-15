@@ -14,6 +14,7 @@
 from googleapiclient import discovery, http
 import abc
 from helpers.base import BaseHelper, Context
+import copy
 
 _PROJECT_NUM_CACHE = {}
 _PROJECT_ID_CACHE = {}
@@ -36,14 +37,10 @@ class ProcessorException(Exception):
 
 
 class Processor(BaseHelper):
-    config = None
-    data = None
-    event = None
-    context: Context
 
     def __init__(self, config, jinja_environment, data, event,
                  context: Context):
-        self.config = config
+        self.config = copy.deepcopy(config)
         self.data = data
         self.event = event
         self.context = context

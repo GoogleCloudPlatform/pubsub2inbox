@@ -36,8 +36,11 @@ pipeline:
 
   # Parse the incoming Slack message by removing the IRC-like nick from the message
   - type: processor.setvariable
+    # Check if this is our bot message from events API
+    stopIf: |
+      {% if 'type' in data and data.event.type == 'message' and data.event.app_id %}1{% endif %}
     runIf: |
-      {% if 'type' in data and data.event.type == 'message' and not data.event.app_id %}1{% endif %}
+      {% if 'type' in data and data.event.type == 'message' %}1{% endif %}
     output: slack_message_text
     config:
       value: |
@@ -89,10 +92,9 @@ pipeline:
               I am a Slack bot designed to be helpful.
         parameters:
           temperature: 0.3
-          maxDecodeSteps: 200
           topP: 0.8
-          topK: 40
-          maxOutputTokens: 100
+          topK: 40 
+          maxOutputTokens: 200 # in some documentation, this appears as maxDecodeSteps, which has been renamed to maxOutputTokens
   
   # Log the response
   - type: output.logger

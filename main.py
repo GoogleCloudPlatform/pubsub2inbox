@@ -72,6 +72,7 @@ def get_jinja_escaping(template_name):
 
 def get_jinja_environment():
     env = Environment(autoescape=get_jinja_escaping,
+                      cache_size=0,
                       extensions=['jinja2.ext.do'])
     env.globals = {**env.globals, **{'env': os.environ}}
     env.globals['req_random_int'] = random.randrange(0, 9223372036854775807)

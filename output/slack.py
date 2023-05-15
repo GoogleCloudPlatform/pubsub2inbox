@@ -39,11 +39,15 @@ class SlackOutput(Output):
         api = self._jinja_expand_string(self.output_config['api'], 'api')
         request = self._jinja_expand_dict_all(self.output_config['request'],
                                               'request')
-
         self.logger.info('Calling Slack API: %s' % (api),
                          extra={
                              "slack_api": api,
                          })
+        self.logger.debug('Calling Slack API: %s' % (api),
+                          extra={
+                              "slack_api": api,
+                              "slack_request": request,
+                          })
 
         api_path = 'https://slack.com/api/%s' % (api)
         request_body = json.dumps(request)

@@ -390,11 +390,12 @@ resource "google_cloudfunctions2_function" "function" {
   }
 
   service_config {
-    service_account_email = var.create_service_account ? google_service_account.service-account[0].email : var.service_account
-    max_instance_count    = var.instance_limits.max_instances
-    available_memory      = "256M"
-    timeout_seconds       = var.function_timeout
-    vpc_connector         = var.vpc_connector
+    service_account_email            = var.create_service_account ? google_service_account.service-account[0].email : var.service_account
+    max_instance_count               = var.instance_limits.max_instances
+    max_instance_request_concurrency = 1
+    available_memory                 = "256M"
+    timeout_seconds                  = var.function_timeout
+    vpc_connector                    = var.vpc_connector
     environment_variables = {
       CONFIG          = google_secret_manager_secret_version.config-secret-version.name
       LOG_LEVEL       = var.log_level
@@ -582,14 +583,14 @@ resource "google_secret_manager_secret" "json2pubsub-response-cel" {
 }
 
 resource "google_secret_manager_secret_version" "json2pubsub-response-cel" {
-  count  = var.deploy_json2pubsub.enabled && var.deploy_json2pubsub.enabled  ? 1 : 0
+  count  = var.deploy_json2pubsub.enabled && var.deploy_json2pubsub.enabled ? 1 : 0
   secret = google_secret_manager_secret.json2pubsub-response-cel[0].id
 
   secret_data = var.deploy_json2pubsub.response_cel
 }
 
 resource "google_secret_manager_secret_iam_member" "json2pubsub-message-cel" {
-  count   = var.create_service_account && var.deploy_json2pubsub.enabled  ? 1 : 0
+  count   = var.create_service_account && var.deploy_json2pubsub.enabled ? 1 : 0
   project = var.project_id
 
   secret_id = google_secret_manager_secret.json2pubsub-message-cel[0].secret_id
@@ -598,7 +599,7 @@ resource "google_secret_manager_secret_iam_member" "json2pubsub-message-cel" {
 }
 
 resource "google_secret_manager_secret_iam_member" "json2pubsub-control-cel" {
-  count   = var.create_service_account && var.deploy_json2pubsub.enabled  ? 1 : 0
+  count   = var.create_service_account && var.deploy_json2pubsub.enabled ? 1 : 0
   project = var.project_id
 
   secret_id = google_secret_manager_secret.json2pubsub-control-cel[0].secret_id
@@ -607,7 +608,7 @@ resource "google_secret_manager_secret_iam_member" "json2pubsub-control-cel" {
 }
 
 resource "google_secret_manager_secret_iam_member" "json2pubsub-response-cel" {
-  count   = var.create_service_account && var.deploy_json2pubsub.enabled  ? 1 : 0
+  count   = var.create_service_account && var.deploy_json2pubsub.enabled ? 1 : 0
   project = var.project_id
 
   secret_id = google_secret_manager_secret.json2pubsub-response-cel[0].secret_id

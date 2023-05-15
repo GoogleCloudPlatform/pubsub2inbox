@@ -17,14 +17,6 @@ Bases: `Exception`
 Bases: [`BaseHelper`](helpers.md#helpers.base.BaseHelper)
 
 
-#### config(_ = Non_ )
-
-#### context(_: [`Context`](helpers.md#helpers.base.Context_ )
-
-#### data(_ = Non_ )
-
-#### event(_ = Non_ )
-
 #### expand_projects(projects)
 
 #### _abstract static_ get_default_config_key()
@@ -159,6 +151,18 @@ Fetch occurrences and notes from Container Analysis API.
 #### get_default_config_key()
 
 #### process(output_var='containeranalysis')
+## processors.debug module
+
+
+### _class_ processors.debug.DebugProcessor(config, jinja_environment, data, event, context)
+Bases: `Processor`
+
+Dumps Jinja variable state to output. Useful for debugging.
+
+
+#### get_default_config_key()
+
+#### process(output_var='debug')
 ## processors.directory module
 
 
