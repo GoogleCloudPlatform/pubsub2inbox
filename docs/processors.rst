@@ -60,6 +60,14 @@ processors.containeranalysis module
    :undoc-members:
    :show-inheritance:
 
+processors.debug module
+-----------------------
+
+.. automodule:: processors.debug
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 processors.directory module
 ---------------------------
 

@@ -13,11 +13,7 @@ Bases: `object`
 
 #### get_token_for_scopes(scopes, service_account=None)
 
-#### jinja_environment(_ = Non_ )
-
 #### logger(_ = Non_ )
-
-#### project_number_cache(_ = {_ )
 
 ### _class_ helpers.base.Context(eventId='', timestamp='', eventType='', resource='')
 Bases: `object`

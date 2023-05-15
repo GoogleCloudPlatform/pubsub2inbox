@@ -13,17 +13,7 @@ Bases: `Exception`
 Bases: [`BaseHelper`](helpers.md#helpers.base.BaseHelper)
 
 
-#### config(_ = Non_ )
-
-#### context(_: [`Context`](helpers.md#helpers.base.Context_ )
-
-#### data(_ = Non_ )
-
-#### event(_ = Non_ )
-
 #### _abstract_ output()
-
-#### output_config(_ = Non_ )
 ## output.bigquery module
 
 

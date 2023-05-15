@@ -13,6 +13,7 @@
 #   limitations under the License.
 import abc
 from helpers.base import BaseHelper, Context
+import copy
 
 
 class NotConfiguredException(Exception):
@@ -20,16 +21,11 @@ class NotConfiguredException(Exception):
 
 
 class Output(BaseHelper):
-    config = None
-    output_config = None
-    data = None
-    event = None
-    context: Context
 
     def __init__(self, config, output_config, jinja_environment, data, event,
                  context: Context):
-        self.config = config
-        self.output_config = output_config
+        self.config = copy.deepcopy(config)
+        self.output_config = copy.deepcopy(output_config)
         self.data = data
         self.event = event
         self.context = context
