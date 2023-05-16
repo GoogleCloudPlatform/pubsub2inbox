@@ -24,7 +24,7 @@ from google.cloud import resourcemanager_v3
 import json_fix  # noqa: F401
 import tempfile
 
-PUBSUB2INBOX_VERSION = '1.7.0'
+PUBSUB2INBOX_VERSION = '1.8.0'
 TEMPORARY_DIRECTORY = None
 
 
