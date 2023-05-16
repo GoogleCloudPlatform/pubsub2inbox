@@ -32,7 +32,7 @@ pipeline:
     output: slack_message_text
     config:
       value: |
-        {{ data.event.text|regex_replace('^<[^>]+> ', '') }}
+        {{ data.event.text|regex_replace('^<[^>]+> ', '')|remove_mrkdwn }}
 
   # Parse the incoming Slack message by removing the IRC-like nick from the message
   - type: processor.setvariable
@@ -44,7 +44,7 @@ pipeline:
     output: slack_message_text
     config:
       value: |
-        {{ data.event.text|regex_replace('^<[^>]+> ', '') }}
+        {{ data.event.text|regex_replace('^<[^>]+> ', '')|remove_mrkdwn }}
 
   # Fetch existing conversation history from Slack to pass back to Vertex PaLM for context
   - type: processor.slack
@@ -75,7 +75,7 @@ pipeline:
     config:
       fromJson: true
       value: |
-        {%- set messages = [] -%}{%- for message in slack_thread.messages -%}{%- set _ = messages.append({"author":"AI" if data.event.user != message.user else "USER","content":message.text|regex_replace('^<[^>]+> ', '')}) -%}{%- endfor -%}{% set _ = messages.append({"author":"USER","content":slack_message_text}) %}{{ messages|json_encode }}
+        {%- set messages = [] -%}{%- for message in slack_thread.messages -%}{%- set _ = messages.append({"author":"AI" if data.event.user != message.user else "USER","content":message.text|regex_replace('^<[^>]+> ', '')|remove_mrkdwn}) -%}{%- endfor -%}{% set _ = messages.append({"author":"USER","content":slack_message_text}) %}{{ messages|json_encode }}
 
   # Call Vertex AI Generative AI with the thread messages to make a chat reply
   - type: processor.vertexgenai
@@ -89,7 +89,10 @@ pipeline:
         instances:
           - messagesExpr: slack_messages
             context: |
-              I am a Slack bot designed to be helpful.
+              You are a helpful Slack bot that offers concise answers to all kinds of issues. 
+              
+              You keep your answers under 100 words.
+            
         parameters:
           temperature: 0.3
           topP: 0.8

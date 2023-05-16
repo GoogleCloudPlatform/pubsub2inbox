@@ -144,6 +144,7 @@ The YAML file is structured of the following top level keys:
   - `maximumMessageAge`: a textual representation of maximum age of a message that can be processed (set to `skip` to ignore)
   - `globals`: a dictionary of variables that is evaluated before starting the pipeline, useful for things like localization, 
     or other configuration parameters that get repeatedly used in the pipeline configuration
+  - `macros`: a list of Jinja macros to be made available in the pipeline (see [example](test/configs/macros.yaml))
 
 For example of a modern pipeline, see [shell script example](examples/shellscript-config.yaml) or [test configs](test/configs/).
 

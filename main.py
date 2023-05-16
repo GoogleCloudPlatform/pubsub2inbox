@@ -26,6 +26,7 @@ import parsedatetime
 from dateutil import parser
 from filters import get_jinja_filters, get_jinja_tests
 from jinja2 import Environment, TemplateError
+from jinja2.nativetypes import NativeEnvironment
 from google.cloud import secretmanager, storage
 from pythonjsonlogger import jsonlogger
 import traceback
@@ -136,6 +137,10 @@ class InvalidMessageFormatException(Exception):
 
 
 class MalformedGlobalsException(Exception):
+    pass
+
+
+class MalformedMacrosException(Exception):
     pass
 
 
@@ -462,6 +467,27 @@ def process_message_pipeline(logger, config, data, event, context):
     }
 
     helper = BaseHelper(jinja_environment)
+
+    if 'macros' in config:
+        if not isinstance(config['macros'], list):
+            raise MalformedMacrosException(
+                '"macros" in configuration should be a list.')
+        macros = {}
+        macro_environment = NativeEnvironment()
+        macro_environment.filters.update(jinja_environment.filters)
+        for macro in config['macros']:
+            macro_template = macro_environment.from_string(macro['macro'])
+            macro_template.name = 'macro'
+            macro_template.render()
+            macro_module = macro_template.module
+
+            for f in dir(macro_module):
+                if not f.startswith("_") and callable(getattr(macro_module, f)):
+                    macro_func = getattr(macro_module, f)
+                    macros[f] = macro_func
+
+        jinja_environment.globals.update(macros)
+
     if 'globals' in config:
         if not isinstance(config['globals'], dict):
             raise MalformedGlobalsException(

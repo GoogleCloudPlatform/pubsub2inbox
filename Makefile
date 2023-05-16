@@ -32,8 +32,12 @@ docs:
 check: lint test
 	true
 
-test:
+test: pytest gotest
+
+pytest:
 	$(PYTHON) -m unittest discover
+
+gotest:
 	cd cmd/json2pubsub && go test
 
 fmt: 

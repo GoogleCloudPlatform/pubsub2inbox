@@ -13,7 +13,7 @@
 #   limitations under the License.
 from .regex import regex_replace, regex_match, regex_search
 from .lists import split, index, merge_dict
-from .strings import add_links, urlencode, generate_signed_url, json_encode, json_decode, b64decode, csv_encode, re_escape, html_table_to_xlsx, make_list, read_gcs_object, filemagic, hash_string, yaml_encode, yaml_decode, read_file, read_file_b64, parse_string, parse_url, trim, ltrim, rtrim
+from .strings import add_links, urlencode, generate_signed_url, json_encode, json_decode, b64decode, csv_encode, re_escape, html_table_to_xlsx, make_list, read_gcs_object, filemagic, hash_string, yaml_encode, yaml_decode, read_file, read_file_b64, parse_string, parse_url, trim, ltrim, rtrim, remove_mrkdwn
 from .date import strftime, utc_strftime, recurring_date
 from .gcp import format_cost, get_cost, get_gcp_resource
 from .tests import test_contains
@@ -38,6 +38,8 @@ def get_jinja_filters():
         'utc_strftime': utc_strftime,
         'json_encode': json_encode,
         'json_decode': json_decode,
+        'to_json': json_encode,
+        'from_json': json_decode,
         'yaml_encode': yaml_encode,
         'yaml_decode': yaml_decode,
         'b64decode': b64decode,
@@ -59,4 +61,5 @@ def get_jinja_filters():
         'trim': trim,
         'ltrim': ltrim,
         'rtrim': rtrim,
+        'remove_mrkdwn': remove_mrkdwn,
     }
