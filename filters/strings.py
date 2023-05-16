@@ -208,3 +208,18 @@ def ltrim(v):
 
 def rtrim(v):
     return v.rstrip()
+
+
+def remove_mrkdwn(v, links=False, italic=True):
+    if links:
+        v = re.sub(r'<([^\|]*)\|[^\|]*>', r'\1', v)
+    else:
+        v = re.sub(r'<[^\|]*\|([^\|]*)>', r'\1', v)
+    # bolding
+    v = re.sub(r'\*([\w\s!\?\(\)\{\}\.,:;\+=&]+)\*', r'\1', v)
+    # strikethrough
+    v = re.sub(r'~([\w\s!\?\(\)\{\}\.,:;\+=&]+)~', r'\1', v)
+    # italic (can be a bit problematic, so disabled by default)
+    if italic:
+        v = re.sub(r'\_([a-zA-Z0-9\s!\?\(\)\{\}\.,:;\+=&]+?)\_', r'\1', v)
+    return v
