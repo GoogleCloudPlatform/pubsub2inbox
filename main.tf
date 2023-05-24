@@ -134,7 +134,8 @@ locals {
   }
   org_permissions     = flatten([for role in var.function_roles : local.iam_permissions[role].org])
   project_permissions = flatten([for role in var.function_roles : local.iam_permissions[role].project])
-  apis                = flatten([for role in var.function_roles : local.iam_permissions[role].apis])
+  _apis               = flatten([for role in var.function_roles : local.iam_permissions[role].apis])
+  apis                = var.cloud_run || var.cloud_functions_v2 ? concat(local._apis, ["eventarc.googleapis.com"]) : local._apis
 }
 
 # Activate the necessary APIs in the project where the function is running
@@ -192,12 +193,17 @@ resource "google_storage_bucket_iam_member" "existing-service-account-bucket" {
   member   = format("serviceAccount:%s", var.service_account)
 }
 
+data "google_service_account" "existing-service-account" {
+  count      = !var.create_service_account && var.grant_token_creator ? 1 : 0
+  account_id = var.service_account
+}
+
 # Allow the service account to create differently scoped tokens
 resource "google_service_account_iam_member" "service-account-actas-self" {
-  count              = var.create_service_account ? 1 : 0
-  service_account_id = google_service_account.service-account[0].name
+  count              = var.grant_token_creator ? 1 : 0
+  service_account_id = var.create_service_account ? google_service_account.service-account[0].name : data.google_service_account.existing-service-account[0].name
   role               = "roles/iam.serviceAccountTokenCreator"
-  member             = format("serviceAccount:%s", google_service_account.service-account[0].email)
+  member             = format("serviceAccount:%s", var.create_service_account ? google_service_account.service-account[0].email : data.google_service_account.existing-service-account[0].email)
 }
 
 # Allow the service account to access the configuration from the secret
@@ -515,12 +521,27 @@ resource "google_cloud_run_service" "function" {
 }
 
 # Json2Pubsub resources
+locals {
+  json2pubsub_sa = (
+    var.create_service_account ?
+    format("%s%s", (var.service_account != "" ? var.service_account : var.function_name), var.deploy_json2pubsub.suffix) :
+    format("%s%s", element(split("@", var.service_account), 0), var.deploy_json2pubsub.suffix)
+  )
+}
+
 resource "google_service_account" "json2pubsub-service-account" {
   count   = var.deploy_json2pubsub.enabled ? 1 : 0
   project = var.project_id
 
-  account_id   = format("%s%s", var.service_account != "" ? var.service_account : var.function_name, var.deploy_json2pubsub.suffix)
-  display_name = format("%s Json2Pubsub Service Account", title(var.service_account))
+  account_id   = local.json2pubsub_sa
+  display_name = format("%s Json2Pubsub Service Account", title(local.json2pubsub_sa))
+}
+
+resource "google_service_account_iam_member" "json2pubsub-service-account-user" {
+  count              = var.deploy_json2pubsub.enabled && var.deploy_json2pubsub.grant_sa_user != null ? 1 : 0
+  service_account_id = google_service_account.json2pubsub-service-account[0].name
+  role               = "roles/iam.serviceAccountUser"
+  member             = format("serviceAccount:%s", var.deploy_json2pubsub.grant_sa_user)
 }
 
 resource "google_secret_manager_secret" "json2pubsub-message-cel" {
@@ -583,14 +604,14 @@ resource "google_secret_manager_secret" "json2pubsub-response-cel" {
 }
 
 resource "google_secret_manager_secret_version" "json2pubsub-response-cel" {
-  count  = var.deploy_json2pubsub.enabled && var.deploy_json2pubsub.enabled ? 1 : 0
+  count  = var.deploy_json2pubsub.enabled ? 1 : 0
   secret = google_secret_manager_secret.json2pubsub-response-cel[0].id
 
   secret_data = var.deploy_json2pubsub.response_cel
 }
 
 resource "google_secret_manager_secret_iam_member" "json2pubsub-message-cel" {
-  count   = var.create_service_account && var.deploy_json2pubsub.enabled ? 1 : 0
+  count   = var.deploy_json2pubsub.enabled ? 1 : 0
   project = var.project_id
 
   secret_id = google_secret_manager_secret.json2pubsub-message-cel[0].secret_id
@@ -599,7 +620,7 @@ resource "google_secret_manager_secret_iam_member" "json2pubsub-message-cel" {
 }
 
 resource "google_secret_manager_secret_iam_member" "json2pubsub-control-cel" {
-  count   = var.create_service_account && var.deploy_json2pubsub.enabled ? 1 : 0
+  count   = var.deploy_json2pubsub.enabled ? 1 : 0
   project = var.project_id
 
   secret_id = google_secret_manager_secret.json2pubsub-control-cel[0].secret_id
@@ -608,7 +629,7 @@ resource "google_secret_manager_secret_iam_member" "json2pubsub-control-cel" {
 }
 
 resource "google_secret_manager_secret_iam_member" "json2pubsub-response-cel" {
-  count   = var.create_service_account && var.deploy_json2pubsub.enabled ? 1 : 0
+  count   = var.deploy_json2pubsub.enabled ? 1 : 0
   project = var.project_id
 
   secret_id = google_secret_manager_secret.json2pubsub-response-cel[0].secret_id
@@ -617,7 +638,7 @@ resource "google_secret_manager_secret_iam_member" "json2pubsub-response-cel" {
 }
 
 resource "google_pubsub_topic_iam_member" "json2pubsub-publisher" {
-  count   = var.create_service_account && var.deploy_json2pubsub.enabled ? 1 : 0
+  count   = var.deploy_json2pubsub.enabled ? 1 : 0
   project = var.project_id
 
   topic  = var.pubsub_topic
@@ -673,6 +694,10 @@ resource "google_cloud_run_service" "json2pubsub-function" {
     percent         = 100
     latest_revision = true
   }
+
+  depends_on = [
+    google_service_account_iam_member.json2pubsub-service-account-user
+  ]
 }
 
 resource "google_cloud_run_service_iam_member" "json2pubsub-public-access" {
@@ -718,6 +743,10 @@ resource "google_cloudfunctions2_function" "json2pubsub-function" {
       RESPONSE_CEL         = format("gsm:%s", google_secret_manager_secret_version.json2pubsub-response-cel[0].name)
     }
   }
+
+  depends_on = [
+    google_service_account_iam_member.json2pubsub-service-account-user
+  ]
 }
 
 resource "google_cloud_run_service_iam_member" "json2pubsub-public-access-v2" {

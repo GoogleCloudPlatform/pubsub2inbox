@@ -36,5 +36,6 @@ class TestOutput(Output):
             result = result.strip()
             expected = expected.strip()
         if result != expected:
-            raise TestFailedException('%s: expected "%s", got "%s"' %
-                                      (test_name, expected, result))
+            raise TestFailedException(
+                '%s: expected "%s", got "%s" (%s)' %
+                (test_name, expected, result, type(result)))

@@ -1,0 +1,134 @@
+#   Copyright 2023 Google LLC
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+maximumMessageAge: skip
+
+macros: 
+  - macro: |
+      {%- macro say_hello() -%}
+      Hello World!
+      {%- endmacro -%}
+  - macro: |
+      {%- macro say_hello_to(name) -%}
+      Hello {{ name }}!
+      {%- endmacro -%}
+  - macro: |
+      {%- macro say_hello_kw(name, upper=True) -%}
+      Hello {% if upper %}{{ name|upper }}{% else %}{{ name }}{% endif %}!
+      {%- endmacro -%}
+  - macro: |
+      {%- macro return_list() -%}
+      [{% for v in varargs %}"{{ v }}",{% endfor %}]
+      {%- endmacro -%}
+  - macro: |
+      {%- macro return_list_va(first_value) -%}
+      ["{{ first_value }}"{% for v in varargs %}{% if not loop.last %}, {% endif %}, "{{ v }}"{% endfor %}]
+      {%- endmacro -%}
+  # FIX: macro that returns a dict with no arguments is a no-go
+  - macro: |
+      {%- macro return_dict() -%}
+      {% set ret = dict({"foo":"bar","bar":"baz"}) %}{{ ret }}
+      {%- endmacro -%}
+  - macro: |
+      {%- macro return_dict_arg(foo) -%}
+      {% set ret = dict({foo:"bar","bar":"baz"}) %}{{ ret }}
+      {%- endmacro -%}
+  
+pipeline:
+  - type: processor.genericjson
+    output: test_message
+
+  - type: output.test
+    config:
+      strip: true
+      name: no parameters
+      result: |
+        {{ say_hello() }}
+      expected: |
+        Hello World!
+
+  - type: output.test
+    config:
+      strip: true
+      name: return simple string
+      result: |
+        {{ say_hello_to('World') }}
+      expected: |
+        Hello World!
+
+  - type: output.test
+    config:
+      strip: true
+      name: try default kwargs
+      result: |
+        {{ say_hello_kw('world') }}
+      expected: |
+        Hello WORLD!
+
+  - type: output.test
+    config:
+      strip: true
+      name: try kwargs
+      result: |
+        {{ say_hello_kw('world', upper=false) }}
+      expected: |
+        Hello world!
+
+  - type: output.test
+    config:
+      strip: true
+      name: return a list
+      result: |
+        {% set l = return_list('a', 'b', 'c') %}{{ l|string }}
+      expected: |
+        ['a', 'b', 'c']
+
+  - type: output.test
+    config:
+      strip: true
+      name: iterate on a returned list
+      result: |
+        {% set l = return_list('a', 'b', 'c') %}{% for item in l %}{{ item }} {% endfor %}
+      expected: |
+        a b c
+
+  - type: output.test
+    config:
+      strip: true
+      name: return a dict
+      result: |
+        {% set d = return_dict() %}{{ d }}
+      expected: |
+        {'foo': 'bar', 'bar': 'baz'}
+
+
+  - type: output.test
+    config:
+      strip: true
+      name: return a dict with arg
+      result: |
+        {% set d = return_dict_arg("foo") %}{{ d|string }}
+      expected: |
+        {'foo': 'bar', 'bar': 'baz'}
+
+  - type: output.test
+    config:
+      strip: true
+      name: iterate a dict
+      result: |
+        {% for k, v in return_dict().items() %}{{ k }} == {{ v }}
+        {% endfor %}
+      expected: |
+        foo == bar
+        bar == baz

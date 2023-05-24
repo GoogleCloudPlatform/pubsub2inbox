@@ -1,0 +1,59 @@
+#   Copyright 2023 Google LLC
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+# This bot posts GitHub issues to a Google Chat channel
+globals:
+  chatSpace: "spaces/A......E"
+  serviceAccountEmail: ${service_account_email}
+
+pipeline:
+  - type: processor.genericjson
+
+  # Notify on creation of a new release
+  - type: output.chat
+    runIf: |
+      {% if data.action == 'opened' %}1{% endif %}
+    config:
+      parent: "{{ chatSpace }}"
+      serviceAccountEmail: "{{ serviceAccountEmail }}"
+      message:
+        cardsV2:
+          - cardId: new-issue
+            card:
+              header:
+                title: |
+                  #{{ data.issue.number }}: {{ data.issue.title }}
+                subtitle: |
+                  New GitHub issue in {{ data.repository.url|replace("https://api.github.com/repos/", "") }}
+                imageUrl: https://github.githubassets.com/images/modules/logos_page/GitHub-Logo.png
+                imageType: SQUARE
+                imageAltText: GitHub issue                
+              sections:
+                - header: "Issue details"
+                  collapsible: true
+                  uncollapsibleWidgetsCount: 2
+                  widgets:
+                    - decoratedText:
+                        topLabel: "Issue created by"
+                        text: "{{ data.issue.user.login }}"
+                    - buttonList:
+                        buttons: 
+                          - text: View in GitHub
+                            onClick:
+                              openLink:
+                                url: |
+                                  {{ data.issue.html_url }}
+                    - decoratedText:
+                        topLabel: "Description"
+                        text: "{{ data.issue.body }}"

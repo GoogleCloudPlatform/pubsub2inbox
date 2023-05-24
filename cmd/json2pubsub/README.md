@@ -80,6 +80,21 @@ Configuration variables are:
 - 
 ## Example expressions
 
+### Example of validating GitHub webhooks
+
+CEL expression for request verification:
+
+```
+'x-hub-signature-256' in request.headers &&
+('sha256='+hmacSHA256('your-github-secret-here', request.body)) == request.headers['x-hub-signature-256']
+```
+
+CEL expression for extracting payload (JSON style webhooks):
+```
+request.json
+```
+
+
 ### Example of Slack incoming event processing
 
 CEL expression for request verification:

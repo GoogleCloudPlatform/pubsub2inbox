@@ -95,6 +95,7 @@ module "function" {
     container_image = null
     min_instances   = 0
     max_instances   = 10
+    grant_sa_user   = null
   }
 }
 
