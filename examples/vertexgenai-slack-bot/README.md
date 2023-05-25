@@ -1,5 +1,7 @@
 # Vertex AI Generative AI Slack bot example
 
+See the article: [Building an AI Slack Bot using Vertex Generative AI](https://taneli-leppa.medium.com/building-an-ai-slack-bot-using-vertex-generative-ai-d5f2c9e5e0b0)
+
 Create a `terraform.tfvars` file containing:
 
 ```hcl

@@ -183,6 +183,12 @@ variable "log_level" {
   default     = 10
 }
 
+variable "grant_token_creator" {
+  type        = bool
+  description = "Grant serviceAccountTokenCreator on the service account to itself"
+  default     = false
+}
+
 variable "deploy_json2pubsub" {
   description = "Deploy Json2Pubsub alongside with this function (eg. for incoming webhooks)"
   type = object({
@@ -195,6 +201,7 @@ variable "deploy_json2pubsub" {
     container_image = string
     min_instances   = number
     max_instances   = number
+    grant_sa_user   = string
   })
   default = {
     enabled         = false
@@ -206,5 +213,6 @@ variable "deploy_json2pubsub" {
     container_image = null
     min_instances   = 0
     max_instances   = 10
+    grant_sa_user   = null
   }
 }

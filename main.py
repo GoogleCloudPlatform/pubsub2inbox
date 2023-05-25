@@ -26,13 +26,13 @@ import parsedatetime
 from dateutil import parser
 from filters import get_jinja_filters, get_jinja_tests
 from jinja2 import Environment, TemplateError
-from jinja2.nativetypes import NativeEnvironment
 from google.cloud import secretmanager, storage
 from pythonjsonlogger import jsonlogger
 import traceback
 from helpers.base import get_grpc_client_info, Context, BaseHelper
 import random
 import uuid
+from functools import partial
 
 config_file_name = 'config.yaml'
 execution_count = 0
@@ -451,6 +451,18 @@ def handle_ignore_on(logger, ignore_config, jinja_environment,
     return True
 
 
+def macro_helper(macro_func, *args, **kwargs):
+    r = macro_func(*args, **kwargs)
+    try:
+        if r.strip().startswith('[') or r.strip().startswith('{'):
+            e = eval(r)
+            return e
+        else:
+            return r
+    except SyntaxError:  # Probably a string, huh.
+        return r
+
+
 def process_message_pipeline(logger, config, data, event, context):
     template_variables = {
         'data': data,
@@ -473,10 +485,9 @@ def process_message_pipeline(logger, config, data, event, context):
             raise MalformedMacrosException(
                 '"macros" in configuration should be a list.')
         macros = {}
-        macro_environment = NativeEnvironment()
-        macro_environment.filters.update(jinja_environment.filters)
         for macro in config['macros']:
-            macro_template = macro_environment.from_string(macro['macro'])
+            macro_template = jinja_environment.from_string(
+                macro['macro'].strip())
             macro_template.name = 'macro'
             macro_template.render()
             macro_module = macro_template.module
@@ -484,7 +495,7 @@ def process_message_pipeline(logger, config, data, event, context):
             for f in dir(macro_module):
                 if not f.startswith("_") and callable(getattr(macro_module, f)):
                     macro_func = getattr(macro_module, f)
-                    macros[f] = macro_func
+                    macros[f] = partial(macro_helper, macro_func)
 
         jinja_environment.globals.update(macros)
 

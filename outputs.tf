@@ -48,3 +48,17 @@ output "json2pubsub_url" {
     google_cloud_run_service.json2pubsub-function[0].status[0].url
   ) : null
 }
+
+output "run_service" {
+  value = (var.cloud_run || var.cloud_functions_v2 ?
+    (var.cloud_run ? {
+      project  = var.project_id
+      location = google_cloud_run_service.function[0].location
+      service  = google_cloud_run_service.function[0].name
+      } : {
+      project  = var.project_id
+      location = google_cloudfunctions2_function.function[0].location
+      service  = google_cloudfunctions2_function.function[0].service_config[0].service
+    })
+  : null)
+}
