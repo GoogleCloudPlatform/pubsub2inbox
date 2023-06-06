@@ -128,10 +128,10 @@ The YAML file is structured of the following top level keys:
 
   - `pipeline`: a list of processors and/or outputs to run in sequence.
     - `type`: what processor or output to run (eg. `processor.genericjson` or `output.logger`)
-    - `variables`: Additional variables to set before invoking this processors/output.
+    - `variables`: Additional variables to set before invoking this processor/output.
     - `config`: configuration of the processor or output
-    - `runIf`: if this evaluates to empty, the processors/output is not run
-    - `stopIf`: if this evalues to non-empty, the processing is stopped immediately (before the processors/output is run)
+    - `runIf`: if this evaluates to empty, the processor/output is not run
+    - `stopIf`: if this evalues to non-empty, the processing is stopped immediately (before the processor/output is run)
     - `ignoreOn`: skips reprocessing of messages, see below:
       - `bucket`: Cloud Storage bucket to store reprocessing markers (zero-length files), has to exist
       - `period`: textual presentation of the period after which a message can be reprocessed (eg. `2 days`)
