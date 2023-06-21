@@ -67,12 +67,12 @@ Available input processors are:
   - [shellscript.py](processors/shellscript.py): Run any binary or shell script and parse the output (JSON, YAML, CSV, TSV, ...)
   - [transcode.py](processors/transcode.py): Transcode media using Transcoder API.
   - [dns.py](processors/dns.py): Issue change requests to Cloud DNS.
-  - [secret.py](processor/secret.py): Fetches (additional) secrets from Secret Manager.
-  - [github.py](processor/github.py): List, get or create issues and comments in GitHub.
-  - [download.py](processor/download.py): Download files using HTTP, FTP and SFTP.
-  - [git.py](processor/git.py): Clone repositories via HTTP or SSH.
-  - [clouddeploy.py](processor/clouddeploy.py): Work with releases and rollouts on Cloud Deploy.
-  - [setvariable.py](processor/setvariable.py): Set global variables.
+  - [secret.py](processors/secret.py): Fetches (additional) secrets from Secret Manager.
+  - [github.py](processors/github.py): List, get or create issues and comments in GitHub.
+  - [download.py](processors/download.py): Download files using HTTP, FTP and SFTP.
+  - [git.py](processors/git.py): Clone repositories via HTTP or SSH.
+  - [clouddeploy.py](processors/clouddeploy.py): Work with releases and rollouts on Cloud Deploy.
+  - [setvariable.py](processors/setvariable.py): Set global variables.
 
 
 For full documentation of permissions, processor input and output parameters, see [PROCESSORS.md](PROCESSORS.md).
