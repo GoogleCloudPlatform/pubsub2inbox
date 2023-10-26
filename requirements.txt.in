@@ -1,4 +1,4 @@
-PyYAML~=5.4.0
+PyYAML==6.0.1
 google-cloud-secret-manager~=2.7.0
 google-cloud-error-reporting~=1.2.0
 google-cloud-billing-budgets~=1.4.0
