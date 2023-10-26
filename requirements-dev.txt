@@ -4,3 +4,4 @@ gcp-storage-emulator~=2022.6.11
 fs~=2.4.0
 ruff
 yapf~=0.40.0
+importlib-metadata~=6.8.0
