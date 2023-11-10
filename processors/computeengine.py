@@ -112,7 +112,7 @@ class ComputeengineProcessor(Processor):
             self.config['disk']) if 'disk' in self.config else None
         device_name = self._jinja_expand_string(
             self.config['deviceName']) if 'deviceName' in self.config else None
-        if disk != None:
+        if disk is not None:
             disk = disk.replace('https://www.googleapis.com/compute/v1/', '')
 
         if self.config['mode'] == 'instances.get':
@@ -218,14 +218,14 @@ class ComputeengineProcessor(Processor):
                                     'https://www.googleapis.com/compute/v1/',
                                     '') == disk:
                         disk_is_detached = False
-                        if device_name == None:
+                        if device_name is None:
                             device_name = attached_disk['deviceName']
                         break
 
             if not disk_is_detached:
                 self.logger.info(
                     'Detaching disk %s from instance %s (zone %s)' %
-                    (disk if disk != None else deviceName, instance, zone))
+                    (disk if disk is not None else device_name, instance, zone))
 
                 detach_request = compute_service.instances().detachDisk(
                     project=project,
