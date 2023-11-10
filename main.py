@@ -451,6 +451,129 @@ def handle_ignore_on(logger, ignore_config, jinja_environment,
     return True
 
 
+def get_concurrency_params(concurrency_config, jinja_environment,
+                           template_variables):
+    if 'bucket' not in concurrency_config:
+        raise NoResendConfigException(
+            'No Cloud Storage bucket configured, even though concurrency is set!'
+        )
+
+    bucket_template = jinja_environment.from_string(
+        concurrency_config['bucket'])
+    bucket_template.name = 'concurrency'
+    concurrency_bucket = bucket_template.render()
+    if 'file' in concurrency_config:
+        file_template = jinja_environment.from_string(
+            concurrency_config['file'])
+        file_template.name = 'concurrency'
+        concurrency_file = file_template.render()
+    else:
+        concurrency_file = 'pubsub2inbox.lock'
+    return concurrency_bucket, concurrency_file
+
+
+def handle_concurrency_post(logger, concurrency_config, jinja_environment,
+                            template_variables):
+    concurrency_bucket, concurrency_file = get_concurrency_params(
+        concurrency_config, jinja_environment, template_variables)
+    logger.debug('Removing concurrency lock object from bucket...',
+                 extra={
+                     'bucket': concurrency_bucket,
+                     'blob': concurrency_file
+                 })
+
+    if os.getenv('STORAGE_EMULATOR_HOST'):
+        from google.auth.credentials import AnonymousCredentials
+
+        anon_credentials = AnonymousCredentials()
+        storage_client = storage.Client(
+            client_info=get_grpc_client_info(),
+            client_options={"api_endpoint": os.getenv('STORAGE_EMULATOR_HOST')},
+            credentials=anon_credentials)
+    else:
+        storage_client = storage.Client(client_info=get_grpc_client_info())
+
+    bucket = storage_client.bucket(concurrency_bucket)
+    concurrency_blob = bucket.blob(concurrency_file)
+    concurrency_blob.delete()
+
+
+def handle_concurrency_pre(logger, concurrency_config, jinja_environment,
+                           template_variables):
+    concurrency_bucket, concurrency_file = get_concurrency_params(
+        concurrency_config, jinja_environment, template_variables)
+    logger.debug('Checking if concurrency lock file exists in bucket...',
+                 extra={
+                     'bucket': concurrency_bucket,
+                     'blob': concurrency_file
+                 })
+
+    if os.getenv('STORAGE_EMULATOR_HOST'):
+        from google.auth.credentials import AnonymousCredentials
+
+        anon_credentials = AnonymousCredentials()
+        storage_client = storage.Client(
+            client_info=get_grpc_client_info(),
+            client_options={"api_endpoint": os.getenv('STORAGE_EMULATOR_HOST')},
+            credentials=anon_credentials)
+    else:
+        storage_client = storage.Client(client_info=get_grpc_client_info())
+
+    bucket = storage_client.bucket(concurrency_bucket)
+    concurrency_blob = bucket.blob(concurrency_file)
+    if concurrency_blob.exists():
+        if 'period' in concurrency_config:
+            concurrency_blob.reload()
+            concurrency_period = concurrency_config['period']
+            concurrency_period_parsed = parsedatetime.Calendar(
+                version=parsedatetime.VERSION_CONTEXT_STYLE).parse(
+                    concurrency_period,
+                    sourceTime=concurrency_blob.time_created)
+            if len(concurrency_period_parsed) > 1:
+                concurrency_earliest = datetime.fromtimestamp(
+                    mktime(concurrency_period_parsed[0]))
+            else:
+                concurrency_earliest = datetime.fromtimestamp(
+                    mktime(concurrency_period_parsed))
+
+            if datetime.utcnow() >= concurrency_earliest:
+                logger.info(
+                    'Concurrency lock period elapsed, continuing with message processing.',
+                    extra={
+                        'process_earliest': concurrency_earliest,
+                        'blob_time_created': concurrency_blob.time_created
+                    })
+                concurrency_blob.upload_from_string('')
+                return True
+            else:
+                logger.info(
+                    'Concurrency lock period not elapsed, not processing the message.',
+                    extra={
+                        'process_earliest': concurrency_earliest,
+                        'blob_time_created': concurrency_blob.time_created
+                    })
+                return False
+        logger.info('Concurrency lock file exists, not processing the message.',
+                    extra={
+                        'bucket': concurrency_bucket,
+                        'blob': concurrency_file
+                    })
+        return False
+    else:
+        try:
+            concurrency_blob.upload_from_string('', if_generation_match=0)
+        except Exception as exc:
+            # Handle TOCTOU condition
+            if 'conditionNotMet' in str(exc):
+                logger.warning(
+                    'Message processing already in progress (concurrency lock file exists).',
+                    extra={'exception': exc})
+                return False
+            else:
+                raise exc
+    return True
+
+
 def macro_helper(macro_func, *args, **kwargs):
     r = macro_func(*args, **kwargs)
     try:
@@ -510,6 +633,15 @@ def process_message_pipeline(logger, config, data, event, context):
             **jinja_environment.globals,
             **template_globals
         }
+
+    if 'concurrency' in config:
+        if not handle_concurrency_pre(logger, config['concurrency'],
+                                      jinja_environment, template_variables):
+            return
+    if 'ignoreOn' in config:
+        if not handle_ignore_on(logger, config['ignoreOn'], jinja_environment,
+                                template_variables):
+            return
 
     task_number = 1
     for task in config['pipeline']:
@@ -674,9 +806,18 @@ def process_message_pipeline(logger, config, data, event, context):
                     logger.warn(
                         'Pipeline failed, but it is allowed to fail. Message processed.'
                     )
+                    if 'concurrency' in config:
+                        handle_concurrency_post(logger, config['concurrency'],
+                                                jinja_environment,
+                                                template_variables)
+
                     helper._clean_tempdir()
                     return
                 else:
+                    if 'concurrency' in config:
+                        handle_concurrency_post(logger, config['concurrency'],
+                                                jinja_environment,
+                                                template_variables)
                     helper._clean_tempdir()
                     raise exc
             else:
@@ -686,6 +827,9 @@ def process_message_pipeline(logger, config, data, event, context):
                     extra={'exception': traceback.format_exc()})
 
         task_number += 1
+    if 'concurrency' in config:
+        handle_concurrency_post(logger, config['concurrency'],
+                                jinja_environment, template_variables)
     helper._clean_tempdir()
 
 

@@ -74,6 +74,7 @@ Available input processors are:
   - [git.py](processors/git.py): Clone repositories via HTTP or SSH.
   - [clouddeploy.py](processors/clouddeploy.py): Work with releases and rollouts on Cloud Deploy.
   - [setvariable.py](processors/setvariable.py): Set global variables.
+  - [computeengine.py](processors/computeengine.py): Set global variables.
 
 
 For full documentation of permissions, processor input and output parameters, see [PROCESSORS.md](PROCESSORS.md).
@@ -146,6 +147,15 @@ The YAML file is structured of the following top level keys:
   - `globals`: a dictionary of variables that is evaluated before starting the pipeline, useful for things like localization, 
     or other configuration parameters that get repeatedly used in the pipeline configuration
   - `macros`: a list of Jinja macros to be made available in the pipeline (see [example](test/configs/macros.yaml))
+  - `ignoreOn`: skips reprocessing of messages, see below:
+    - `bucket`: Cloud Storage bucket to store reprocessing markers (zero-length files), has to exist
+    - `period`: textual presentation of the period after which a message can be reprocessed (eg. `2 days`)
+    - `key`: the object reprocessing marker name (filename), if not set, it is the message and its properties hashed,
+        otherwise you can specify a Jinja expression
+  - `concurrency`: skips processing of messages by limiting concurrent instances of the function, see below:
+    - `bucket`: Cloud Storage bucket to store zero-length concurrency lock file
+    - `period`: textual presentation of the period after which the lock is considered invalid (eg. `2 days`, leave unset if no period)
+    - `file`: the concurrency lock file name (defaults to `pubsub2inbox.lock`)
 
 For example of a modern pipeline, see [shell script example](examples/shellscript-config.yaml) or [test configs](test/configs/).
 
