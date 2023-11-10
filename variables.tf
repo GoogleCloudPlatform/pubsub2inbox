@@ -39,9 +39,16 @@ variable "pubsub_topic" {
 
 variable "region" {
   type        = string
-  description = "Project ID"
+  description = "Region to deploy function into"
 
   default = "europe-west1"
+}
+
+variable "trigger_region" {
+  type        = string
+  description = "Trigger region for Cloud Functions v2 (eg. set to global for Pub/Sub)"
+
+  default = null
 }
 
 variable "secret_id" {

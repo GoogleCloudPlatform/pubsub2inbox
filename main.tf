@@ -16,7 +16,7 @@ terraform {
   required_version = ">= 1.0.0"
 
   required_providers {
-    google  = ">= 4.48.0"
+    google  = ">= 5.0.0"
     archive = ">= 2.2.0"
     http = {
       source  = "hashicorp/http"
@@ -40,7 +40,7 @@ resource "google_secret_manager_secret" "config-secret" {
   secret_id = var.secret_id != "" ? var.secret_id : var.function_name
 
   replication {
-    automatic = true
+    auto {}
   }
 
   depends_on = [
@@ -130,6 +130,11 @@ locals {
       org     = []
       project = ["roles/aiplatform.user"]
       apis    = ["aiplatform.googleapis.com"]
+    }
+    compute-engine = {
+      org     = []
+      project = ["roles/compute.instanceAdmin"]
+      apis    = ["compute.googleapis.com"]
     }
   }
   org_permissions     = flatten([for role in var.function_roles : local.iam_permissions[role].org])
@@ -410,7 +415,7 @@ resource "google_cloudfunctions2_function" "function" {
   }
 
   event_trigger {
-    trigger_region = var.region
+    trigger_region = var.trigger_region != null ? var.trigger_region : var.region
     event_type     = "google.cloud.pubsub.topic.v1.messagePublished"
     pubsub_topic   = var.pubsub_topic
     retry_policy   = "RETRY_POLICY_RETRY"
@@ -551,7 +556,7 @@ resource "google_secret_manager_secret" "json2pubsub-message-cel" {
   secret_id = format("%s%s-message", var.secret_id != "" ? var.secret_id : var.function_name, var.deploy_json2pubsub.suffix)
 
   replication {
-    automatic = true
+    auto {}
   }
 
   depends_on = [
@@ -573,7 +578,7 @@ resource "google_secret_manager_secret" "json2pubsub-control-cel" {
   secret_id = format("%s%s-control", var.secret_id != "" ? var.secret_id : var.function_name, var.deploy_json2pubsub.suffix)
 
   replication {
-    automatic = true
+    auto {}
   }
 
   depends_on = [
@@ -595,7 +600,7 @@ resource "google_secret_manager_secret" "json2pubsub-response-cel" {
   secret_id = format("%s%s-response", var.secret_id != "" ? var.secret_id : var.function_name, var.deploy_json2pubsub.suffix)
 
   replication {
-    automatic = true
+    auto {}
   }
 
   depends_on = [
