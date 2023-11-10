@@ -49,6 +49,19 @@ class TestMailMsGraphAPI(unittest.TestCase):
                     % tenant_id
             })
 
+        responses.add(
+            responses.GET,
+            'https://login.microsoftonline.com/%s/v2.0/'
+            '.well-known/openid-configuration' % tenant_id,
+            json={
+                'token_endpoint':
+                    'https://login.microsoftonline.com/%s/oauth2/v2.0/token' %
+                    tenant_id,
+                'authorization_endpoint':
+                    'https://login.microsoftonline.com/%s/oauth2/v2.0/authorize'
+                    % tenant_id
+            })
+
         responses.add(responses.POST,
                       'https://login.microsoftonline.com/%s/oauth2/v2.0/token' %
                       tenant_id,
