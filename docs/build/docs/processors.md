@@ -129,6 +129,51 @@ Compress files to zip/tar/tgz formats.
 #### get_default_config_key()
 
 #### process(output_var='compress')
+## processors.computeengine module
+
+
+### _exception_ processors.computeengine.ComputeengineOperationFailed()
+Bases: `Exception`
+
+
+### _class_ processors.computeengine.ComputeengineProcessor(config, jinja_environment, data, event, context)
+Bases: `Processor`
+
+Perform actions on Compute Engine instances.
+
+
+* **Parameters**
+
+    
+    * **project** (*str**, **optional*) – Google Cloud project ID.
+
+
+    * **instance** (*str*) – Instance to operate on.
+
+
+    * **disk** (*str**, **optional*) – Disk to operate on.
+
+
+    * **deviceName** (*str**, **optional*) – Device name to operate on.
+
+
+    * **region** (*str**, **optional*) – Google Cloud region.
+
+
+    * **zone** (*str**, **optional*) – Google Cloud zone for the instance.
+
+
+    * **mode** (*str*) – One of: instances.get, instances.stop, instances.reset, instances.start, instances.detachdisk, regiondisks.attach
+
+
+
+#### get_default_config_key()
+
+#### get_instance(compute_service, project, zone, instance)
+
+#### process(output_var='computeengine')
+
+#### wait_for_operation_done(compute_service, operation_name, operation_self_link, project, zone, region, timeout=30)
 ## processors.containeranalysis module
 
 

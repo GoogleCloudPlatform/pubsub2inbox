@@ -36,6 +36,14 @@ test.test\_ingcp module
    :undoc-members:
    :show-inheritance:
 
+test.test\_macros module
+------------------------
+
+.. automodule:: test.test_macros
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 test.test\_mail\_msgraphapi module
 ----------------------------------
 

@@ -52,6 +52,14 @@ processors.compress module
    :undoc-members:
    :show-inheritance:
 
+processors.computeengine module
+-------------------------------
+
+.. automodule:: processors.computeengine
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 processors.containeranalysis module
 -----------------------------------
 

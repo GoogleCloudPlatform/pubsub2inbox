@@ -17,6 +17,10 @@ Bases: `Exception`
 Bases: `Exception`
 
 
+### _exception_ main.MalformedMacrosException()
+Bases: `Exception`
+
+
 ### _exception_ main.MalformedTypeInPipelineException()
 Bases: `Exception`
 
@@ -64,6 +68,8 @@ Bases: `Exception`
 ### main.handle_ignore_on(logger, ignore_config, jinja_environment, template_variables)
 
 ### main.load_configuration(file_name)
+
+### main.macro_helper(macro_func, \*args, \*\*kwargs)
 
 ### main.process_message(config, data, event, context)
 

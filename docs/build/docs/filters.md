@@ -93,6 +93,8 @@ Returns a signed URL to a GCS object. URL should be in format “gs://bucket/fil
 
 ### filters.strings.read_gcs_object(url, start=None, end=None)
 
+### filters.strings.remove_mrkdwn(v, links=False, italic=True)
+
 ### filters.strings.rtrim(v)
 
 ### filters.strings.trim(v)

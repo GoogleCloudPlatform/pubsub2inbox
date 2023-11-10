@@ -32,6 +32,14 @@ Bases: `TestCase`
 
 
 #### test_in_gcp()
+## test.test_macros module
+
+
+### _class_ test.test_macros.TestMacros(methodName='runTest')
+Bases: `TestCase`
+
+
+#### test_macros()
 ## test.test_mail_msgraphapi module
 
 
