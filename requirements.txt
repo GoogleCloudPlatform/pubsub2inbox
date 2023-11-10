@@ -212,9 +212,9 @@ gitpython==3.1.40 \
     --hash=sha256:22b126e9ffb671fdd0c129796343a02bf67bf2994b35449ffc9321aa755e18a4 \
     --hash=sha256:cf14627d5a8049ffbf49915732e5eddbe8134c3bdb9d476e6182b676fc573f8a
     # via -r requirements.txt.in
-google-api-core[grpc]==2.11.1 \
-    --hash=sha256:25d29e05a0058ed5f19c61c0a78b1b53adea4d9364b464d014fbda941f6d1c9a \
-    --hash=sha256:d92a5a92dc36dd4f4b9ee4e55528a90e432b059f93aee6ad857f9de8cc7ae94a
+google-api-core[grpc]==2.14.0 \
+    --hash=sha256:5368a4502b793d9bbf812a5912e13e4e69f9bd87f6efb508460c43f5bbd1ce41 \
+    --hash=sha256:de2fb50ed34d47ddbb2bd2dcf680ee8fead46279f4ed6b16de362aca23a18952
     # via
     #   -r requirements.txt.in
     #   google-api-python-client
@@ -378,9 +378,9 @@ google-resumable-media==2.5.0 \
     # via
     #   google-cloud-bigquery
     #   google-cloud-storage
-googleapis-common-protos[grpc]==1.59.1 \
-    --hash=sha256:0cbedb6fb68f1c07e18eb4c48256320777707e7d0c55063ae56c15db3224a61e \
-    --hash=sha256:b35d530fe825fb4227857bc47ad84c33c809ac96f312e13182bdeaa2abe1178a
+googleapis-common-protos[grpc]==1.61.0 \
+    --hash=sha256:22f1915393bb3245343f6efe87f6fe868532efc12aa26b391b15132e1279f1c0 \
+    --hash=sha256:8a64866a97f6304a7179873a465d6eee97b7a24ec6cfd78e0f575e96b821240b
     # via
     #   -r requirements.txt.in
     #   google-api-core
