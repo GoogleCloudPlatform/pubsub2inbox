@@ -124,6 +124,9 @@
         * [`read_gcs_object()`](filters.md#filters.strings.read_gcs_object)
 
 
+        * [`remove_mrkdwn()`](filters.md#filters.strings.remove_mrkdwn)
+
+
         * [`rtrim()`](filters.md#filters.strings.rtrim)
 
 
@@ -211,6 +214,9 @@
     * [`MalformedGlobalsException`](main.md#main.MalformedGlobalsException)
 
 
+    * [`MalformedMacrosException`](main.md#main.MalformedMacrosException)
+
+
     * [`MalformedTypeInPipelineException`](main.md#main.MalformedTypeInPipelineException)
 
 
@@ -254,6 +260,9 @@
 
 
     * [`load_configuration()`](main.md#main.load_configuration)
+
+
+    * [`macro_helper()`](main.md#main.macro_helper)
 
 
     * [`process_message()`](main.md#main.process_message)
@@ -563,6 +572,27 @@
 
 
             * [`CompressProcessor.process()`](processors.md#processors.compress.CompressProcessor.process)
+
+
+    * [processors.computeengine module](processors.md#module-processors.computeengine)
+
+
+        * [`ComputeengineOperationFailed`](processors.md#processors.computeengine.ComputeengineOperationFailed)
+
+
+        * [`ComputeengineProcessor`](processors.md#processors.computeengine.ComputeengineProcessor)
+
+
+            * [`ComputeengineProcessor.get_default_config_key()`](processors.md#processors.computeengine.ComputeengineProcessor.get_default_config_key)
+
+
+            * [`ComputeengineProcessor.get_instance()`](processors.md#processors.computeengine.ComputeengineProcessor.get_instance)
+
+
+            * [`ComputeengineProcessor.process()`](processors.md#processors.computeengine.ComputeengineProcessor.process)
+
+
+            * [`ComputeengineProcessor.wait_for_operation_done()`](processors.md#processors.computeengine.ComputeengineProcessor.wait_for_operation_done)
 
 
     * [processors.containeranalysis module](processors.md#module-processors.containeranalysis)
@@ -914,6 +944,15 @@
 
 
             * [`TestIngcp.test_in_gcp()`](test.md#test.test_ingcp.TestIngcp.test_in_gcp)
+
+
+    * [test.test_macros module](test.md#module-test.test_macros)
+
+
+        * [`TestMacros`](test.md#test.test_macros.TestMacros)
+
+
+            * [`TestMacros.test_macros()`](test.md#test.test_macros.TestMacros.test_macros)
 
 
     * [test.test_mail_msgraphapi module](test.md#module-test.test_mail_msgraphapi)

@@ -1,0 +1,56 @@
+#   Copyright 2023 Google LLC
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+# Example of controlling Compute Engine instances
+
+pipeline:
+  - type: processor.genericjson
+  - type: processor.computeengine
+    output: primary
+    config:
+      mode: instances.get
+      zone: europe-west4-c
+      instance: failover-primary
+  - type: output.logger
+    config:
+      message: |
+        Primary instance: {{ primary|json_encode }}
+  - type: processor.computeengine
+    canFail: true
+    config:
+      mode: instances.stop
+      zone: europe-west4-c
+      instance: failover-primary
+  - type: processor.computeengine
+    canFail: true
+    config:
+      mode: instances.detachdisk
+      zone: europe-west4-c
+      instance: failover-primary
+      disk: projects/example-project/regions/europe-west4/disks/failover-regional-disk-1
+      # deviceName: failover-regional-disk-1
+  - type: processor.computeengine
+    config:
+      mode: instances.attachdisk
+      zone: europe-west4-b
+      instance: failover-secondary
+      disk: projects/example-project/regions/europe-west4/disks/failover-regional-disk-1
+      deviceName: failover-regional-disk-1
+      forceAttach: true
+  - type: processor.computeengine
+    canFail: true
+    config:
+      mode: instances.start
+      zone: europe-west4-b
+      instance: failover-secondary
