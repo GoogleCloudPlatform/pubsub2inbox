@@ -33,11 +33,14 @@ class ComputeengineProcessor(Processor):
         deviceName (str, optional): Device name to operate on.
         snapshotName (str, optional): Snapshot name (or regexp for disks.instanceSnapshots) for instant snapshots.
         maxSnapshots (int, optional): Maximum snapshots for disks.instanceSnapshots.purge.
+        storageLocations (list, optional): Storage locations for disk.snapshots.
+        snapshotParameters (dict, optional): Additional snapshot configuration.
         labels (dict, optional): Labels for instant snapshots.
         region (str, optional): Google Cloud region.
         zone (str, optional): Google Cloud zone for the instance.
         mode (str): One of: instances.get, instances.stop, instances.reset, instances.start, 
-          instances.detachDisk, instances.attach, disks.instantSnapshots.create, disks.instantSnapshots.purge
+          instances.detachDisk, instances.attachDisk, disks.instantSnapshots.create, disks.instantSnapshots.purge,
+          disk.snapshots.create, disk.snapshots.purge
     """
 
     def get_default_config_key():
@@ -90,9 +93,14 @@ class ComputeengineProcessor(Processor):
         if 'mode' not in self.config:
             raise NotConfiguredException(
                 'No Compute Engine operation specified.')
-        if 'instance' not in self.config and 'disk' not in self.config:
-            raise NotConfiguredException(
-                'No instance or disk ID specified in configuration.')
+        if self.config['mode'].startswith('instances.'):
+            if 'instance' not in self.config:
+                raise NotConfiguredException(
+                    'No instance specified in configuration.')
+        if self.config['mode'].lower() in ['instances.attachdisk', 'instances.detachdisk']:
+            if 'disk' not in self.config:
+                raise NotConfiguredException(
+                    'No disk specified in configuration.')
 
         credentials, credentials_project_id = google.auth.default()
         project = self._jinja_expand_string(
@@ -314,6 +322,92 @@ class ComputeengineProcessor(Processor):
                         'Failed to attach disk %s to %s: %s' %
                         (disk, instance, str(attach_response)))
 
+        if self.config['mode'].lower().startswith('disks.snapshots.'):
+            if 'snapshotName' not in self.config:
+                raise NotConfiguredException(
+                    'No snapshotName in configuration!')
+            
+            snapshot_name = self._jinja_expand_string(
+                self.config['snapshotName'], 'snapshot_name')
+
+            if self.config['mode'].lower() == 'disks.snapshots.create':
+                if 'storageLocations' not in self.config:
+                    raise NotConfiguredException(
+                        'No storageLocations in configuration!')
+                storage_locations = self._jinja_expand_list(self.config['storageLocations'], 'storage_locations')
+
+                request_body = {
+                    'name': snapshot_name,
+                    'sourceDisk': disk,
+                    'storageLocations': storage_locations,
+                }
+                if 'snapshotParameters' in self.config:
+                    snapshot_parameters = self._jinja_expand_dict_all(self.config['snapshotParameters'], 'snapshot_parameters')
+                    request_body = {**request_body, **snapshot_parameters}
+
+                if 'labels' in self.config:
+                    request_body['labels'] = self._jinja_expand_dict_all(
+                        self.config['labels'], 'labels')
+
+                snapshot_request = None
+                if region is not None:
+                    self.logger.info(
+                        'Creating snapshot %s of disk %s in %s...' %
+                        (snapshot_name, disk, region))
+                    snapshot_request = compute_service.regionDisks(
+                    ).createSnapshot(project=project, region=region, disk=disk, body=request_body)
+                else:
+                    self.logger.info(
+                        'Creating snapshot %s of disk %s in %s...' %
+                        (snapshot_name, disk, zone))
+                    snapshot_request = compute_service.disks().createSnapshot(project=project, zone=zone, disk=disk, body=request_body)
+                snapshot_response = snapshot_request.execute()
+                if 'id' in snapshot_response:
+                    ret = self.wait_for_operation_done(
+                        compute_service, snapshot_response['id'],
+                        snapshot_response['selfLink'], project, zone, region,
+                        timeout)
+                    return {output_var: ret}
+                else:
+                    raise ComputeengineOperationFailed(
+                        'Failed to create snapshot %s of disk %s: %s' %
+                        (snapshot_name, disk, str(snapshot_response)))
+
+            if self.config['mode'].lower() == 'disks.snapshots.purge':
+                max_snapshots = self._jinja_expand_int(
+                    self.config['maxSnapshots'], 'max_snapshots')
+
+                snapshot_request = None
+                page_token = None
+                matching_snapshots = []
+                while True:
+                    snapshot_request = compute_service.snapshots().list(project=project, pageToken=page_token)
+                    snapshot_response = snapshot_request.execute()
+                    if 'items' in snapshot_response:
+                        for snapshot in snapshot_response['items']:
+                            if re.match(snapshot_name, snapshot['name']):
+                                matching_snapshots.append(snapshot)
+                    if 'nextPageToken' in snapshot_response:
+                        page_token = snapshot_response['nextPageToken']
+                    else:
+                        break
+                if len(matching_snapshots) > max_snapshots:
+                    matching_snapshots.sort(
+                        key=lambda item: item['creationTimestamp'],
+                        reverse=True)
+                    for snapshot in matching_snapshots[max_snapshots:]:
+                        self.logger.info('Purging snapshot %s in project %s...' % (snapshot['name'], project))
+                        delete_request = compute_service.snapshots().delete(project=project,
+                                     snapshot=snapshot['name'])
+                        delete_response = delete_request.execute()
+                        if 'id' in delete_response:
+                            self.wait_for_operation_done(
+                                compute_service, delete_response['id'],
+                                delete_response['selfLink'], project, zone,
+                                region, timeout)
+                    return {output_var: len(matching_snapshots)}
+
+
         if self.config['mode'].lower().startswith('disks.instantsnapshots.'):
             if 'snapshotName' not in self.config:
                 raise NotConfiguredException(
@@ -335,6 +429,10 @@ class ComputeengineProcessor(Processor):
                     'name': snapshot_name,
                     'sourceDisk': disk,
                 }
+                if 'snapshotParameters' in self.config:
+                    snapshot_parameters = self._jinja_expand_dict_all(self.config['snapshotParameters'], 'snapshot_parameters')
+                    request_body = {**request_body, **snapshot_parameters}
+
                 if 'labels' in self.config:
                     request_body['labels'] = self._jinja_expand_dict_all(
                         self.config['labels'], 'labels')
@@ -362,6 +460,7 @@ class ComputeengineProcessor(Processor):
                     raise ComputeengineOperationFailed(
                         'Failed to create instant snapshot %s of disk %s: %s' %
                         (snapshot_name, disk, str(snapshot_response)))
+
             if self.config['mode'].lower() == 'disks.instantsnapshots.purge':
                 max_snapshots = self._jinja_expand_int(
                     self.config['maxSnapshots'], 'max_snapshots')
@@ -393,6 +492,7 @@ class ComputeengineProcessor(Processor):
                         reverse=True)
                     for snapshot in matching_snapshots[max_snapshots:]:
                         delete_request = None
+                        self.logger.info('Purging snapshot %s in project %s...' % (snapshot['name'], project))
                         if '/regions/' in snapshot['selfLink']:
                             delete_request = compute_service_beta.regionInstantSnapshots(
                             ).delete(project=project,

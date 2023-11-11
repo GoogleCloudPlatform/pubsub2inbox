@@ -163,6 +163,12 @@ Perform actions on Compute Engine instances.
     * **maxSnapshots** (*int**, **optional*) – Maximum snapshots for disks.instanceSnapshots.purge.
 
 
+    * **storageLocations** (*list**, **optional*) – Storage locations for disk.snapshots.
+
+
+    * **snapshotParameters** (*dict**, **optional*) – Additional snapshot configuration.
+
+
     * **labels** (*dict**, **optional*) – Labels for instant snapshots.
 
 
@@ -173,7 +179,8 @@ Perform actions on Compute Engine instances.
 
 
     * **mode** (*str*) – One of: instances.get, instances.stop, instances.reset, instances.start,
-    instances.detachDisk, instances.attach, disks.instantSnapshots.create, disks.instantSnapshots.purge
+    instances.detachDisk, instances.attachDisk, disks.instantSnapshots.create, disks.instantSnapshots.purge,
+    disk.snapshots.create, disk.snapshots.purge
 
 
 
