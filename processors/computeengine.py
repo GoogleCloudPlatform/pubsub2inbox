@@ -15,6 +15,7 @@ from .base import Processor, NotConfiguredException
 import google.auth
 from googleapiclient import discovery
 import time
+import re
 
 
 class ComputeengineOperationFailed(Exception):
@@ -30,9 +31,13 @@ class ComputeengineProcessor(Processor):
         instance (str): Instance to operate on.
         disk (str, optional): Disk to operate on.
         deviceName (str, optional): Device name to operate on.
+        snapshotName (str, optional): Snapshot name (or regexp for disks.instanceSnapshots) for instant snapshots.
+        maxSnapshots (int, optional): Maximum snapshots for disks.instanceSnapshots.purge.
+        labels (dict, optional): Labels for instant snapshots.
         region (str, optional): Google Cloud region.
         zone (str, optional): Google Cloud zone for the instance.
-        mode (str): One of: instances.get, instances.stop, instances.reset, instances.start, instances.detachdisk, regiondisks.attach
+        mode (str): One of: instances.get, instances.stop, instances.reset, instances.start, 
+          instances.detachDisk, instances.attach, disks.instantSnapshots.create, disks.instantSnapshots.purge
     """
 
     def get_default_config_key():
@@ -190,7 +195,7 @@ class ComputeengineProcessor(Processor):
                         'Failed to start instance: %s' % str(start_response))
             return {output_var: inst}
 
-        if self.config['mode'] == 'instances.detachdisk':
+        if self.config['mode'].lower() == 'instances.detachdisk':
             wait_for_stopped = self._jinja_expand_bool(
                 self.config['waitForStopped']
             ) if 'waitForStopped' in self.config else True
@@ -309,6 +314,102 @@ class ComputeengineProcessor(Processor):
                         'Failed to attach disk %s to %s: %s' %
                         (disk, instance, str(attach_response)))
 
+        if self.config['mode'].lower().startswith('disks.instantsnapshots.'):
+            if 'snapshotName' not in self.config:
+                raise NotConfiguredException(
+                    'No snapshotName in configuration!')
+
+            snapshot_name = self._jinja_expand_string(
+                self.config['snapshotName'], 'snapshot_name')
+
+            compute_service_beta = discovery.build(
+                'compute',
+                'beta',
+                cache_discovery=False,
+                discoveryServiceUrl=
+                'https://www.googleapis.com/discovery/v1/apis/compute/beta/rest',
+                http=self._get_branded_http(credentials))
+
+            if self.config['mode'].lower() == 'disks.instantsnapshots.create':
+                request_body = {
+                    'name': snapshot_name,
+                    'sourceDisk': disk,
+                }
+                if 'labels' in self.config:
+                    request_body['labels'] = self._jinja_expand_dict_all(
+                        self.config['labels'], 'labels')
+                snapshot_request = None
+                if '/regions/' in disk:
+                    self.logger.info(
+                        'Creating instant snapshot %s of disk %s in %s...' %
+                        (snapshot_name, disk, region))
+                    snapshot_request = compute_service_beta.regionInstantSnapshots(
+                    ).insert(project=project, region=region, body=request_body)
+                else:
+                    self.logger.info(
+                        'Creating instant snapshot %s of disk %s in %s...' %
+                        (snapshot_name, disk, zone))
+                    snapshot_request = compute_service_beta.instantSnapshots(
+                    ).insert(project=project, zone=zone, body=request_body)
+                snapshot_response = snapshot_request.execute()
+                if 'id' in snapshot_response:
+                    ret = self.wait_for_operation_done(
+                        compute_service_beta, snapshot_response['id'],
+                        snapshot_response['selfLink'], project, zone, region,
+                        timeout)
+                    return {output_var: ret}
+                else:
+                    raise ComputeengineOperationFailed(
+                        'Failed to create instant snapshot %s of disk %s: %s' %
+                        (snapshot_name, disk, str(snapshot_response)))
+            if self.config['mode'].lower() == 'disks.instantsnapshots.purge':
+                max_snapshots = self._jinja_expand_int(
+                    self.config['maxSnapshots'], 'max_snapshots')
+
+                snapshot_request = None
+                page_token = None
+                matching_snapshots = []
+                while True:
+                    if region is not None:
+                        snapshot_request = compute_service_beta.regionInstantSnapshots(
+                        ).list(project=project,
+                               region=region,
+                               pageToken=page_token)
+                    else:
+                        snapshot_request = compute_service_beta.instantSnapshots(
+                        ).list(project=project, zone=zone, pageToken=page_token)
+                    snapshot_response = snapshot_request.execute()
+                    if 'items' in snapshot_response:
+                        for snapshot in snapshot_response['items']:
+                            if re.match(snapshot_name, snapshot['name']):
+                                matching_snapshots.append(snapshot)
+                    if 'nextPageToken' in snapshot_response:
+                        page_token = snapshot_response['nextPageToken']
+                    else:
+                        break
+                if len(matching_snapshots) > max_snapshots:
+                    matching_snapshots.sort(
+                        key=lambda item: item['creationTimestamp'],
+                        reverse=True)
+                    for snapshot in matching_snapshots[max_snapshots:]:
+                        delete_request = None
+                        if '/regions/' in snapshot['selfLink']:
+                            delete_request = compute_service_beta.regionInstantSnapshots(
+                            ).delete(project=project,
+                                     region=region,
+                                     instantSnapshot=snapshot['name'])
+                        else:
+                            delete_request = compute_service_beta.instantSnapshots(
+                            ).delete(project=project,
+                                     zone=zone,
+                                     instantSnapshot=snapshot['name'])
+                        delete_response = delete_request.execute()
+                        if 'id' in delete_response:
+                            self.wait_for_operation_done(
+                                compute_service_beta, delete_response['id'],
+                                delete_response['selfLink'], project, zone,
+                                region, timeout)
+                    return {output_var: len(matching_snapshots)}
         return {
             output_var: None,
         }
