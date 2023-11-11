@@ -9,6 +9,10 @@ Bases: `object`
 
 #### on_post(req, res)
 
+### _exception_ main.ConcurrencyRetryException()
+Bases: `Exception`
+
+
 ### _exception_ main.InvalidMessageFormatException()
 Bases: `Exception`
 
