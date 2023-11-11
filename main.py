@@ -497,7 +497,7 @@ def handle_concurrency_post(logger, concurrency_config, jinja_environment,
 
     bucket = storage_client.bucket(concurrency_bucket)
     concurrency_blob = bucket.blob(concurrency_file)
-    # concurrency_blob.delete()
+    concurrency_blob.delete()
 
 
 def handle_concurrency_pre(logger, concurrency_config, jinja_environment,
