@@ -133,7 +133,7 @@ locals {
     }
     compute-engine = {
       org     = []
-      project = ["roles/compute.instanceAdmin.v1"]
+      project = ["roles/compute.instanceAdmin.v1", "roles/compute.loadBalancerAdmin"]
       apis    = ["compute.googleapis.com"]
     }
   }
