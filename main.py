@@ -497,7 +497,7 @@ def handle_concurrency_post(logger, concurrency_config, jinja_environment,
 
     bucket = storage_client.bucket(concurrency_bucket)
     concurrency_blob = bucket.blob(concurrency_file)
-    concurrency_blob.delete()
+    # concurrency_blob.delete()
 
 
 def handle_concurrency_pre(logger, concurrency_config, jinja_environment,
@@ -554,12 +554,12 @@ def handle_concurrency_pre(logger, concurrency_config, jinja_environment,
                         'process_earliest': concurrency_earliest,
                         'blob_time_created': concurrency_blob.time_created
                     })
-                return False
-        logger.info('Concurrency lock file exists, not processing the message.',
-                    extra={
-                        'bucket': concurrency_bucket,
-                        'blob': concurrency_file
-                    })
+        else:
+            logger.info('Concurrency lock file exists, not processing the message.',
+                        extra={
+                            'bucket': concurrency_bucket,
+                            'blob': concurrency_file
+                        })
         if 'defer' in concurrency_config and concurrency_config['defer']:
             raise ConcurrencyRetryException('Failing message processing due to concurrency control, allowing retry.')
         return False
