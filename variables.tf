@@ -112,6 +112,12 @@ variable "function_timeout" {
   default     = 240
 }
 
+variable "available_memory_mb" {
+  type        = number
+  description = "Maximum memory the function can use"
+  default     = 512
+}
+
 variable "retry_minimum_backoff" {
   type        = string
   description = "Minimum retry backoff (value between 0-600 seconds, suffixed with s, default 10s, Cloud Run only)"

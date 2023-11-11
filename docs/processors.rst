@@ -132,6 +132,14 @@ processors.groups module
    :undoc-members:
    :show-inheritance:
 
+processors.loadbalancing module
+-------------------------------
+
+.. automodule:: processors.loadbalancing
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 processors.monitoring module
 ----------------------------
 

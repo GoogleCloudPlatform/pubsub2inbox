@@ -157,13 +157,23 @@ Perform actions on Compute Engine instances.
     * **deviceName** (*str**, **optional*) – Device name to operate on.
 
 
+    * **snapshotName** (*str**, **optional*) – Snapshot name (or regexp for disks.instanceSnapshots) for instant snapshots.
+
+
+    * **maxSnapshots** (*int**, **optional*) – Maximum snapshots for disks.instanceSnapshots.purge.
+
+
+    * **labels** (*dict**, **optional*) – Labels for instant snapshots.
+
+
     * **region** (*str**, **optional*) – Google Cloud region.
 
 
     * **zone** (*str**, **optional*) – Google Cloud zone for the instance.
 
 
-    * **mode** (*str*) – One of: instances.get, instances.stop, instances.reset, instances.start, instances.detachdisk, regiondisks.attach
+    * **mode** (*str*) – One of: instances.get, instances.stop, instances.reset, instances.start,
+    instances.detachDisk, instances.attach, disks.instantSnapshots.create, disks.instantSnapshots.purge
 
 
 
@@ -366,6 +376,47 @@ Bases: `Processor`
 #### get_default_config_key()
 
 #### process(output_var={'all_groups': 'all_groups', 'groups_by_manager': 'groups_by_manager', 'groups_by_owner': 'groups_by_owner'})
+## processors.loadbalancing module
+
+
+### _exception_ processors.loadbalancing.LoadbalancingOperationFailed()
+Bases: `Exception`
+
+
+### _class_ processors.loadbalancing.LoadbalancingProcessor(config, jinja_environment, data, event, context)
+Bases: `Processor`
+
+Perform actions on Cloud Load Balancers.
+
+
+* **Parameters**
+
+    
+    * **project** (*str**, **optional*) – Google Cloud project ID.
+
+
+    * **backend_service** (*str*) – Backend service to operate on.
+
+
+    * **timeout** (*int**, **optional*) – Timeout of waiting on operations.
+
+
+    * **region** (*str**, **optional*) – Google Cloud region.
+
+
+    * **mode** (*str*) – One of: backendservice.get, regionbackendservice.get, backendservice.patch, regionbackendservice.patch
+
+
+
+#### get_backend(compute_service, project, backend_service)
+
+#### get_default_config_key()
+
+#### get_region_backend(compute_service, project, region, backend_service)
+
+#### process(output_var='loadbalancing')
+
+#### wait_for_operation_done(compute_service, operation_name, operation_self_link, project, zone, region, timeout=30)
 ## processors.monitoring module
 
 

@@ -12,7 +12,11 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-# Example of controlling Compute Engine instances
+# Example of controlling Compute Engine instances (failover-like setup)
+
+# We'll employ a lock file to prevent this function from running concurrently
+concurrency:
+  bucket: add-a-bucket-here
 
 pipeline:
   - type: processor.genericjson
@@ -26,13 +30,27 @@ pipeline:
     config:
       message: |
         Primary instance: {{ primary|json_encode }}
-  - type: processor.computeengine
+  - type: processor.computeengine # Make an instant snapshot of the disk before stopping the instance
+    canFail: true
+    config:
+      mode: disks.instantSnapshots.create
+      region: europe-west4
+      disk: projects/example-project/regions/europe-west4/disks/failover-regional-disk-1
+      snapshotName: "failover-regional-disk-1-{{ ''|utc_strftime('%Y%m%d-%H%M%S') }}"
+  - type: processor.computeengine # Only keep 3 last snapshots
+    canFail: true
+    config:
+      mode: disks.instantSnapshots.purge
+      region: europe-west4
+      snapshotName: "^failover-regional-disk-1-"
+      maxSnapshots: 3
+  - type: processor.computeengine # Stop the instance
     canFail: true
     config:
       mode: instances.stop
       zone: europe-west4-c
       instance: failover-primary
-  - type: processor.computeengine
+  - type: processor.computeengine # Attempt to detach the disk politely
     canFail: true
     config:
       mode: instances.detachdisk
@@ -40,7 +58,7 @@ pipeline:
       instance: failover-primary
       disk: projects/example-project/regions/europe-west4/disks/failover-regional-disk-1
       # deviceName: failover-regional-disk-1
-  - type: processor.computeengine
+  - type: processor.computeengine # Attach the disk to the other instance, forcibly
     config:
       mode: instances.attachdisk
       zone: europe-west4-b
@@ -48,9 +66,17 @@ pipeline:
       disk: projects/example-project/regions/europe-west4/disks/failover-regional-disk-1
       deviceName: failover-regional-disk-1
       forceAttach: true
-  - type: processor.computeengine
+  - type: processor.computeengine # Start the other instance
     canFail: true
     config:
       mode: instances.start
       zone: europe-west4-b
       instance: failover-secondary
+  - type: processor.loadbalancing # Update the backend service with a UMIG containing the spun up instance
+    config:
+      mode: regionbackendservice.patch
+      region: "europe-west4"
+      backendService: "l4-backend-service"
+      patch:
+        backends:
+          - group: "https://www.googleapis.com/compute/v1/projects/example-project/zones/europe-west4-c/instanceGroups/secondary-mig"

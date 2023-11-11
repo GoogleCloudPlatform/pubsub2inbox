@@ -61,9 +61,15 @@ Bases: `Exception`
 
 ### main.decode_and_process(logger, config, event, context)
 
+### main.get_concurrency_params(concurrency_config, jinja_environment, template_variables)
+
 ### main.get_jinja_environment()
 
 ### main.get_jinja_escaping(template_name)
+
+### main.handle_concurrency_post(logger, concurrency_config, jinja_environment, template_variables)
+
+### main.handle_concurrency_pre(logger, concurrency_config, jinja_environment, template_variables)
 
 ### main.handle_ignore_on(logger, ignore_config, jinja_environment, template_variables)
 

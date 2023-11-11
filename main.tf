@@ -133,7 +133,7 @@ locals {
     }
     compute-engine = {
       org     = []
-      project = ["roles/compute.instanceAdmin"]
+      project = ["roles/compute.instanceAdmin.v1"]
       apis    = ["compute.googleapis.com"]
     }
   }
@@ -352,7 +352,7 @@ resource "google_cloudfunctions_function" "function" {
 
   service_account_email = var.create_service_account ? google_service_account.service-account[0].email : var.service_account
 
-  available_memory_mb   = 256
+  available_memory_mb   = var.available_memory_mb
   source_archive_bucket = google_storage_bucket.function-bucket[0].name
   source_archive_object = var.use_local_files ? google_storage_bucket_object.function-archive[0].name : google_storage_bucket_object.function-archive-release[0].name
   entry_point           = "process_pubsub"
@@ -404,7 +404,7 @@ resource "google_cloudfunctions2_function" "function" {
     service_account_email            = var.create_service_account ? google_service_account.service-account[0].email : var.service_account
     max_instance_count               = var.instance_limits.max_instances
     max_instance_request_concurrency = 1
-    available_memory                 = "256M"
+    available_memory                 = format("%dM", var.available_memory_mb)
     timeout_seconds                  = var.function_timeout
     vpc_connector                    = var.vpc_connector
     environment_variables = {
@@ -738,7 +738,7 @@ resource "google_cloudfunctions2_function" "json2pubsub-function" {
   service_config {
     service_account_email = google_service_account.json2pubsub-service-account[0].email
     max_instance_count    = var.deploy_json2pubsub.max_instances
-    available_memory      = "128Mi"
+    available_memory      = format("%dMi", var.available_memory_mb)
     timeout_seconds       = var.function_timeout
     environment_variables = {
       GOOGLE_CLOUD_PROJECT = var.project_id

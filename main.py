@@ -95,6 +95,8 @@ def get_jinja_environment():
     env.tests.update(get_jinja_tests())
     return env
 
+class ConcurrencyRetryException(Exception):
+    pass
 
 class MessageTooOldException(Exception):
     pass
@@ -558,6 +560,8 @@ def handle_concurrency_pre(logger, concurrency_config, jinja_environment,
                         'bucket': concurrency_bucket,
                         'blob': concurrency_file
                     })
+        if 'defer' in concurrency_config and concurrency_config['defer']:
+            raise ConcurrencyRetryException('Failing message processing due to concurrency control, allowing retry.')
         return False
     else:
         try:

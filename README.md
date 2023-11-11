@@ -34,7 +34,7 @@ Out of the box, you'll have the following functionality available as examples:
 | Cloud Storage                 | When a new report arrives in a bucket, send it out as an email attachment. Or copy files to a backup bucket as soon as they arrive. See: [How to set up Cloud Storage notifications](https://cloud.google.com/storage/docs/reporting-changes) | [Cloud Storage notifications](examples/storage-example.yaml)<br />[Cloud Storage backup copier](examples/gcscopy-example.yaml)                                                                                                                                                                                                                 |
 | BigQuery                      | Run BigQuery queries on a schedule and turn the results into CSV or spreadsheets and send them out as email attachments.                                                                                                                      | [BigQuery queries](examples/bigquery-example.yaml)                                                                                                                                                                                                                                                                                             |
 | Recommendations               | Generate recommendations and insights for project owner's on a scheduled basis. Uses [Recommender API](https://cloud.google.com/recommender/docs/overview).                                                                                   | [Recommendations and Insights reports](examples/recommendations/)<br />[Example with attached spreadsheet](examples/recommendations/per-project/recommendations.yaml)<br />[Example with with GCS and BigQuery output](examples/recommendations/all-projects/recommendations-example-3.yaml).                                                  |
-| Compute Engine                | Start and stop instances, detach and attach disks.                                                                                                                                                                                            | [Compute Engine instance control](examples/computeengine-example.yaml)                                                                                                                                                                                                                                                                         |
+| Compute Engine                | Start and stop instances, detach and attach disks, patch load balancer backends. services.                                                                                                                                                    | [Compute Engine instance control](examples/computeengine-example.yaml)                                                                                                                                                                                                                                                                         |
 | Cloud Monitoring              | Send alerts from Cloud Monitoring via your own SMTP servers, or use an unsupported messaging platform. Or run Cloud Monitoring MQL queries and send the results.                                                                              | [Cloud Monitoring alerts](examples/monitoring-alert-config.yaml)<br />[Service account usage reporting using Cloud Monitoring and Cloud Asset Inventory](examples/cai-example.yaml)                                                                                                                                                            |
 | Cloud Asset Inventory         | Use Cloud Asset Inventory to fetch resources organization-wide.                                                                                                                                                                               | [Fetch all service accounts from CAI](examples/cai-example.yaml)                                                                                                                                                                                                                                                                               |
 | Cloud Identity                | Fetch groups or memberships, or change group settings. For example, build a report of members in a group for review and send it out via email.                                                                                                | [Cloud Identity groups](examples/groups-example.yaml)<br />[Another example](examples/groups-example-2.yaml)<br />[Groups that allow external members](examples/external-groups-example.yaml)<br />[Example of Directory API](examples/directory-example.yaml)<br />[Update group default settings on creation](examples/groups-settings.yaml) |
@@ -74,7 +74,8 @@ Available input processors are:
   - [git.py](processors/git.py): Clone repositories via HTTP or SSH.
   - [clouddeploy.py](processors/clouddeploy.py): Work with releases and rollouts on Cloud Deploy.
   - [setvariable.py](processors/setvariable.py): Set global variables.
-  - [computeengine.py](processors/computeengine.py): Set global variables.
+  - [computeengine.py](processors/computeengine.py): Manipulate Compute Engine resources.
+  - [loadbalancing.py](processors/loadbalancing.py): Change load balancer settings.
 
 
 For full documentation of permissions, processor input and output parameters, see [PROCESSORS.md](PROCESSORS.md).
@@ -82,7 +83,7 @@ For full documentation of permissions, processor input and output parameters, se
 Please note that the input processors have some IAM requirements to be able to
 pull information from GCP:
 
- - Resend mechanism (see below)
+ - Resend mechanism and concurrency control (see below)
     - Storage Object Admin (`roles/storage.objectAdmin`)
  - Signed URL generation (see `filters/strings.py:generate_signed_url`)
     - Storage Admin on the bucket (`roles/storage.admin`)
@@ -134,7 +135,7 @@ The YAML file is structured of the following top level keys:
     - `config`: configuration of the processor or output
     - `runIf`: if this evaluates to empty, the processor/output is not run
     - `stopIf`: if this evalues to non-empty, the processing is stopped immediately (before the processor/output is run)
-    - `ignoreOn`: skips reprocessing of messages, see below:
+    - `ignoreOn`: (*deprecated*) skips reprocessing of messages, see below:
       - `bucket`: Cloud Storage bucket to store reprocessing markers (zero-length files), has to exist
       - `period`: textual presentation of the period after which a message can be reprocessed (eg. `2 days`)
       - `key`: the object reprocessing marker name (filename), if not set, it is the message and its properties hashed,
@@ -156,6 +157,7 @@ The YAML file is structured of the following top level keys:
     - `bucket`: Cloud Storage bucket to store zero-length concurrency lock file
     - `period`: textual presentation of the period after which the lock is considered invalid (eg. `2 days`, leave unset if no period)
     - `file`: the concurrency lock file name (defaults to `pubsub2inbox.lock`)
+    - `defer`: allow Pub/Sub to retry the message (defaults to `false`)
 
 For example of a modern pipeline, see [shell script example](examples/shellscript-config.yaml) or [test configs](test/configs/).
 
