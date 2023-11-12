@@ -39,6 +39,19 @@ module "project" {
   }
 }
 
+resource "google_project_service" "pubsub" {
+  project = var.project_id
+  service = "pubsub.googleapis.com"
+
+  timeouts {
+    create = "30m"
+    update = "40m"
+  }
+
+  disable_dependent_services = true
+  disable_on_destroy         = false
+}
+
 module "vpc" {
   source     = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/net-vpc?ref=daily-2023.11.11"
   project_id = module.project.project_id
@@ -242,6 +255,9 @@ module "pubsub" {
   name       = "repd-failover"
   iam = {
   }
+  depends_on = [
+    google_project_service.pubsub
+  ]
 }
 
 module "lock-bucket" {
