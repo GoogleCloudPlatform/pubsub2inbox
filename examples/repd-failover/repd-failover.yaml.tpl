@@ -69,7 +69,7 @@ pipeline:
       region: "{{ regional_disk.region }}"
       storageLocations:
         - "{{ regional_disk.region }}"
-      disk: "{{ regional_disk.self_link|split('/')|last }}"
+      disk: "{{ regional_disk.id|split('/')|last }}"
       snapshotName: "{{ regional_disk.device_name }}-{{ ''|utc_strftime('%Y%m%d-%H%M%S') }}"
   - type: processor.computeengine # Only keep 3 last snapshots
     canFail: true
