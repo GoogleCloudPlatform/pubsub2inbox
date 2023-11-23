@@ -136,6 +136,16 @@ locals {
       project = ["roles/compute.instanceAdmin.v1", "roles/compute.loadBalancerAdmin"]
       apis    = ["compute.googleapis.com"]
     }
+    cloud-run-ro = {
+      org     = []
+      project = ["roles/run.viewer"]
+      apis    = ["run.googleapis.com"]
+    }
+    logging-ro = {
+      org     = []
+      project = ["roles/logging.viewer"]
+      apis    = ["logging.googleapis.com"]
+    }
   }
   org_permissions     = flatten([for role in var.function_roles : local.iam_permissions[role].org])
   project_permissions = flatten([for role in var.function_roles : local.iam_permissions[role].project])
