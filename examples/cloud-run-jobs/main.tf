@@ -49,6 +49,7 @@ resource "google_cloud_run_v2_job" "default" {
     template {
       service_account = module.job-service-account.email
       containers {
+        name  = "example"
         image = var.job_container
         env {
           name  = "PUBSUB_TOPIC"

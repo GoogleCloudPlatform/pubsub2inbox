@@ -17,7 +17,10 @@ set -euo pipefail
 CLOUD_RUN_TASK_INDEX=${CLOUD_RUN_TASK_INDEX:=0}
 CLOUD_RUN_TASK_ATTEMPT=${CLOUD_RUN_TASK_ATTEMPT:=0}
 
+OVERRIDE_ARG=${OVERRIDE_ARG:=none}
+
 echo "Starting Cloud Run job ${CLOUD_RUN_JOB}, execution ${CLOUD_RUN_EXECUTION}, task #${CLOUD_RUN_TASK_INDEX}, attempt #${CLOUD_RUN_TASK_ATTEMPT}..."
+echo "Override argument is: ${OVERRIDE_ARG}"
 
 echo "Your fortune is:"
 /usr/games/fortune
