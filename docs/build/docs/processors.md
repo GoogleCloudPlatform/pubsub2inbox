@@ -95,6 +95,41 @@ Operate Cloud Deploy applications, releases and other such things.
 #### process(output_var='clouddeploy')
 
 #### wait_for_operation_done(deploy_service, operation_name)
+## processors.cloudrun module
+
+
+### _class_ processors.cloudrun.CloudrunProcessor(config, jinja_environment, data, event, context)
+Bases: `Processor`
+
+Fetches information and performs actions on Cloud Run (mainly Cloud Run Jobs).
+
+
+* **Parameters**
+
+    
+    * **project** (*str**, **optional*) – Google Cloud project ID.
+
+
+    * **location** (*str*) – Cloud Run location.
+
+
+    * **job** (*str**, **optional*) – Cloud Run Job name.
+
+
+    * **execution** (*str**, **optional*) – Cloud Run Job execution.
+
+
+    * **task** (*str**, **optional*) – Cloud Run Job execution task.
+
+
+    * **mode** (*str*) – One of: jobs.executions.list, jobs.executions.get, jobs.executions.cancel,
+    jobs.run
+
+
+
+#### get_default_config_key()
+
+#### process(output_var='cloudrun')
 ## processors.compress module
 
 
@@ -424,6 +459,40 @@ Perform actions on Cloud Load Balancers.
 #### process(output_var='loadbalancing')
 
 #### wait_for_operation_done(compute_service, operation_name, operation_self_link, project, zone, region, timeout=30)
+## processors.logging module
+
+
+### _class_ processors.logging.LoggingProcessor(config, jinja_environment, data, event, context)
+Bases: `Processor`
+
+Fetch logging information from Cloud Logging.
+
+
+* **Parameters**
+
+    
+    * **project** (*str**, **optional*) – Google Cloud project ID.
+
+
+    * **resourceNames** (*list*) – Parent resources to fetch logging entries from.
+
+
+    * **filter** (*str**, **optional*) – Logging filter.
+
+
+    * **orderBy** (*str**, **optional*) – How to order log entries.
+
+
+    * **format** (*str**, **optional*) – One of: full, text-only, with-timestamps (default full)
+
+
+    * **mode** (*str*) – One of: entries.list
+
+
+
+#### get_default_config_key()
+
+#### process(output_var='logging')
 ## processors.monitoring module
 
 
@@ -434,6 +503,34 @@ Bases: `Processor`
 #### get_default_config_key()
 
 #### process(output_var='time_series')
+## processors.opsgenie module
+
+
+### _class_ processors.opsgenie.OpsgenieProcessor(config, jinja_environment, data, event, context)
+Bases: `Processor`
+
+Create OpsGenie alerts and incidents.
+
+
+* **Parameters**
+
+    
+    * **endpoint** (*str**, **optional*) – OpsGenie API endpoint (use [https://api.eu.opsgenie.com/v2](https://api.eu.opsgenie.com/v2) for EU).
+
+
+    * **token** (*str*) – OpsGenie authentication token.
+
+
+    * **mode** (*str*) – One of: alert.create, incident.create
+
+
+    * **data** (*dict*) – Body data for API call.
+
+
+
+#### get_default_config_key()
+
+#### process(output_var='opsgenie')
 ## processors.projects module
 
 

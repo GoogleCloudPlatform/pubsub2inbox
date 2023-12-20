@@ -44,6 +44,14 @@ processors.clouddeploy module
    :undoc-members:
    :show-inheritance:
 
+processors.cloudrun module
+--------------------------
+
+.. automodule:: processors.cloudrun
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 processors.compress module
 --------------------------
 
@@ -140,10 +148,26 @@ processors.loadbalancing module
    :undoc-members:
    :show-inheritance:
 
+processors.logging module
+-------------------------
+
+.. automodule:: processors.logging
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 processors.monitoring module
 ----------------------------
 
 .. automodule:: processors.monitoring
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+processors.opsgenie module
+--------------------------
+
+.. automodule:: processors.opsgenie
    :members:
    :undoc-members:
    :show-inheritance:

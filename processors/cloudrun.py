@@ -89,12 +89,14 @@ class CloudrunProcessor(Processor):
             name = f"projects/{project}/locations/{location}/jobs/{job}"
             overrides = {}
             if 'overrides' in self.config:
-                overrides = self._jinja_expand_dict_all(self.config['overrides'])
+                overrides = self._jinja_expand_dict_all(
+                    self.config['overrides'])
             request_body = {
                 'validateOnly': False,
                 'overrides': overrides,
             }
-            run_request = run_service.projects().locations().jobs().run(name=name, body=request_body)
+            run_request = run_service.projects().locations().jobs().run(
+                name=name, body=request_body)
             run_response = run_request.execute()
             return {output_var: run_response}
 
