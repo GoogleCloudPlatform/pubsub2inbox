@@ -33,7 +33,8 @@ module "project" {
   services = [
     "aiplatform.googleapis.com",
     "cloudfunctions.googleapis.com",
-    "run.googleapis.com"
+    "run.googleapis.com",
+    "artifactregistry.googleapis.com"
   ]
 }
 
@@ -101,6 +102,7 @@ module "function" {
 
 resource "google_project_iam_custom_role" "custom-role" {
   count       = var.create_custom_role ? 1 : 0
+  project     = module.project.project_id
   role_id     = "vertexAiPredict"
   title       = "Vertex AI predict only"
   description = "Only allow to perform online predictions"
