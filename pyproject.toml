@@ -1,0 +1,29 @@
+[project]
+name = "pubsub2inbox"
+description = "The PyPA recommended tool for installing Python packages."
+readme = "README.md"
+license = {text = "Apache License 2.0"}
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: Apache Software License",
+  "Topic :: Software Development",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.7",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+]
+requires-python = ">=3.8"
+
+[tool.vendoring]
+destination = "_vendor/"
+requirements = "_vendor/vendor.txt"
+namespace = "_vendor"
+
+protected-files = ["__init__.py", "README.md", "vendor.txt"]
+patches-dir = "patches"

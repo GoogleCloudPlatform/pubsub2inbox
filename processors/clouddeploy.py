@@ -37,7 +37,7 @@ class ClouddeployProcessor(Processor):
         while True and (end_time - start_time) < 60:
             op_request = deploy_service.projects().locations().operations().get(
                 name=operation_name).execute()
-            if op_request['done']:
+            if 'done' in op_request and op_request['done']:
                 if 'error' in op_request:
                     self.logger.error(
                         'Error while waiting for long running operation %s to complete.'

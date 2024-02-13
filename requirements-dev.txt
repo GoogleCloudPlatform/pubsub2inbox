@@ -7,3 +7,4 @@ yapf~=0.40.0
 importlib-metadata~=6.8.0
 zipp~=3.17.0
 platformdirs~=3.11.0
+vendoring
