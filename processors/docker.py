@@ -196,7 +196,9 @@ class DockerProcessor(Processor):
                     ar_request = ar_service.projects().locations().repositories(
                     ).packages().tags().delete(name=name)
                 ar_response = ar_request.execute()
-                self.wait_for_operation_done(ar_service, ar_response['name'])
+                if 'name' in ar_response:
+                    self.wait_for_operation_done(ar_service,
+                                                 ar_response['name'])
             else:
                 source_registry.delete_image(image, tag)
 
