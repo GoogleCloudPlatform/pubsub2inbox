@@ -8,3 +8,4 @@ importlib-metadata~=6.8.0
 zipp~=3.17.0
 platformdirs~=3.11.0
 vendoring
+tomli~=2.0.0
