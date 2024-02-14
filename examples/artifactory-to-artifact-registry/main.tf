@@ -39,6 +39,7 @@ resource "random_id" "random" {
 
 # Create Serverless VPC Connector to access 
 resource "google_vpc_access_connector" "connector" {
+  count         = var.vpc_config.create_connector ? 1 : 0
   name          = "ar-vpc-connector"
   region        = var.region
   project       = var.vpc_config.network_project == null ? module.project.project_id : var.vpc_config.network_project
@@ -65,7 +66,7 @@ resource "google_project_iam_member" "cloud-run-iam" {
 resource "google_artifact_registry_repository" "repository" {
   project       = module.project.project_id
   location      = var.region
-  repository_id = "pubsub2inbox"
+  repository_id = var.artifact_registry_repository
   description   = "Target Artifact Registry from Artifactory artifacts"
   format        = "DOCKER"
   docker_config {
@@ -95,7 +96,7 @@ module "pubsub2inbox" {
 
   available_memory_mb = 2048 # Container contents have to be kept in memory, so the function might need a lot of memory
   available_cpu       = 2
-  vpc_connector       = google_vpc_access_connector.connector.id
+  vpc_connector       = var.vpc_config.create_connector ? google_vpc_access_connector.connector[0].id : var.vpc_config.connector
 
   service_account = "artifactory-to-ar"
   pubsub_topic    = module.pubsub.id

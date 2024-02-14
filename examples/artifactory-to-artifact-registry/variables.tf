@@ -25,11 +25,19 @@ variable "region" {
 
 variable "vpc_config" {
   type = object({
-    network         = string
-    network_project = optional(string)
-    cidr            = string
+    network          = string
+    network_project  = optional(string)
+    cidr             = string
+    create_connector = optional(bool, true)
+    connector        = optional(string)
   })
   description = "Settings for deploying Serverless VPC Connector"
+}
+
+variable "artifact_registry_repository" {
+  type        = string
+  description = "Name of the Artifact Registry repository. Must match the repository on Artifactory side."
+  default     = "pubsub2inbox"
 }
 
 variable "artifactory_username" {
