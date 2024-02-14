@@ -667,6 +667,21 @@
             * [`DnsProcessor.process()`](processors.md#processors.dns.DnsProcessor.process)
 
 
+    * [processors.docker module](processors.md#module-processors.docker)
+
+
+        * [`DockerProcessor`](processors.md#processors.docker.DockerProcessor)
+
+
+            * [`DockerProcessor.get_default_config_key()`](processors.md#processors.docker.DockerProcessor.get_default_config_key)
+
+
+            * [`DockerProcessor.process()`](processors.md#processors.docker.DockerProcessor.process)
+
+
+            * [`DockerProcessor.wait_for_operation_done()`](processors.md#processors.docker.DockerProcessor.wait_for_operation_done)
+
+
     * [processors.download module](processors.md#module-processors.download)
 
 
@@ -974,6 +989,510 @@
 
 
     * [Module contents](processors.md#module-processors)
+
+
+* [python_docker package](python_docker.md)
+
+
+    * [Submodules](python_docker.md#submodules)
+
+
+    * [python_docker.base module](python_docker.md#module-python_docker.base)
+
+
+        * [`Image`](python_docker.md#python_docker.base.Image)
+
+
+            * [`Image.add_layer_contents()`](python_docker.md#python_docker.base.Image.add_layer_contents)
+
+
+            * [`Image.add_layer_path()`](python_docker.md#python_docker.base.Image.add_layer_path)
+
+
+            * [`Image.add_layer_paths()`](python_docker.md#python_docker.base.Image.add_layer_paths)
+
+
+            * [`Image.from_filename()`](python_docker.md#python_docker.base.Image.from_filename)
+
+
+            * [`Image.load()`](python_docker.md#python_docker.base.Image.load)
+
+
+            * [`Image.manifest_v2`](python_docker.md#python_docker.base.Image.manifest_v2)
+
+
+            * [`Image.remove_layer()`](python_docker.md#python_docker.base.Image.remove_layer)
+
+
+            * [`Image.run()`](python_docker.md#python_docker.base.Image.run)
+
+
+            * [`Image.write_filename()`](python_docker.md#python_docker.base.Image.write_filename)
+
+
+        * [`Layer`](python_docker.md#python_docker.base.Layer)
+
+
+            * [`Layer.checksum`](python_docker.md#python_docker.base.Layer.checksum)
+
+
+            * [`Layer.compressed_checksum`](python_docker.md#python_docker.base.Layer.compressed_checksum)
+
+
+            * [`Layer.compressed_content`](python_docker.md#python_docker.base.Layer.compressed_content)
+
+
+            * [`Layer.compressed_size`](python_docker.md#python_docker.base.Layer.compressed_size)
+
+
+            * [`Layer.content`](python_docker.md#python_docker.base.Layer.content)
+
+
+            * [`Layer.list_files()`](python_docker.md#python_docker.base.Layer.list_files)
+
+
+            * [`Layer.size`](python_docker.md#python_docker.base.Layer.size)
+
+
+            * [`Layer.tar`](python_docker.md#python_docker.base.Layer.tar)
+
+
+            * [`Layer.targz`](python_docker.md#python_docker.base.Layer.targz)
+
+
+    * [python_docker.docker module](python_docker.md#module-python_docker.docker)
+
+
+        * [`load()`](python_docker.md#python_docker.docker.load)
+
+
+        * [`pull()`](python_docker.md#python_docker.docker.pull)
+
+
+        * [`push()`](python_docker.md#python_docker.docker.push)
+
+
+        * [`run()`](python_docker.md#python_docker.docker.run)
+
+
+        * [`tag()`](python_docker.md#python_docker.docker.tag)
+
+
+    * [python_docker.registry module](python_docker.md#module-python_docker.registry)
+
+
+        * [`Registry`](python_docker.md#python_docker.registry.Registry)
+
+
+            * [`Registry.authenticate()`](python_docker.md#python_docker.registry.Registry.authenticate)
+
+
+            * [`Registry.authenticated()`](python_docker.md#python_docker.registry.Registry.authenticated)
+
+
+            * [`Registry.basic_authenticate()`](python_docker.md#python_docker.registry.Registry.basic_authenticate)
+
+
+            * [`Registry.begin_upload()`](python_docker.md#python_docker.registry.Registry.begin_upload)
+
+
+            * [`Registry.check_blob()`](python_docker.md#python_docker.registry.Registry.check_blob)
+
+
+            * [`Registry.delete_image()`](python_docker.md#python_docker.registry.Registry.delete_image)
+
+
+            * [`Registry.detect_authentication()`](python_docker.md#python_docker.registry.Registry.detect_authentication)
+
+
+            * [`Registry.get_blob()`](python_docker.md#python_docker.registry.Registry.get_blob)
+
+
+            * [`Registry.get_manifest()`](python_docker.md#python_docker.registry.Registry.get_manifest)
+
+
+            * [`Registry.get_manifest_configuration()`](python_docker.md#python_docker.registry.Registry.get_manifest_configuration)
+
+
+            * [`Registry.get_manifest_digest()`](python_docker.md#python_docker.registry.Registry.get_manifest_digest)
+
+
+            * [`Registry.list_image_tags()`](python_docker.md#python_docker.registry.Registry.list_image_tags)
+
+
+            * [`Registry.list_images()`](python_docker.md#python_docker.registry.Registry.list_images)
+
+
+            * [`Registry.pull_image()`](python_docker.md#python_docker.registry.Registry.pull_image)
+
+
+            * [`Registry.push_image()`](python_docker.md#python_docker.registry.Registry.push_image)
+
+
+            * [`Registry.request()`](python_docker.md#python_docker.registry.Registry.request)
+
+
+            * [`Registry.token_authenticate()`](python_docker.md#python_docker.registry.Registry.token_authenticate)
+
+
+            * [`Registry.upload_blob()`](python_docker.md#python_docker.registry.Registry.upload_blob)
+
+
+            * [`Registry.upload_manifest()`](python_docker.md#python_docker.registry.Registry.upload_manifest)
+
+
+    * [python_docker.schema module](python_docker.md#module-python_docker.schema)
+
+
+        * [`DockerConfig`](python_docker.md#python_docker.schema.DockerConfig)
+
+
+            * [`DockerConfig.architecture`](python_docker.md#python_docker.schema.DockerConfig.architecture)
+
+
+            * [`DockerConfig.author`](python_docker.md#python_docker.schema.DockerConfig.author)
+
+
+            * [`DockerConfig.config`](python_docker.md#python_docker.schema.DockerConfig.config)
+
+
+            * [`DockerConfig.container`](python_docker.md#python_docker.schema.DockerConfig.container)
+
+
+            * [`DockerConfig.container_config`](python_docker.md#python_docker.schema.DockerConfig.container_config)
+
+
+            * [`DockerConfig.created`](python_docker.md#python_docker.schema.DockerConfig.created)
+
+
+            * [`DockerConfig.docker_version`](python_docker.md#python_docker.schema.DockerConfig.docker_version)
+
+
+            * [`DockerConfig.history`](python_docker.md#python_docker.schema.DockerConfig.history)
+
+
+            * [`DockerConfig.model_computed_fields`](python_docker.md#python_docker.schema.DockerConfig.model_computed_fields)
+
+
+            * [`DockerConfig.model_config`](python_docker.md#python_docker.schema.DockerConfig.model_config)
+
+
+            * [`DockerConfig.model_fields`](python_docker.md#python_docker.schema.DockerConfig.model_fields)
+
+
+            * [`DockerConfig.os`](python_docker.md#python_docker.schema.DockerConfig.os)
+
+
+            * [`DockerConfig.rootfs`](python_docker.md#python_docker.schema.DockerConfig.rootfs)
+
+
+        * [`DockerConfigConfig`](python_docker.md#python_docker.schema.DockerConfigConfig)
+
+
+            * [`DockerConfigConfig.ArgsEscaped`](python_docker.md#python_docker.schema.DockerConfigConfig.ArgsEscaped)
+
+
+            * [`DockerConfigConfig.AttachStderr`](python_docker.md#python_docker.schema.DockerConfigConfig.AttachStderr)
+
+
+            * [`DockerConfigConfig.AttachStdin`](python_docker.md#python_docker.schema.DockerConfigConfig.AttachStdin)
+
+
+            * [`DockerConfigConfig.AttachStdout`](python_docker.md#python_docker.schema.DockerConfigConfig.AttachStdout)
+
+
+            * [`DockerConfigConfig.Cmd`](python_docker.md#python_docker.schema.DockerConfigConfig.Cmd)
+
+
+            * [`DockerConfigConfig.Domainname`](python_docker.md#python_docker.schema.DockerConfigConfig.Domainname)
+
+
+            * [`DockerConfigConfig.Entrypoint`](python_docker.md#python_docker.schema.DockerConfigConfig.Entrypoint)
+
+
+            * [`DockerConfigConfig.Env`](python_docker.md#python_docker.schema.DockerConfigConfig.Env)
+
+
+            * [`DockerConfigConfig.Hostname`](python_docker.md#python_docker.schema.DockerConfigConfig.Hostname)
+
+
+            * [`DockerConfigConfig.Image`](python_docker.md#python_docker.schema.DockerConfigConfig.Image)
+
+
+            * [`DockerConfigConfig.Labels`](python_docker.md#python_docker.schema.DockerConfigConfig.Labels)
+
+
+            * [`DockerConfigConfig.OnBuild`](python_docker.md#python_docker.schema.DockerConfigConfig.OnBuild)
+
+
+            * [`DockerConfigConfig.OpenStdin`](python_docker.md#python_docker.schema.DockerConfigConfig.OpenStdin)
+
+
+            * [`DockerConfigConfig.StdinOnce`](python_docker.md#python_docker.schema.DockerConfigConfig.StdinOnce)
+
+
+            * [`DockerConfigConfig.Tty`](python_docker.md#python_docker.schema.DockerConfigConfig.Tty)
+
+
+            * [`DockerConfigConfig.User`](python_docker.md#python_docker.schema.DockerConfigConfig.User)
+
+
+            * [`DockerConfigConfig.Volumes`](python_docker.md#python_docker.schema.DockerConfigConfig.Volumes)
+
+
+            * [`DockerConfigConfig.WorkingDir`](python_docker.md#python_docker.schema.DockerConfigConfig.WorkingDir)
+
+
+            * [`DockerConfigConfig.model_computed_fields`](python_docker.md#python_docker.schema.DockerConfigConfig.model_computed_fields)
+
+
+            * [`DockerConfigConfig.model_config`](python_docker.md#python_docker.schema.DockerConfigConfig.model_config)
+
+
+            * [`DockerConfigConfig.model_fields`](python_docker.md#python_docker.schema.DockerConfigConfig.model_fields)
+
+
+        * [`DockerConfigHistory`](python_docker.md#python_docker.schema.DockerConfigHistory)
+
+
+            * [`DockerConfigHistory.created`](python_docker.md#python_docker.schema.DockerConfigHistory.created)
+
+
+            * [`DockerConfigHistory.created_by`](python_docker.md#python_docker.schema.DockerConfigHistory.created_by)
+
+
+            * [`DockerConfigHistory.empty_layer`](python_docker.md#python_docker.schema.DockerConfigHistory.empty_layer)
+
+
+            * [`DockerConfigHistory.model_computed_fields`](python_docker.md#python_docker.schema.DockerConfigHistory.model_computed_fields)
+
+
+            * [`DockerConfigHistory.model_config`](python_docker.md#python_docker.schema.DockerConfigHistory.model_config)
+
+
+            * [`DockerConfigHistory.model_fields`](python_docker.md#python_docker.schema.DockerConfigHistory.model_fields)
+
+
+        * [`DockerConfigRootFS`](python_docker.md#python_docker.schema.DockerConfigRootFS)
+
+
+            * [`DockerConfigRootFS.diff_ids`](python_docker.md#python_docker.schema.DockerConfigRootFS.diff_ids)
+
+
+            * [`DockerConfigRootFS.model_computed_fields`](python_docker.md#python_docker.schema.DockerConfigRootFS.model_computed_fields)
+
+
+            * [`DockerConfigRootFS.model_config`](python_docker.md#python_docker.schema.DockerConfigRootFS.model_config)
+
+
+            * [`DockerConfigRootFS.model_fields`](python_docker.md#python_docker.schema.DockerConfigRootFS.model_fields)
+
+
+            * [`DockerConfigRootFS.type`](python_docker.md#python_docker.schema.DockerConfigRootFS.type)
+
+
+        * [`DockerManifestV1`](python_docker.md#python_docker.schema.DockerManifestV1)
+
+
+            * [`DockerManifestV1.architecture`](python_docker.md#python_docker.schema.DockerManifestV1.architecture)
+
+
+            * [`DockerManifestV1.fsLayers`](python_docker.md#python_docker.schema.DockerManifestV1.fsLayers)
+
+
+            * [`DockerManifestV1.history`](python_docker.md#python_docker.schema.DockerManifestV1.history)
+
+
+            * [`DockerManifestV1.model_computed_fields`](python_docker.md#python_docker.schema.DockerManifestV1.model_computed_fields)
+
+
+            * [`DockerManifestV1.model_config`](python_docker.md#python_docker.schema.DockerManifestV1.model_config)
+
+
+            * [`DockerManifestV1.model_fields`](python_docker.md#python_docker.schema.DockerManifestV1.model_fields)
+
+
+            * [`DockerManifestV1.name`](python_docker.md#python_docker.schema.DockerManifestV1.name)
+
+
+            * [`DockerManifestV1.schemaVersion`](python_docker.md#python_docker.schema.DockerManifestV1.schemaVersion)
+
+
+            * [`DockerManifestV1.signatures`](python_docker.md#python_docker.schema.DockerManifestV1.signatures)
+
+
+            * [`DockerManifestV1.tag`](python_docker.md#python_docker.schema.DockerManifestV1.tag)
+
+
+        * [`DockerManifestV1History`](python_docker.md#python_docker.schema.DockerManifestV1History)
+
+
+            * [`DockerManifestV1History.model_computed_fields`](python_docker.md#python_docker.schema.DockerManifestV1History.model_computed_fields)
+
+
+            * [`DockerManifestV1History.model_config`](python_docker.md#python_docker.schema.DockerManifestV1History.model_config)
+
+
+            * [`DockerManifestV1History.model_fields`](python_docker.md#python_docker.schema.DockerManifestV1History.model_fields)
+
+
+            * [`DockerManifestV1History.v1Compatibility`](python_docker.md#python_docker.schema.DockerManifestV1History.v1Compatibility)
+
+
+        * [`DockerManifestV1Layer`](python_docker.md#python_docker.schema.DockerManifestV1Layer)
+
+
+            * [`DockerManifestV1Layer.blobSum`](python_docker.md#python_docker.schema.DockerManifestV1Layer.blobSum)
+
+
+            * [`DockerManifestV1Layer.model_computed_fields`](python_docker.md#python_docker.schema.DockerManifestV1Layer.model_computed_fields)
+
+
+            * [`DockerManifestV1Layer.model_config`](python_docker.md#python_docker.schema.DockerManifestV1Layer.model_config)
+
+
+            * [`DockerManifestV1Layer.model_fields`](python_docker.md#python_docker.schema.DockerManifestV1Layer.model_fields)
+
+
+        * [`DockerManifestV1Signatures`](python_docker.md#python_docker.schema.DockerManifestV1Signatures)
+
+
+            * [`DockerManifestV1Signatures.header`](python_docker.md#python_docker.schema.DockerManifestV1Signatures.header)
+
+
+            * [`DockerManifestV1Signatures.model_computed_fields`](python_docker.md#python_docker.schema.DockerManifestV1Signatures.model_computed_fields)
+
+
+            * [`DockerManifestV1Signatures.model_config`](python_docker.md#python_docker.schema.DockerManifestV1Signatures.model_config)
+
+
+            * [`DockerManifestV1Signatures.model_fields`](python_docker.md#python_docker.schema.DockerManifestV1Signatures.model_fields)
+
+
+            * [`DockerManifestV1Signatures.protected`](python_docker.md#python_docker.schema.DockerManifestV1Signatures.protected)
+
+
+            * [`DockerManifestV1Signatures.signature`](python_docker.md#python_docker.schema.DockerManifestV1Signatures.signature)
+
+
+        * [`DockerManifestV2`](python_docker.md#python_docker.schema.DockerManifestV2)
+
+
+            * [`DockerManifestV2.config`](python_docker.md#python_docker.schema.DockerManifestV2.config)
+
+
+            * [`DockerManifestV2.layers`](python_docker.md#python_docker.schema.DockerManifestV2.layers)
+
+
+            * [`DockerManifestV2.mediaType`](python_docker.md#python_docker.schema.DockerManifestV2.mediaType)
+
+
+            * [`DockerManifestV2.model_computed_fields`](python_docker.md#python_docker.schema.DockerManifestV2.model_computed_fields)
+
+
+            * [`DockerManifestV2.model_config`](python_docker.md#python_docker.schema.DockerManifestV2.model_config)
+
+
+            * [`DockerManifestV2.model_fields`](python_docker.md#python_docker.schema.DockerManifestV2.model_fields)
+
+
+            * [`DockerManifestV2.schemaVersion`](python_docker.md#python_docker.schema.DockerManifestV2.schemaVersion)
+
+
+        * [`DockerManifestV2Config`](python_docker.md#python_docker.schema.DockerManifestV2Config)
+
+
+            * [`DockerManifestV2Config.digest`](python_docker.md#python_docker.schema.DockerManifestV2Config.digest)
+
+
+            * [`DockerManifestV2Config.mediaType`](python_docker.md#python_docker.schema.DockerManifestV2Config.mediaType)
+
+
+            * [`DockerManifestV2Config.model_computed_fields`](python_docker.md#python_docker.schema.DockerManifestV2Config.model_computed_fields)
+
+
+            * [`DockerManifestV2Config.model_config`](python_docker.md#python_docker.schema.DockerManifestV2Config.model_config)
+
+
+            * [`DockerManifestV2Config.model_fields`](python_docker.md#python_docker.schema.DockerManifestV2Config.model_fields)
+
+
+            * [`DockerManifestV2Config.size`](python_docker.md#python_docker.schema.DockerManifestV2Config.size)
+
+
+        * [`DockerManifestV2Layer`](python_docker.md#python_docker.schema.DockerManifestV2Layer)
+
+
+            * [`DockerManifestV2Layer.digest`](python_docker.md#python_docker.schema.DockerManifestV2Layer.digest)
+
+
+            * [`DockerManifestV2Layer.mediaType`](python_docker.md#python_docker.schema.DockerManifestV2Layer.mediaType)
+
+
+            * [`DockerManifestV2Layer.model_computed_fields`](python_docker.md#python_docker.schema.DockerManifestV2Layer.model_computed_fields)
+
+
+            * [`DockerManifestV2Layer.model_config`](python_docker.md#python_docker.schema.DockerManifestV2Layer.model_config)
+
+
+            * [`DockerManifestV2Layer.model_fields`](python_docker.md#python_docker.schema.DockerManifestV2Layer.model_fields)
+
+
+            * [`DockerManifestV2Layer.size`](python_docker.md#python_docker.schema.DockerManifestV2Layer.size)
+
+
+        * [`DockerRegistryError`](python_docker.md#python_docker.schema.DockerRegistryError)
+
+
+            * [`DockerRegistryError.BLOB_UNKNOWN`](python_docker.md#python_docker.schema.DockerRegistryError.BLOB_UNKNOWN)
+
+
+            * [`DockerRegistryError.DENIED`](python_docker.md#python_docker.schema.DockerRegistryError.DENIED)
+
+
+            * [`DockerRegistryError.MANIFEST_UNKNOWN`](python_docker.md#python_docker.schema.DockerRegistryError.MANIFEST_UNKNOWN)
+
+
+            * [`DockerRegistryError.NAME_UNKNOWN`](python_docker.md#python_docker.schema.DockerRegistryError.NAME_UNKNOWN)
+
+
+            * [`DockerRegistryError.UNAUTHORIZED`](python_docker.md#python_docker.schema.DockerRegistryError.UNAUTHORIZED)
+
+
+            * [`DockerRegistryError.UNSUPPORTED`](python_docker.md#python_docker.schema.DockerRegistryError.UNSUPPORTED)
+
+
+    * [python_docker.tar module](python_docker.md#module-python_docker.tar)
+
+
+        * [`parse_v1()`](python_docker.md#python_docker.tar.parse_v1)
+
+
+        * [`write_tar_from_contents()`](python_docker.md#python_docker.tar.write_tar_from_contents)
+
+
+        * [`write_tar_from_path()`](python_docker.md#python_docker.tar.write_tar_from_path)
+
+
+        * [`write_tar_from_paths()`](python_docker.md#python_docker.tar.write_tar_from_paths)
+
+
+        * [`write_v1()`](python_docker.md#python_docker.tar.write_v1)
+
+
+        * [`write_v1_layer_metadata()`](python_docker.md#python_docker.tar.write_v1_layer_metadata)
+
+
+        * [`write_v1_repositories()`](python_docker.md#python_docker.tar.write_v1_repositories)
+
+
+    * [python_docker.utils module](python_docker.md#module-python_docker.utils)
+
+
+        * [`sorted_json_dumps()`](python_docker.md#python_docker.utils.sorted_json_dumps)
+
+
+    * [Module contents](python_docker.md#module-python_docker)
 
 
 * [test package](test.md)
