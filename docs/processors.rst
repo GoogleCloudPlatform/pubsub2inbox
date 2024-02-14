@@ -100,6 +100,14 @@ processors.dns module
    :undoc-members:
    :show-inheritance:
 
+processors.docker module
+------------------------
+
+.. automodule:: processors.docker
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 processors.download module
 --------------------------
 

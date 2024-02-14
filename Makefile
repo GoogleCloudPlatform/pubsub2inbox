@@ -44,4 +44,4 @@ fmt:
 	$(YAPF) --style google --recursive -i .
 
 lint:
-	$(RUFF) check --ignore E501,E741 --exclude '.*' .
+	$(RUFF) check --ignore E501,E741 --exclude '.*' --exclude '*.pyi' .

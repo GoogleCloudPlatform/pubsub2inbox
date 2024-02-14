@@ -261,7 +261,7 @@ resource "google_storage_bucket" "function-bucket" {
 }
 
 locals {
-  function_files       = ["main.py", "requirements.txt", "filters/*.py", "output/*.py", "processors/*.py", "helpers/*.py"]
+  function_files       = ["main.py", "requirements.txt", "filters/*.py", "output/*.py", "processors/*.py", "helpers/*.py", "_vendor/*.pyi", "_vendor/python_docker/*.py"]
   local_files_path     = var.local_files_path == null ? path.module : var.local_files_path
   all_function_files   = var.use_local_files ? setunion([for glob in local.function_files : fileset(local.local_files_path, glob)]...) : []
   function_file_hashes = [for file_path in local.all_function_files : filemd5(format("%s/%s", local.local_files_path, file_path))]
@@ -415,6 +415,7 @@ resource "google_cloudfunctions2_function" "function" {
     max_instance_count               = var.instance_limits.max_instances
     max_instance_request_concurrency = 1
     available_memory                 = format("%dM", var.available_memory_mb)
+    available_cpu                    = var.available_cpu != null ? var.available_cpu : "0.333"
     timeout_seconds                  = var.function_timeout
     vpc_connector                    = var.vpc_connector
     environment_variables = {
@@ -513,9 +514,15 @@ resource "google_cloud_run_service" "function" {
           name  = "SERVICE_ACCOUNT"
           value = var.create_service_account ? google_service_account.service-account[0].email : var.service_account
         }
+        resources {
+          limits = {
+            memory = format("%dMi", var.available_memory_mb)
+            cpu    = var.available_cpu != null ? var.available_cpu : 1
+          }
+        }
       }
       service_account_name  = var.create_service_account ? google_service_account.service-account[0].email : var.service_account
-      container_concurrency = 8
+      container_concurrency = var.container_concurrency
       timeout_seconds       = var.function_timeout
     }
     metadata {
@@ -526,7 +533,11 @@ resource "google_cloud_run_service" "function" {
         "run.googleapis.com/cloudsql-instances" = var.cloudsql_connection
         } : {}, var.vpc_connector != null ? {
         "run.googleapis.com/vpc-access-connector" = var.vpc_connector
-      } : {})
+        } : {}, var.vpc_egress != null ? {
+        "run.googleapis.com/vpc-access-egress"  = var.vpc_egress.egress,
+        "run.googleapis.com/network-interfaces" = jsonencode([{ network = var.vpc_egress.network, subnetwork = var.vpc_egress.subnetwork, tags = var.vpc_egress.tags }])
+        } : {}
+      )
     }
   }
   traffic {
@@ -695,7 +706,7 @@ resource "google_cloud_run_service" "json2pubsub-function" {
         }
       }
       service_account_name  = google_service_account.json2pubsub-service-account[0].email
-      container_concurrency = 8
+      container_concurrency = 1
       timeout_seconds       = var.function_timeout
     }
     metadata {
@@ -746,10 +757,11 @@ resource "google_cloudfunctions2_function" "json2pubsub-function" {
   }
 
   service_config {
-    service_account_email = google_service_account.json2pubsub-service-account[0].email
-    max_instance_count    = var.deploy_json2pubsub.max_instances
-    available_memory      = format("%dMi", var.available_memory_mb)
-    timeout_seconds       = var.function_timeout
+    service_account_email            = google_service_account.json2pubsub-service-account[0].email
+    max_instance_count               = var.deploy_json2pubsub.max_instances
+    available_memory                 = "256M"
+    timeout_seconds                  = var.function_timeout
+    max_instance_request_concurrency = 1
     environment_variables = {
       GOOGLE_CLOUD_PROJECT = var.project_id
       PUBSUB_TOPIC         = basename(var.pubsub_topic)

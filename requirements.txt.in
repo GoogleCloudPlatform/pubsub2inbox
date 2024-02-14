@@ -40,3 +40,4 @@ paramiko~=3.4.0
 GitPython~=3.1.32
 parse~=1.19.0
 urllib3==1.26.18
+pydantic==2.6.1

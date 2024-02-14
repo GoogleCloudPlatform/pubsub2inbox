@@ -296,6 +296,57 @@ Submit changes to Cloud DNS API. For more information, see:
 #### get_default_config_key()
 
 #### process(output_var='dns')
+## processors.docker module
+
+
+### _class_ processors.docker.DockerProcessor(config, jinja_environment, data, event, context)
+Bases: `Processor`
+
+Perform actions on Docker registries.
+
+
+* **Parameters**
+
+    
+    * **hostname** (*str*) – Docker registry hostname.
+
+
+    * **username** (*str**, **optional*) – Username for Docker registry. Defaults to SA authentication for Artifact Registry.
+
+
+    * **password** (*str**, **optional*) – Password for Docker registry.
+
+
+    * **image** (*str*) – Image to pull/push
+
+
+    * **tag** (*str**, **optional*) – Tag to pull/push, defaults to latest.
+
+
+    * **mode** (*str*) – image.copy, image.delete, image.deleteversion, images.list
+
+
+    * **destination_hostname** (*str**, **optional*) – Docker registry hostname. (For copy)
+
+
+    * **destination_username** (*str**, **optional*) – Username for Docker registry. Defaults to SA authentication for Artifact Registry. (For copy)
+
+
+    * **destination_password** (*str**, **optional*) – Password for Docker registry. (For copy)
+
+
+    * **destination_image** (*str*) – Image to pull/push
+
+
+    * **destination_tag** (*str**, **optional*) – Tag to pull/push, defaults to latest.
+
+
+
+#### get_default_config_key()
+
+#### process(output_var='docker')
+
+#### wait_for_operation_done(ar_service, operation_name)
 ## processors.download module
 
 

@@ -118,6 +118,18 @@ variable "available_memory_mb" {
   default     = 512
 }
 
+variable "available_cpu" {
+  type        = number
+  description = "Available CPUs to the function"
+  default     = null
+}
+
+variable "container_concurrency" {
+  type        = number
+  description = "Concurrency of requests to the container"
+  default     = 8
+}
+
 variable "retry_minimum_backoff" {
   type        = string
   description = "Minimum retry backoff (value between 0-600 seconds, suffixed with s, default 10s, Cloud Run only)"
@@ -145,6 +157,17 @@ variable "instance_limits" {
 variable "vpc_connector" {
   type        = string
   description = "VPC connector ID for Cloud Function serverless access"
+  default     = null
+}
+
+variable "vpc_egress" {
+  type = object({
+    network    = string
+    subnetwork = string
+    tags       = optional(string, "pubsub2inbox")
+    egress     = optional(string, "all-traffic")
+  })
+  description = "Direct VPC egress configuration"
   default     = null
 }
 

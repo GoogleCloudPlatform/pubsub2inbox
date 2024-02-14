@@ -9,4 +9,5 @@ pubsub2inbox
    main
    output
    processors
+   python_docker
    test

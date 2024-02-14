@@ -1,0 +1,10 @@
+__pycache__/
+.terraform.lock.hcl
+.terraform/
+terraform.tfstate*
+terraform.tfvars
+.DS_Store
+.buildinfo
+.doctrees/
+*.zip
+terraformrc
