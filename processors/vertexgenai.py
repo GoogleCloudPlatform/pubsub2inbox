@@ -94,7 +94,7 @@ class VertexgenaiProcessor(Processor):
                 new_contents = []
                 last_role = None
                 for content in list(reversed(request['contents'])):
-                    if last_role == None:
+                    if not last_role:
                         last_role = content['role']
                         new_contents.insert(0, content)
                     else:
