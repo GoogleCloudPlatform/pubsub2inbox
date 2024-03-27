@@ -123,7 +123,7 @@ class VertexgenaiProcessor(Processor):
                     if 'error' in err and 'message' in err['error']:
                         return {
                             output_var: {
-                                'error': response_json['error']['message']
+                                'error': err['error']['message']
                             }
                         }
             self.logger.error('Error calling %s: %s' % (e.request.url, e),
