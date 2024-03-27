@@ -156,6 +156,15 @@ class DockerProcessor(Processor):
             source_image.name = destination_image
             source_image.tag = destination_tag
             destination_registry.push_image(source_image)
+
+            self.logger.info(
+                'Pushed image to: %s/%s:%s' %
+                (destination_hostname, destination_image, destination_tag),
+                extra={
+                    'registry': destination_hostname,
+                    'image': destination_image,
+                    'tag': destination_tag
+                })
             return {
                 output_var: {
                     'registry': destination_hostname,

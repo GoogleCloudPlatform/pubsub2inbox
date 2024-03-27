@@ -943,6 +943,9 @@
             * [`SlackProcessor.call_slack()`](processors.md#processors.slack.SlackProcessor.call_slack)
 
 
+            * [`SlackProcessor.download_slack()`](processors.md#processors.slack.SlackProcessor.download_slack)
+
+
             * [`SlackProcessor.get_default_config_key()`](processors.md#processors.slack.SlackProcessor.get_default_config_key)
 
 

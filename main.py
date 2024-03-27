@@ -658,6 +658,10 @@ def process_message_pipeline(logger, config, data, event, context):
             raise NoTypeInPipelineException('No type in pipeline task #%d: %s' %
                                             (task_number, str(task)))
 
+        description = ' '
+        if 'description' in task:
+            description = ' "%s" ' % (task['description'])
+
         task_type, task_handler = task['type'].split('.', 2)
         if not task_type or not task_handler or task_type not in [
                 'processor', 'output'
@@ -684,8 +688,8 @@ def process_message_pipeline(logger, config, data, event, context):
             if stopif_contents.strip() != '':
                 jinja_environment.globals['previous_run'] = False
                 logger.info(
-                    'Pipeline task #%d (%s) stop-if condition evaluated to true (non-empty), stopping processing.'
-                    % (task_number, task['type']))
+                    'Pipeline task%s#%d (%s) stop-if condition evaluated to true (non-empty), stopping processing.'
+                    % (description, task_number, task['type']))
                 helper._clean_tempdir()
                 return
 
@@ -697,8 +701,8 @@ def process_message_pipeline(logger, config, data, event, context):
             if runif_contents.strip() == '':
                 jinja_environment.globals['previous_run'] = False
                 logger.info(
-                    'Pipeline task #%d (%s) run-if condition evaluated to false (empty), skipping task.'
-                    % (task_number, task['type']))
+                    'Pipeline task%s#%d (%s) run-if condition evaluated to false (empty), skipping task.'
+                    % (description, task_number, task['type']))
                 task_number += 1
                 continue
 
@@ -739,8 +743,9 @@ def process_message_pipeline(logger, config, data, event, context):
             # Handle the actual work
             if task_type == 'processor':  # Handle processor
                 processor = task_handler
-                logger.debug('Pipeline task #%d (%s), running processor: %s' %
-                             (task_number, task['type'], processor))
+                logger.debug(
+                    'Pipeline task%s#%d (%s), running processor: %s' %
+                    (description, task_number, task['type'], processor))
                 mod = __import__('processors.%s' % processor)
                 processor_module = getattr(mod, processor)
                 processor_class = getattr(
@@ -762,8 +767,9 @@ def process_message_pipeline(logger, config, data, event, context):
                 }
             elif task_type == 'output':  # Handle output
                 output_type = task_handler
-                logger.debug('Pipeline task #%d (%s), running output: %s' %
-                             (task_number, task['type'], output_type))
+                logger.debug(
+                    'Pipeline task%s#%d (%s), running output: %s' %
+                    (description, task_number, task['type'], output_type))
                 mod = __import__('output.%s' % output_type)
                 output_module = getattr(mod, output_type)
                 output_class = getattr(output_module,
@@ -808,8 +814,8 @@ def process_message_pipeline(logger, config, data, event, context):
                     output_instance.output()
 
                 logger.error(
-                    'Pipeline task #%d (%s) failed, stopping processing.' %
-                    (task_number, task['type']),
+                    'Pipeline task%s#%d (%s) failed, stopping processing.' %
+                    (description, task_number, task['type']),
                     extra={'exception': traceback.format_exc()})
                 if 'canFail' in config and config['canFail']:
                     logger.warn(
@@ -831,8 +837,8 @@ def process_message_pipeline(logger, config, data, event, context):
                     raise exc
             else:
                 logger.warning(
-                    'Pipeline task #%d (%s) failed, but continuing...' %
-                    (task_number, task['type']),
+                    'Pipeline task%s#%d (%s) failed, but continuing...' %
+                    (description, task_number, task['type']),
                     extra={'exception': traceback.format_exc()})
 
         task_number += 1

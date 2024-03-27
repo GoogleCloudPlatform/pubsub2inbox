@@ -15,6 +15,7 @@ from .base import Processor, NotConfiguredException
 from helpers.base import get_user_agent
 import requests
 import json
+import base64
 
 
 class SlackProcessor(Processor):
@@ -23,7 +24,12 @@ class SlackProcessor(Processor):
 
     Args:
         token (str): A Slack Bot User OAuth Token.
-        api (str): One of: conversations.list, conversations.history, conversations.replies,
+        api (str): One of: conversations.list, conversations.history, conversations.replies
+        mode (str, optional: api or processMessages (default api)
+        multimodal (bool, optional): Use multi-modal processing in processMessages.
+        messages (list, optional): List of messages to process.
+        appId (str, optional): The app ID to detect bot messages.
+        prompt (str, optional): Initial message to append to the beginning of the conversation.
         request (dict): The API call body.
     """
 
@@ -47,26 +53,134 @@ class SlackProcessor(Processor):
             'Authorization': 'Bearer %s' % (token)
         }
         if urlencoded:
-            headers[
-                'Content-type'] = 'application/x-www-form-urlencoded; charset=utf-8'
+            headers['Content-type'] = 'application/x-www-form-urlencoded'
 
         response = requests.post(api_path, data=request_body, headers=headers)
         response.raise_for_status()
         response_json = response.json()
         return response_json
 
+    def download_slack(self, url, token):
+        self.logger.info('Downloading from Slack: %s' % (url),
+                         extra={
+                             "slack_url": url,
+                         })
+        headers = {
+            'User-Agent': get_user_agent(),
+            'Authorization': 'Bearer %s' % (token)
+        }
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        return base64.b64encode(response.content).decode('ascii')
+
+    def _slack_message_to_parts(self, message, token, multi_modal):
+        parts = []
+        if 'files' in message and multi_modal:
+            for file in message['files']:
+                if file['size'] >= 20971520:  # 20MB limit
+                    self.logger.debug(
+                        'Attachment too large to download from Slack (%d bytes).'
+                        % (file['size']),
+                        extra={'file': file})
+                    continue
+                if file['mimetype'][0:6] == 'image/':
+                    if 'thumb_720' in file:
+                        parts.append({
+                            'inlineData': {
+                                'mimeType':
+                                    file['mimetype'],
+                                'data':
+                                    self.download_slack(file['thumb_720'],
+                                                        token)
+                            }
+                        })
+                    elif 'url_private_download' in file:
+                        parts.append({
+                            'inlineData': {
+                                'mimeType':
+                                    file['mimetype'],
+                                'data':
+                                    self.download_slack(
+                                        file['url_private_download'], token)
+                            }
+                        })
+                elif 'url_private_download' in file:
+                    parts.append({
+                        'inlineData': {
+                            'mimeType':
+                                file['mimetype'],
+                            'data':
+                                self.download_slack(
+                                    file['url_private_download'], token)
+                        }
+                    })
+        if 'text' in message and message['text'] != '':
+            parts.append({'text': message['text']})
+        return parts
+
     def process(self, output_var='slack'):
-        if 'api' not in self.config:
+        if 'api' not in self.config and 'mode' not in self.config:
             raise NotConfiguredException('No Slack API call specified.')
         if 'token' not in self.config:
             raise NotConfiguredException('No Slack token specified.')
         if 'request' not in self.config:
             self.config['request'] = {}
 
+        mode = self._jinja_expand_string(
+            self.config['mode'], 'mode') if 'mode' in self.config else 'api'
+
         token = self._jinja_expand_string(self.config['token'], 'token')
-        slack_api = self._jinja_expand_string(self.config['api'], 'api')
+        slack_api = None
+        if mode == 'api':
+            slack_api = self._jinja_expand_string(self.config['api'], 'api')
         request_params = self._jinja_expand_dict_all(self.config['request'],
                                                      'request')
+
+        if mode == 'processMessages':
+            if 'messages' not in self.config:
+                raise NotConfiguredException('No Slack messages specified.')
+            if 'appId' not in self.config:
+                raise NotConfiguredException('No Slack app ID specified.')
+            app_id = self._jinja_expand_string(self.config['appId'], 'app_id')
+            multi_modal = self._jinja_expand_bool(
+                self.config['multimodal'],
+                'multimodal') if 'multimodal' in self.config else False
+            messages = self._jinja_expand_expr(self.config['messages'],
+                                               'messages')
+
+            processed = []
+            # Append an initial prompt that can be instructions or such
+            if 'prompt' in self.config:
+                processed.append({
+                    'role':
+                        'USER',
+                    'parts': [{
+                        'text':
+                            self._jinja_expand_string(self.config['prompt'],
+                                                      'prompt')
+                    }]
+                })
+
+            if 'messages' in messages:
+                messages = messages['messages']
+
+            for message in messages:
+                new_message = None
+                if 'app_id' in message:
+                    if message['app_id'] == app_id:
+                        parts = self._slack_message_to_parts(
+                            message, token, multi_modal)
+                        if len(parts) > 0:
+                            new_message = {'role': 'MODEL', 'parts': parts}
+                else:
+                    parts = self._slack_message_to_parts(
+                        message, token, multi_modal)
+                    if len(parts) > 0:
+                        new_message = {'role': 'USER', 'parts': parts}
+                if new_message:
+                    processed.append(new_message)
+            return {output_var: processed}
+
         if slack_api == 'conversations.list':
             slack_response = self.call_slack(self.config['api'], token,
                                              request_params, True)
