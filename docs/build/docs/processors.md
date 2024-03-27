@@ -778,7 +778,25 @@ Slack processor for fetching messages.
     * **token** (*str*) – A Slack Bot User OAuth Token.
 
 
-    * **api** (*str*) – One of: conversations.list, conversations.history, conversations.replies,
+    * **api** (*str*) – One of: conversations.list, conversations.history, conversations.replies
+
+
+    * **(****str** (*mode*) – api or processMessages (default api)
+
+
+    * **optional** – api or processMessages (default api)
+
+
+    * **multimodal** (*bool**, **optional*) – Use multi-modal processing in processMessages.
+
+
+    * **messages** (*list**, **optional*) – List of messages to process.
+
+
+    * **appId** (*str**, **optional*) – The app ID to detect bot messages.
+
+
+    * **prompt** (*str**, **optional*) – Initial message to append to the beginning of the conversation.
 
 
     * **request** (*dict*) – The API call body.
@@ -786,6 +804,8 @@ Slack processor for fetching messages.
 
 
 #### call_slack(api, token, request, urlencoded=False)
+
+#### download_slack(url, token)
 
 #### get_default_config_key()
 
@@ -852,6 +872,12 @@ Vertex AI Generative AI processor.
 
 
     * **project** (*str**, **optional*) – Google Cloud project ID.
+
+
+    * **method** (*str**, **optional*) – Method to call, by default: “predict”
+
+
+    * **returnErrors** (*bool**, **optional*) – Set to true to return errors
 
 
     * **request** (*dict*) – Request.

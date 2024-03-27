@@ -39,6 +39,7 @@ pipeline:
 
   # Parse the incoming Slack message by removing the IRC-like nick from the message
   - type: processor.setvariable
+    description: Parse message if the app was mentioned in a public channel
     runIf: |
       {% if 'api_app_id' in data and data.event.type == 'app_mention' %}1{% endif %}
     output: slack_message_text
@@ -46,9 +47,18 @@ pipeline:
       value: |
         {{ data.event.text|regex_replace('^<[^>]+> ', '')|remove_mrkdwn }}
 
+  # Set the type of communicatoin
+  - type: processor.setvariable
+    description: Check if discussion was in public or in private chat
+    output: slack_public
+    config:
+      value: |
+        {% if 'api_app_id' in data and data.event.type == 'app_mention' %}1{% else %}0{% endif %}
+
   # Parse the incoming Slack message by removing the IRC-like nick from the message
   - type: processor.setvariable
     # Check if this is our bot message from events API
+    description: Parse message if it was a private message to the app
     stopIf: |
       {% if 'type' in data and data.event.type == 'message' and data.event.app_id %}1{% endif %}
     runIf: |
@@ -58,9 +68,9 @@ pipeline:
       value: |
         {{ data.event.text|regex_replace('^<[^>]+> ', '')|remove_mrkdwn }}
 
-  # Fetch existing conversation history from Slack to pass back to Vertex PaLM for context
+  # Fetch existing conversation history from Slack to pass back to Gemini for context
   - type: processor.slack
-    runIf: "{% if slack_message_text %}1{% endif %}"
+    description: Fetch Slack conversation history
     output: slack_thread
     config:
       api: conversations.replies
@@ -71,56 +81,73 @@ pipeline:
 
   # See if this conservation thread has any our app ID mentioned, if so, assume it's a follow up thread
   - type: processor.setvariable
-    runIf: |
-      {% if slack_message_text %}1{% endif %}
+    description: Check if we should reply back
     output: slack_should_reply
     config:
       fromJson: true
       value: |
-        {% set app_thread = [(data.event.type == 'app_mention')] %}{% for message in slack_thread.messages %}{% if message.app_id == slackAppId %}{% set _ = app_thread.append(true) %}{% endif %}{% endfor %}{{ app_thread|last|json_encode }}
+        {% set app_thread = [(data.event.type == 'app_mention')] %}{% for message in slack_thread.messages %}{% if message.app_id == slackAppId or message.type == 'message' %}{% set _ = app_thread.append(true) %}{% endif %}{% endfor %}{{ app_thread|last|json_encode }}
 
-  # Process the returned conversation history messages into suitable format for Vertex
-  - type: processor.setvariable
+  # Process the returned conversation history messages into suitable format for Gemini
+  - type: processor.slack
+    description: Process the conversation history to a format suitable for the API
     runIf: |
-      {% if slack_message_text and slack_should_reply %}1{% endif %}
+      {% if slack_should_reply %}1{% endif %}
     output: slack_messages
     config:
-      fromJson: true
-      value: |
-        {%- set messages = [] -%}{%- for message in slack_thread.messages -%}{%- set _ = messages.append({"author":"AI" if data.event.user != message.user else "USER","content":message.text|regex_replace('^<[^>]+> ', '')|remove_mrkdwn}) -%}{%- endfor -%}{% set _ = messages.append({"author":"USER","content":slack_message_text}) %}{{ messages|json_encode }}
+      mode: processMessages
+      token: "{{ slackToken }}"
+      appId: "{{ slackAppId }}"
+      multimodal: true
+      messages: slack_thread
+
+  - type: output.logger
+    runIf: |
+      {% if slack_should_reply %}1{% endif %}
+    config:
+      message: "Processed Slack thread: {{ slack_messages|json_encode }}"
 
   # Call Vertex AI Generative AI with the thread messages to make a chat reply
   - type: processor.vertexgenai
+    description: Call Vertex AI API to generate a reply
     runIf: |
-      {% if slack_message_text and slack_should_reply %}1{% endif %}
+      {% if slack_should_reply %}1{% endif %}
     output: vertex_response
     config:
       location: "${vertex_region}"
       modelId: "${vertex_model}"
+      method: "streamGenerateContent"
+      returnErrors: true
       request:
-        instances:
-          - messagesExpr: slack_messages
-            context: |
-              You are a helpful Slack bot that offers concise answers to all kinds of issues. 
-
-              You keep your answers under 100 words.
-
-        parameters:
-          temperature: 0.3
-          topP: 0.8
-          topK: 40
-          maxOutputTokens: 200 # in some documentation, this appears as maxDecodeSteps, which has been renamed to maxOutputTokens
-
+        contentsExpr: slack_messages
+        # tools: []
+        safetySettings:
+          - category: HARM_CATEGORY_SEXUALLY_EXPLICIT
+            threshold: BLOCK_ONLY_HIGH
+          - category: HARM_CATEGORY_HATE_SPEECH
+            threshold: BLOCK_ONLY_HIGH
+          - category: HARM_CATEGORY_HARASSMENT
+            threshold: BLOCK_ONLY_HIGH
+          - category: HARM_CATEGORY_DANGEROUS_CONTENT
+            threshold: BLOCK_ONLY_HIGH
+        generationConfig:
+          temperature: 0.9
+          topP: 1.0
+          topK: 32
+          candidateCount: 1
+          maxOutputTokens: 2048
+          # stopSequences: []
   # Log the response
   - type: output.logger
     runIf: |
-      {% if slack_message_text and slack_should_reply %}1{% endif %}
+      {% if slack_should_reply %}1{% endif %}
     config:
       message: "Vertex GenAI response: {{ vertex_response|json_encode }}"
 
   # Post Vertex AI reply to the correct thread
   - type: output.slack
-    runIf: "{% if slack_message_text and slack_should_reply and vertex_response.predictions|length > 0 %}1{% endif %}"
+    description: Reply back in Slack to the correct thread
+    runIf: "{% if slack_should_reply and vertex_response|length > 0 %}1{% endif %}"
     config:
       token: "{{ slackToken }}"
       api: chat.postMessage
@@ -128,4 +155,4 @@ pipeline:
         channel: "{{ data.event.channel }}"
         thread_ts: "{% if data.event.thread_ts %}{{ data.event.thread_ts }}{% else %}{{ data.event.ts }}{% endif %}"
         text: |
-          {{ ((vertex_response.predictions|first).candidates|first).content }}
+          {% if 'error' in vertex_response %}{{ vertex_response.error }}{% endif %}{% for resp in vertex_response %}{% for candidate in resp.candidates %}{% for part in candidate.content.parts %}{{ part.text }}{% endfor %}{% endfor %}{% endfor %}

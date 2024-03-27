@@ -1,0 +1,39 @@
+_metadata:
+  major_version: 1
+  minor_version: 1
+display_information:
+  name: Gemini Pro bot
+  long_description: |
+    A Slack chat bot that uses Google Cloud Vertex AI's Gemini Pro model to converse on
+    channels and private messages. The bot can operate multi-modally both with texts and
+    images.
+  description: A chat bot that uses Gemini Pro model from Google Cloud.
+  background_color: "#0000AA"
+settings:
+  socket_mode_enabled: false
+  interactivity:
+    is_enabled: false
+  event_subscriptions:
+    request_url: https://REPLACE-ME-AFTER-DEPLOYMENT-json2pubsub-abcd1234-ew.a.run.app
+    bot_events:
+      - app_mention
+      - message.channels
+      - message.im
+features:
+  app_home:
+    home_tab_enabled: false
+    messages_tab_enabled: true
+    messages_tab_read_only_enabled: false
+  bot_user:
+    display_name: gemini-pro
+oauth_config:
+  scopes:
+    bot:
+      - commands
+      - chat:write
+      - chat:write.public
+      - channels:history
+      - app_mentions:read
+      - im:history
+      - mpim:history
+      - files:read
