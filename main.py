@@ -33,6 +33,7 @@ from helpers.base import get_grpc_client_info, Context, BaseHelper
 import random
 import uuid
 from functools import partial
+from flask import Response
 
 config_file_name = 'config.yaml'
 execution_count = 0
@@ -595,11 +596,17 @@ def macro_helper(macro_func, *args, **kwargs):
         return r
 
 
-def process_message_pipeline(logger, config, data, event, context):
+def process_message_pipeline(logger,
+                             config,
+                             data,
+                             event,
+                             context,
+                             using_webserver=False):
     template_variables = {
         'data': data,
         'event': event,
         'context': context,
+        'using_webserver': using_webserver
     }
     if len(config['pipeline']) == 0:
         raise NoPipelineConfiguredException('Empty pipeline configured!')
@@ -778,6 +785,11 @@ def process_message_pipeline(logger, config, data, event, context):
                                                jinja_environment, data, event,
                                                context)
                 output_instance.output()
+                # HTTP response
+                if output_instance.status_code and output_instance.body:
+                    context.http_response = (output_instance.status_code,
+                                             output_instance.headers,
+                                             output_instance.body)
                 jinja_environment.globals['previous_run'] = True
         except Exception as exc:
             jinja_environment.globals['previous_run'] = False
@@ -848,18 +860,19 @@ def process_message_pipeline(logger, config, data, event, context):
     helper._clean_tempdir()
 
 
-def process_message(config, data, event, context):
+def process_message(config, data, event, context, using_webserver=False):
     logger = logging.getLogger('pubsub2inbox')
 
     check_retry_period(config, context, logger)
 
     if 'pipeline' in config and isinstance(config['pipeline'], list):
-        process_message_pipeline(logger, config, data, event, context)
+        process_message_pipeline(logger, config, data, event, context,
+                                 using_webserver)
     else:
         process_message_legacy(logger, config, data, event, context)
 
 
-def decode_and_process(logger, config, event, context):
+def decode_and_process(logger, config, event, context, using_webserver=False):
     if 'data' not in event:
         raise NoDataFieldException('No data field in Pub/Sub message!')
 
@@ -881,12 +894,15 @@ def decode_and_process(logger, config, event, context):
                      'data': data,
                      'attributes': event['attributes']
                  })
-    process_message(config, data, event, context)
+    process_message(config, data, event, context, using_webserver)
     logger.debug('Pub/Sub message processing finished.',
                  extra={'event_id': context.event_id})
 
 
-def process_pubsub(event, context, message_too_old_exception=False):
+def process_pubsub(event,
+                   context,
+                   message_too_old_exception=False,
+                   using_webserver=False):
     """Function that is triggered by Pub/Sub incoming message.
     Args:
          event (dict):  The dictionary with data specific to this type of
@@ -901,19 +917,31 @@ def process_pubsub(event, context, message_too_old_exception=False):
 
     if not logger:
         logger = setup_logging()
-    logger.debug('Received a Pub/Sub message.',
-                 extra={
-                     'event_id': context.event_id,
-                     'timestamp': context.timestamp,
-                     'hostname': socket.gethostname(),
-                     'pid': os.getpid(),
-                     'execution_count': execution_count
-                 })
+    if using_webserver:
+        logger.debug('Received an API call.',
+                     extra={
+                         'event_id': context.event_id,
+                         'timestamp': context.timestamp,
+                         'hostname': socket.gethostname(),
+                         'pid': os.getpid(),
+                         'execution_count': execution_count
+                     })
+    else:
+        logger.debug('Received a Pub/Sub message.',
+                     extra={
+                         'event_id': context.event_id,
+                         'timestamp': context.timestamp,
+                         'hostname': socket.gethostname(),
+                         'pid': os.getpid(),
+                         'execution_count': execution_count
+                     })
+
     socket.setdefaulttimeout(10)
     if not configuration:
         configuration = load_configuration(config_file_name)
     try:
-        decode_and_process(logger, configuration, event, context)
+        decode_and_process(logger, configuration, event, context,
+                           using_webserver)
     except TemplateError as exc:
         logger.error('Error while evaluating a Jinja2 template!',
                      extra={
@@ -954,6 +982,36 @@ def process_pubsub_v2(event, context, message_too_old_exception=False):
     process_pubsub(event, new_context)
 
 
+def process_api_v2(request):
+    """Function that is triggered by API request for functions V2.
+    """
+    global logger
+
+    if not logger:
+        logger = setup_logging()
+
+    request_headers = json.loads(json.dumps({**request.headers}))
+    if 'authorization' in request_headers:
+        del request_headers['authorization']
+    event = {
+        'data':
+            base64.b64encode(json.dumps(request.get_json()).encode('utf-8')),
+        'attributes': {
+            'headers': request_headers
+        }
+    }
+    context = Context(timestamp=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'))
+    process_pubsub(event,
+                   context,
+                   message_too_old_exception=True,
+                   using_webserver=True)
+    if context.http_response:
+        return Response(response=context.http_response[2],
+                        status=context.http_response[0],
+                        headers=context.http_response[1])
+    return Response(response="", status=200)
+
+
 class CloudRunServer:
 
     def on_get(self, req, res):
@@ -973,30 +1031,64 @@ class CloudRunServer:
             import falcon
             res.content_type = falcon.MEDIA_TEXT
 
-            try:
-                envelope = req.media
-            except falcon.MediaNotFoundError:
-                raise NoMessageReceivedException('No Pub/Sub message received')
-            except falcon.MediaMalformedError:
-                raise InvalidMessageFormatException('Invalid Pub/Sub JSON')
+            # Check if this is an API call
+            context = None
+            event = None
+            using_webserver = False
+            if req.url[-4:] != '/api':
+                try:
+                    envelope = req.media
+                except falcon.MediaNotFoundError:
+                    raise NoMessageReceivedException(
+                        'No Pub/Sub message received')
+                except falcon.MediaMalformedError:
+                    raise InvalidMessageFormatException('Invalid Pub/Sub JSON')
 
-            if not isinstance(envelope, dict) or 'message' not in envelope:
-                raise InvalidMessageFormatException(
-                    'Invalid Pub/Sub message format')
+                if not isinstance(envelope, dict) or 'message' not in envelope:
+                    raise InvalidMessageFormatException(
+                        'Invalid Pub/Sub message format')
 
-            event = {
-                'data':
-                    envelope['message']['data'],
-                'attributes':
-                    envelope['message']['attributes']
-                    if 'attributes' in envelope['message'] else {}
-            }
+                event = {
+                    'data':
+                        envelope['message']['data'],
+                    'attributes':
+                        envelope['message']['attributes']
+                        if 'attributes' in envelope['message'] else {}
+                }
+                context = Context(eventId=envelope['message']['messageId'],
+                                  timestamp=envelope['message']['publishTime'])
+            else:
+                try:
+                    envelope = req.media
+                except falcon.MediaNotFoundError:
+                    raise NoMessageReceivedException('No request received')
+                except falcon.MediaMalformedError:
+                    raise InvalidMessageFormatException('Invalid Pub/Sub JSON')
+                request_headers = req.headers
+                if 'authorization' in request_headers:
+                    del request_headers['authorization']
+                event = {
+                    'data':
+                        base64.b64encode(json.dumps(envelope).encode('utf-8')),
+                    'attributes': {
+                        'headers': request_headers
+                    }
+                }
+                context = Context(
+                    timestamp=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'))
+                using_webserver = True
 
-            context = Context(eventId=envelope['message']['messageId'],
-                              timestamp=envelope['message']['publishTime'])
-            process_pubsub(event, context, message_too_old_exception=True)
-            res.status = falcon.HTTP_200
-            res.text = 'Message processed.'
+            process_pubsub(event,
+                           context,
+                           message_too_old_exception=True,
+                           using_webserver=using_webserver)
+            if context.http_response:
+                res.status = context.http_response[0]
+                res.set_headers(context.http_response[1])
+                res.text = context.http_response[2]
+            else:
+                res.status = falcon.HTTP_200
+                res.text = 'Message processed.'
         except (NoMessageReceivedException,
                 InvalidMessageFormatException) as me:
             # Do not attempt to retry malformed messages
@@ -1039,6 +1131,7 @@ def run_webserver(run_locally=False):
         app = falcon.App()
         server = CloudRunServer()
         app.add_route('/', server)
+        app.add_route('/api', server)
         if run_locally:
             from waitress import serve
             port = 8080 if not os.getenv('PORT') or os.getenv(

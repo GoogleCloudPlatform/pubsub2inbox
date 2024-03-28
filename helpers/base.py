@@ -39,6 +39,7 @@ class Context(object):
         self.timestamp = timestamp
         self.event_type = eventType
         self.resource = resource
+        self.http_response = None
 
     def __json__(self):
         return "{\"event_id\": \"%s\", \"timestamp\": \"%s\", \"event_type\": \"%s\", \"resource\": \"%s\"}" % (

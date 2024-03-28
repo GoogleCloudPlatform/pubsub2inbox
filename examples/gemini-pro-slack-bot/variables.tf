@@ -60,3 +60,12 @@ variable "pubsub_topic" {
   type        = string
   default     = "pubsub2inbox-gemini-pro-bot"
 }
+
+variable "vertex_search" {
+  description = "Integrate Vertex Search as a Gemini function"
+  type = object({
+    enabled      = optional(bool, false)
+    location     = optional(string)
+    datastore_id = optional(string)
+  })
+}

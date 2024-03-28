@@ -30,7 +30,16 @@ class Output(BaseHelper):
         self.event = event
         self.context = context
 
+        self.status_code = None
+        self.headers = None
+        self.body = None
+
         super().__init__(jinja_environment)
+
+    def outputHttpResponse(self, status_code, headers, body):
+        self.status_code = status_code
+        self.headers = headers
+        self.body = body
 
     @abc.abstractmethod
     def output(self):

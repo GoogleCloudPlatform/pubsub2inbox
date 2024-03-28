@@ -16,6 +16,23 @@ A Slack chat bot that uses the Gemini 1.0 Pro Vision model. It can accept images
 10. In Slack, create a channel and add the bot to it (channel settings, `Integrations > Add an app`).
 11. You can now discuss with the bot via private messages or tagging it in a channel!
 
+## Integrating Vertex AI Search
+
+By setting `vertex_search` parameter, you can deploy an additional Gemini function call which can search
+your Vertex AI Datastore. Follow the [Vertex AI Search quickstart](https://cloud.google.com/generative-ai-app-builder/docs/try-enterprise-search)
+(which uses Alphabet's financial documents) and enable it in `terraform.tfvars`:
+
+```
+vertex_search = {
+  enabled      = true
+  location     = "eu" # or global, us
+  datastore_id = "YOUR_DATASTORE_ID_12345678" # replace this with your datastore ID
+}
+```
+
+Once deployed, Gemini is given the possibility to function call the Vertex Search function
+and integrate the results.
+
 ### Example Terraform connfiguraiton
 
 Example `terraform.tfvars` file:

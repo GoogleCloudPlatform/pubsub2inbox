@@ -118,9 +118,34 @@ pipeline:
       modelId: "${vertex_model}"
       method: "streamGenerateContent"
       returnErrors: true
+%{ if api_enabled ~}
+      callFunctions:
+        search_vertex:
+          url: "${vertex_search_function}"
+          method: "POST"
+          headers:
+            - name: Content-type
+              value: application/json
+          body:
+            query: "{{ query }}"
+          idToken: true
+%{ endif ~}
       request:
         contentsExpr: slack_messages
-        # tools: []
+%{ if api_enabled ~}
+        tools:
+          functionDeclarations:
+            - name: search_vertex
+              description: |
+                Search for documents related to Alphabet financial information and other corporate
+                documents.
+              parameters:
+                type: object
+                properties:
+                  query:
+                    type: string
+                    description: Search query
+%{ endif ~}
         safetySettings:
           - category: HARM_CATEGORY_SEXUALLY_EXPLICIT
             threshold: BLOCK_ONLY_HIGH
@@ -131,7 +156,7 @@ pipeline:
           - category: HARM_CATEGORY_DANGEROUS_CONTENT
             threshold: BLOCK_ONLY_HIGH
         generationConfig:
-          temperature: 0.9
+          temperature: %{ if api_enabled }0.0%{ else }0.9%{ endif }
           topP: 1.0
           topK: 32
           candidateCount: 1

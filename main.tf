@@ -131,6 +131,11 @@ locals {
       project = ["roles/aiplatform.user"]
       apis    = ["aiplatform.googleapis.com"]
     }
+    vertexai-search = {
+      org     = []
+      project = ["roles/discoveryengine.viewer"]
+      apis    = ["discoveryengine.googleapis.com"]
+    }
     compute-engine = {
       org     = []
       project = ["roles/compute.instanceAdmin.v1", "roles/compute.loadBalancerAdmin"]
@@ -365,29 +370,32 @@ resource "google_cloudfunctions_function" "function" {
   available_memory_mb   = var.available_memory_mb
   source_archive_bucket = google_storage_bucket.function-bucket[0].name
   source_archive_object = var.use_local_files ? google_storage_bucket_object.function-archive[0].name : google_storage_bucket_object.function-archive-release[0].name
-  entry_point           = "process_pubsub"
+  entry_point           = var.api == null ? "process_pubsub" : "process_api"
   timeout               = var.function_timeout
 
   vpc_connector = var.vpc_connector
 
-  event_trigger {
-    event_type = "google.pubsub.topic.publish"
-    resource   = var.pubsub_topic
-    failure_policy {
-      retry = true
+  dynamic "event_trigger" {
+    for_each = var.api == null || try(var.api.enabled, false) == false ? [""] : []
+    content {
+      event_type = "google.pubsub.topic.publish"
+      resource   = var.pubsub_topic
+      failure_policy {
+        retry = true
+      }
     }
   }
 
   min_instances = var.instance_limits.min_instances
   max_instances = var.instance_limits.max_instances
 
-  environment_variables = {
+  environment_variables = merge({
     # You could also specify latest secret version here, in case you don't want to redeploy
     # and are fine with the function picking up the new config on subsequent runs.
     CONFIG          = google_secret_manager_secret_version.config-secret-version.name
     LOG_LEVEL       = var.log_level
     SERVICE_ACCOUNT = var.create_service_account ? google_service_account.service-account[0].email : var.service_account
-  }
+  }, var.api != null && try(var.api.enabled, false) == true ? { WEBSERVER = "1" } : {})
 }
 
 resource "google_cloudfunctions2_function" "function" {
@@ -401,7 +409,7 @@ resource "google_cloudfunctions2_function" "function" {
 
   build_config {
     runtime     = "python310"
-    entry_point = "process_pubsub_v2"
+    entry_point = var.api == null || try(var.api.enabled, false) == false ? "process_pubsub_v2" : "process_api_v2"
     source {
       storage_source {
         bucket = google_storage_bucket.function-bucket[0].name
@@ -425,11 +433,14 @@ resource "google_cloudfunctions2_function" "function" {
     }
   }
 
-  event_trigger {
-    trigger_region = var.trigger_region != null ? var.trigger_region : var.region
-    event_type     = "google.cloud.pubsub.topic.v1.messagePublished"
-    pubsub_topic   = var.pubsub_topic
-    retry_policy   = "RETRY_POLICY_RETRY"
+  dynamic "event_trigger" {
+    for_each = var.api == null || try(var.api.enabled, false) == false ? [""] : []
+    content {
+      trigger_region = var.trigger_region != null ? var.trigger_region : var.region
+      event_type     = "google.cloud.pubsub.topic.v1.messagePublished"
+      pubsub_topic   = var.pubsub_topic
+      retry_policy   = "RETRY_POLICY_RETRY"
+    }
   }
 }
 
@@ -446,13 +457,23 @@ resource "google_service_account" "invoker-service-account" {
 
 # Allow the invoker service account to run the Cloud Run function
 resource "google_cloud_run_service_iam_member" "pubsub-invoker" {
-  count   = var.cloud_run ? 1 : 0
+  count   = var.cloud_run && (var.api == null || try(var.api.enabled, false) == false) ? 1 : 0
   project = var.project_id
 
   location = google_cloud_run_service.function[0].location
   service  = google_cloud_run_service.function[0].name
   role     = "roles/run.invoker"
   member   = format("serviceAccount:%s", google_service_account.invoker-service-account[0].email)
+}
+
+resource "google_cloud_run_service_iam_member" "pubsub-api-invokers" {
+  for_each = toset(var.api != null && try(var.api.enabled, false) == true ? var.api.iam_invokers : [])
+  project  = var.project_id
+
+  location = google_cloud_run_service.function[0].location
+  service  = google_cloud_run_service.function[0].name
+  role     = "roles/run.invoker"
+  member   = each.value
 }
 
 # Grant Pub/Sub P4SA to create auth tokens for the invoker service account
@@ -466,7 +487,7 @@ resource "google_service_account_iam_member" "pubsub-token-creator" {
 
 # Create a Pub/Sub push subscription that calls the Cloud Run function
 resource "google_pubsub_subscription" "pubsub-subscription" {
-  count   = var.cloud_run ? 1 : 0
+  count   = var.cloud_run && (var.api == null || try(var.api.enabled, false) == false) ? 1 : 0
   project = var.project_id
 
   name  = format("%s-subscription", var.function_name)
@@ -513,6 +534,13 @@ resource "google_cloud_run_service" "function" {
         env {
           name  = "SERVICE_ACCOUNT"
           value = var.create_service_account ? google_service_account.service-account[0].email : var.service_account
+        }
+        dynamic "env" {
+          for_each = var.api != null && try(var.api.enabled, false) == true ? [""] : []
+          content {
+            name  = "WEBSERVER"
+            value = "1"
+          }
         }
         resources {
           limits = {
