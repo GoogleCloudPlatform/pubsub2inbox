@@ -35,6 +35,16 @@ variable "function_roles" {
 variable "pubsub_topic" {
   type        = string
   description = "Pub/Sub topic (projects/project-id/topics/topic-id)"
+  default     = null
+}
+
+variable "api" {
+  type = object({
+    enabled      = optional(bool, false)
+    iam_invokers = optional(list(string), [])
+  })
+  description = "Run the function as API server (eg. non-Pub/Sub)"
+  default     = null
 }
 
 variable "region" {

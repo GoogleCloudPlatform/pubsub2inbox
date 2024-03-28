@@ -211,6 +211,13 @@ def rtrim(v):
 
 
 def remove_mrkdwn(v, links=False, italic=True):
+    if isinstance(v, list):
+        removed = []
+        for s in v:
+            removed.append(remove_mrkdwn(s, links, italic))
+        return removed
+    if not isinstance(v, str):
+        return v
     if links:
         v = re.sub(r'<([^\|]*)\|[^\|]*>', r'\1', v)
     else:

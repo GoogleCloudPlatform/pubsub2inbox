@@ -1,0 +1,71 @@
+#   Copyright 2023 Google LLC
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+# This example shows how to call Vertex AI Search
+#
+# It can be also run interactively as a non-Pub/Sub function by specifying
+# WEBSERVER=1 environment parameter (or --webserver flag).
+#
+# Example:
+#   python3 main.py --config examples/vertex-search.yaml --webserver
+#   curl -i -X POST -H "Content-type: application/json" http://localhost:8080/api -d '{"query":"sample query"}'
+
+pipeline:
+  - type: processor.genericjson
+
+  # Call Vertex Search
+  - type: processor.vertexai
+    description: Call Vertex AI Search API
+    output: vertex_response
+    config:
+      project: "project-id"
+      location: "eu"
+      mode: "search"
+      datastoreId: "appname_12345678"
+      returnErrors: true
+      request:
+        query: "Financial results"
+        # Image query
+        pageSize: 10
+        queryExpansionSpec:
+          condition: "AUTO"
+        spellCorrectionSpec:
+          mode: "AUTO"
+        contentSearchSpec:
+          snippetSpec:
+            returnSnippet: true
+          summarySpec:
+            summaryResultCount: 5
+            includeCitations: true
+            ignoreAdversarialQuery: true
+            ignoreNonSummarySeekingQuery: true
+            # modelPromptSpec:
+            #  preamble: "Custom prompt preamble"
+            modelSpec:
+              version: "stable"
+
+  # Log the response
+  - type: output.logger
+    config:
+      message: "Vertex GenAI response: {{ vertex_response|json_encode }}"
+
+  # This outputs a HTTP response when using interactively via the /api endpoint
+  - type: output.httpresponse
+    runIf: "{% if using_webserver %}1{% endif %}"
+    config:
+      statusCode: 200
+      headers:
+        content-type: "application/json"
+      body: |
+        {{ vertex_response|json_encode }}

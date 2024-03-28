@@ -66,12 +66,16 @@ module "function" {
 
   pubsub_topic = module.pubsub-topic.id
 
-  config = templatefile("${path.module}/slack-bot.yaml", {
+  config = templatefile("${path.module}/slack-bot.yaml", merge({
     slack_token   = var.slack_token
     slack_app_id  = var.slack_app_id
     vertex_region = var.vertex_region
     vertex_model  = var.vertex_model
-  })
+    api_enabled   = false
+    }, var.vertex_search.enabled == true ? {
+    api_enabled            = true
+    vertex_search_function = module.api[""].run_service.url
+  } : {}))
   use_local_files  = true
   local_files_path = "../.."
 
@@ -115,5 +119,47 @@ resource "google_project_iam_member" "custom-role-binding" {
   project = module.project.project_id
   role    = google_project_iam_custom_role.custom-role[0].id
   member  = format("serviceAccount:%s", module.function.service_account)
+}
+
+# Deploy Vertex Search interactive API function
+module "api" {
+  for_each = toset(var.vertex_search.enabled == true ? [""] : [])
+  source   = "../.."
+
+  project_id         = module.project.project_id
+  region             = var.region
+  cloud_functions_v2 = true
+
+  function_name = "gemini-vertex-search"
+
+  service_account        = "gemini-vertex-search"
+  create_service_account = true
+
+  api = {
+    enabled      = true
+    api_invokers = []
+  }
+  config = templatefile("${path.module}/vertex-search.yaml", {
+    project      = module.project.project_id
+    location     = var.vertex_search.location
+    datastore_id = var.vertex_search.datastore_id
+  })
+  use_local_files  = true
+  local_files_path = "../.."
+
+  bucket_name     = format("gemini-pro-vertex-search-build-%s", random_string.random.result)
+  bucket_location = var.region
+
+  function_roles = ["vertexai-search"]
+}
+
+resource "google_cloud_run_service_iam_member" "api-invoker" {
+  for_each = toset(var.vertex_search.enabled == true ? [""] : [])
+  project  = module.project.project_id
+
+  location = module.api[""].run_service.location
+  service  = module.api[""].run_service.name
+  role     = "roles/run.invoker"
+  member   = format("serviceAccount:%s", module.function.service_account)
 }
 

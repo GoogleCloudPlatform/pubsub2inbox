@@ -25,7 +25,7 @@ class SlackProcessor(Processor):
     Args:
         token (str): A Slack Bot User OAuth Token.
         api (str): One of: conversations.list, conversations.history, conversations.replies
-        mode (str, optional: api or processMessages (default api)
+        mode (str, optional: api, processMessages or lastImage (default api)
         multimodal (bool, optional): Use multi-modal processing in processMessages.
         messages (list, optional): List of messages to process.
         appId (str, optional): The app ID to detect bot messages.
@@ -136,7 +136,7 @@ class SlackProcessor(Processor):
         request_params = self._jinja_expand_dict_all(self.config['request'],
                                                      'request')
 
-        if mode == 'processMessages':
+        if mode == 'processMessages' or mode == 'lastImage':
             if 'messages' not in self.config:
                 raise NotConfiguredException('No Slack messages specified.')
             if 'appId' not in self.config:
@@ -179,6 +179,14 @@ class SlackProcessor(Processor):
                         new_message = {'role': 'USER', 'parts': parts}
                 if new_message:
                     processed.append(new_message)
+            if mode == 'lastImage':
+                if len(processed) > 0:
+                    last_message = processed[len(processed) - 1]
+                    for part in last_message['parts']:
+                        if 'inlineData' in part:
+                            if part['inlineData']['mimeType'][0:6] == 'image/':
+                                return {output_var: part['inlineData']['data']}
+                return {output_var: None}
             return {output_var: processed}
 
         if slack_api == 'conversations.list':

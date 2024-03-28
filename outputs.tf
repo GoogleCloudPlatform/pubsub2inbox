@@ -55,10 +55,22 @@ output "run_service" {
       project  = var.project_id
       location = google_cloud_run_service.function[0].location
       service  = google_cloud_run_service.function[0].name
+      name     = google_cloud_run_service.function[0].name
+      url      = google_cloud_run_service.function[0].status[0].url
       } : {
       project  = var.project_id
       location = google_cloudfunctions2_function.function[0].location
       service  = google_cloudfunctions2_function.function[0].service_config[0].service
+      name     = google_cloudfunctions2_function.function[0].name
+      url      = google_cloudfunctions2_function.function[0].url
     })
   : null)
+}
+
+output "cloud_run" {
+  value = var.cloud_run
+}
+
+output "cloud_functions_v2" {
+  value = var.cloud_functions_v2
 }
