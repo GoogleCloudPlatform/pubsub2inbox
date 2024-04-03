@@ -14,6 +14,8 @@ Bases: [`BaseHelper`](helpers.md#helpers.base.BaseHelper)
 
 
 #### _abstract_ output()
+
+#### outputHttpResponse(status_code, headers, body)
 ## output.bigquery module
 
 
@@ -129,6 +131,14 @@ Bases: `Output`
 
 
 ### _class_ output.groupssettings.GroupssettingsOutput(config, output_config, jinja_environment, data, event, context)
+Bases: `Output`
+
+
+#### output()
+## output.httpresponse module
+
+
+### _class_ output.httpresponse.HttpresponseOutput(config, output_config, jinja_environment, data, event, context)
 Bases: `Output`
 
 

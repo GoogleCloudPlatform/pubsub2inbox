@@ -252,6 +252,14 @@ processors.transcode module
    :undoc-members:
    :show-inheritance:
 
+processors.vertexai module
+--------------------------
+
+.. automodule:: processors.vertexai
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 processors.vertexgenai module
 -----------------------------
 

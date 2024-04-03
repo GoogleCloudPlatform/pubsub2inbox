@@ -63,7 +63,7 @@ Bases: `Exception`
 
 ### main.check_retry_period(config, context, logger)
 
-### main.decode_and_process(logger, config, event, context)
+### main.decode_and_process(logger, config, event, context, using_webserver=False)
 
 ### main.get_concurrency_params(concurrency_config, jinja_environment, template_variables)
 
@@ -81,13 +81,17 @@ Bases: `Exception`
 
 ### main.macro_helper(macro_func, \*args, \*\*kwargs)
 
-### main.process_message(config, data, event, context)
+### main.process_api_v2(request)
+Function that is triggered by API request for functions V2.
+
+
+### main.process_message(config, data, event, context, using_webserver=False)
 
 ### main.process_message_legacy(logger, config, data, event, context)
 
-### main.process_message_pipeline(logger, config, data, event, context)
+### main.process_message_pipeline(logger, config, data, event, context, using_webserver=False)
 
-### main.process_pubsub(event, context, message_too_old_exception=False)
+### main.process_pubsub(event, context, message_too_old_exception=False, using_webserver=False)
 Function that is triggered by Pub/Sub incoming message.
 :type event: 
 :param event: The dictionary with data specific to this type of

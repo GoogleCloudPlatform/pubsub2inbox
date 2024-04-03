@@ -22,6 +22,10 @@ globals:
   slackToken: "${slack_token}"
   slackAppId: "${slack_app_id}"
 
+# Allow processing to fail, so it doesn't keep retrying errors that won't get
+# resolved
+canFail: true
+
 pipeline:
   - type: processor.genericjson
 
@@ -62,7 +66,7 @@ pipeline:
     stopIf: |
       {% if 'type' in data and data.event.type == 'message' and data.event.app_id %}1{% endif %}
     runIf: |
-      {% if 'type' in data and data.event.type == 'message' %}1{% endif %}
+      {% if 'type' in data and data.event.type == 'message' and 'text' in data.event %}1{% endif %}
     output: slack_message_text
     config:
       value: |
@@ -100,6 +104,12 @@ pipeline:
       appId: "{{ slackAppId }}"
       multimodal: true
       messages: slack_thread
+%{ if api_enabled ~}
+      prompt: |
+        Do not consult external sources unless my question is strictly related to Alphabet financials which
+        you don't know the answer for.
+        
+%{ endif ~}
 
   - type: output.logger
     runIf: |
@@ -137,14 +147,15 @@ pipeline:
           functionDeclarations:
             - name: search_vertex
               description: |
-                Search for documents related to Alphabet financial information and other corporate
-                documents.
+                Current information on Alphabet financials.
               parameters:
                 type: object
                 properties:
                   query:
                     type: string
                     description: Search query
+                required:
+                  - query
 %{ endif ~}
         safetySettings:
           - category: HARM_CATEGORY_SEXUALLY_EXPLICIT

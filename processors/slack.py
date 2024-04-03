@@ -149,18 +149,6 @@ class SlackProcessor(Processor):
                                                'messages')
 
             processed = []
-            # Append an initial prompt that can be instructions or such
-            if 'prompt' in self.config:
-                processed.append({
-                    'role':
-                        'USER',
-                    'parts': [{
-                        'text':
-                            self._jinja_expand_string(self.config['prompt'],
-                                                      'prompt')
-                    }]
-                })
-
             if 'messages' in messages:
                 messages = messages['messages']
 
@@ -179,6 +167,24 @@ class SlackProcessor(Processor):
                         new_message = {'role': 'USER', 'parts': parts}
                 if new_message:
                     processed.append(new_message)
+
+            # Prepend an initial prompt that can be instructions or such
+            if 'prompt' in self.config:
+                prompt_added = False
+                for msg_idx, msg in enumerate(processed):
+                    if msg['role'] == 'USER':
+                        for part_idx, part in enumerate(msg['parts']):
+                            if 'text' in part:
+                                processed[msg_idx]['parts'][part_idx][
+                                    'text'] = self._jinja_expand_string(
+                                        self.config['prompt'],
+                                        'prompt') + " " + processed[msg_idx][
+                                            'parts'][part_idx]['text']
+                                prompt_added = True
+                                break
+                    if prompt_added:
+                        break
+
             if mode == 'lastImage':
                 if len(processed) > 0:
                     last_message = processed[len(processed) - 1]

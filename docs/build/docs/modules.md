@@ -277,6 +277,9 @@
     * [`macro_helper()`](main.md#main.macro_helper)
 
 
+    * [`process_api_v2()`](main.md#main.process_api_v2)
+
+
     * [`process_message()`](main.md#main.process_message)
 
 
@@ -314,6 +317,9 @@
 
 
             * [`Output.output()`](output.md#output.base.Output.output)
+
+
+            * [`Output.outputHttpResponse()`](output.md#output.base.Output.outputHttpResponse)
 
 
     * [output.bigquery module](output.md#module-output.bigquery)
@@ -371,6 +377,15 @@
 
 
             * [`GroupssettingsOutput.output()`](output.md#output.groupssettings.GroupssettingsOutput.output)
+
+
+    * [output.httpresponse module](output.md#module-output.httpresponse)
+
+
+        * [`HttpresponseOutput`](output.md#output.httpresponse.HttpresponseOutput)
+
+
+            * [`HttpresponseOutput.output()`](output.md#output.httpresponse.HttpresponseOutput.output)
 
 
     * [output.logger module](output.md#module-output.logger)
@@ -979,10 +994,25 @@
             * [`TranscodeProcessor.process()`](processors.md#processors.transcode.TranscodeProcessor.process)
 
 
+    * [processors.vertexai module](processors.md#module-processors.vertexai)
+
+
+        * [`VertexaiProcessor`](processors.md#processors.vertexai.VertexaiProcessor)
+
+
+            * [`VertexaiProcessor.get_default_config_key()`](processors.md#processors.vertexai.VertexaiProcessor.get_default_config_key)
+
+
+            * [`VertexaiProcessor.process()`](processors.md#processors.vertexai.VertexaiProcessor.process)
+
+
     * [processors.vertexgenai module](processors.md#module-processors.vertexgenai)
 
 
         * [`VertexgenaiProcessor`](processors.md#processors.vertexgenai.VertexgenaiProcessor)
+
+
+            * [`VertexgenaiProcessor.call_function()`](processors.md#processors.vertexgenai.VertexgenaiProcessor.call_function)
 
 
             * [`VertexgenaiProcessor.get_default_config_key()`](processors.md#processors.vertexgenai.VertexgenaiProcessor.get_default_config_key)

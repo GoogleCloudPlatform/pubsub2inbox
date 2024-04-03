@@ -60,6 +60,14 @@ output.groupssettings module
    :undoc-members:
    :show-inheritance:
 
+output.httpresponse module
+--------------------------
+
+.. automodule:: output.httpresponse
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 output.logger module
 --------------------
 

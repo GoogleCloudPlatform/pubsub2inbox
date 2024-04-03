@@ -781,10 +781,10 @@ Slack processor for fetching messages.
     * **api** (*str*) – One of: conversations.list, conversations.history, conversations.replies
 
 
-    * **(****str** (*mode*) – api or processMessages (default api)
+    * **(****str** (*mode*) – api, processMessages or lastImage (default api)
 
 
-    * **optional** – api or processMessages (default api)
+    * **optional** – api, processMessages or lastImage (default api)
 
 
     * **multimodal** (*bool**, **optional*) – Use multi-modal processing in processMessages.
@@ -853,6 +853,55 @@ Transcode media using Transcoder API. For more information, see:
 #### get_default_config_key()
 
 #### process(output_var='transcode')
+## processors.vertexai module
+
+
+### _class_ processors.vertexai.VertexaiProcessor(config, jinja_environment, data, event, context)
+Bases: `Processor`
+
+Vertex AI processor.
+
+
+* **Parameters**
+
+    
+    * **region** (*str*) – Endpoint to use.
+
+
+    * **mode** (*str*) – search (Vertex AI Search)
+
+
+    * **method** (*str**, **optional*) – Method to call (defaults to “search”).
+
+
+    * **project** (*str**, **optional*) – Google Cloud project ID.
+
+
+    * **location** (*str*) – Location for Vertex AI.
+
+
+    * **collection** (*str**, **optional*) – Collection (defaults to “default_collection”)
+
+
+    * **engineId** (*str*) – Engine ID.
+
+
+    * **datastoreId** (*str*) – Data store ID (either this or engineId).
+
+
+    * **servingConfig** (*str**, **optional*) – Serving configuration (defaults to “default_config”).
+
+
+    * **returnErrors** (*bool**, **optional*) – Set to true to return errors
+
+
+    * **request** (*dict*) – Request.
+
+
+
+#### get_default_config_key()
+
+#### process(output_var='vertexai')
 ## processors.vertexgenai module
 
 
@@ -880,9 +929,14 @@ Vertex AI Generative AI processor.
     * **returnErrors** (*bool**, **optional*) – Set to true to return errors
 
 
+    * **callFunctions** (*dict**, **optional*) – URLs for functions.
+
+
     * **request** (*dict*) – Request.
 
 
+
+#### call_function(name, params)
 
 #### get_default_config_key()
 

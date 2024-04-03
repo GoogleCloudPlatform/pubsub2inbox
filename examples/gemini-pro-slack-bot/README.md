@@ -33,6 +33,10 @@ vertex_search = {
 Once deployed, Gemini is given the possibility to function call the Vertex Search function
 and integrate the results.
 
+Please note that for now, the multimodal search functionality (eg. images) will not work in 
+conjunction with the function calling. The model also might be less efficient at answering
+common knowledge questions related in any way to finance (work in progress!).
+
 ### Example Terraform connfiguraiton
 
 Example `terraform.tfvars` file:
