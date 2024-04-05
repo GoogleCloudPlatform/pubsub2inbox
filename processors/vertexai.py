@@ -33,6 +33,7 @@ class VertexaiProcessor(Processor):
         datastoreId (str): Data store ID (either this or engineId).
         servingConfig (str, optional): Serving configuration (defaults to "default_config").
         returnErrors (bool, optional): Set to true to return errors
+        apiVersion (str, optional): API version, defaults to "v1".
         request (dict): Request.
     """
 
@@ -70,17 +71,19 @@ class VertexaiProcessor(Processor):
             self.config['servingConfig'], 'serving_config'
         ) if 'servingConfig' in self.config else 'default_config'
 
+        api_version = self._jinja_expand_string(self.config['apiVersion']) if 'apiVersion' in self.config else 'v1'
+
         method = self._jinja_expand_string(
             self.config['method'],
             'method') if 'method' in self.config else 'search'
         if mode == 'search':
             if engine_id:
-                api_path = 'https://%s-discoveryengine.googleapis.com/v1/projects/%s/locations/%s/collections/%s/engineId/%s/servingConfigs/%s:%s' % (
-                    location, project, location, collection, engine_id,
+                api_path = 'https://%s-discoveryengine.googleapis.com/%s/projects/%s/locations/%s/collections/%s/engineId/%s/servingConfigs/%s:%s' % (
+                    api_version, location, project, location, collection, engine_id,
                     serving_config, method)
             else:
-                api_path = 'https://%s-discoveryengine.googleapis.com/v1/projects/%s/locations/%s/collections/%s/dataStores/%s/servingConfigs/%s:%s' % (
-                    location, project, location, collection, datastore_id,
+                api_path = 'https://%s-discoveryengine.googleapis.com/%s/projects/%s/locations/%s/collections/%s/dataStores/%s/servingConfigs/%s:%s' % (
+                    location, api_version, project, location, collection, datastore_id,
                     serving_config, method)
 
             return_errors = False
@@ -123,7 +126,7 @@ class VertexaiProcessor(Processor):
                 self.logger.error('Error calling %s: %s' % (e.request.url, e),
                                   extra={'response': e.response.text})
                 raise e
-            print(response.content)
+
             response_json = response.json()
         return {
             output_var: response_json,

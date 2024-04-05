@@ -106,8 +106,9 @@ pipeline:
       messages: slack_thread
 %{ if api_enabled ~}
       prompt: |
-        Do not consult external sources unless my question is strictly related to Alphabet financials which
-        you don't know the answer for.
+        Do not call functions unless my question is strictly related to Alphabet financials which
+        you don't know the answer for. Answer questions without calling functions if you know the
+        answer well enough.
         
 %{ endif ~}
 
@@ -124,6 +125,7 @@ pipeline:
       {% if slack_should_reply %}1{% endif %}
     output: vertex_response
     config:
+      apiVersion: "v1beta"
       location: "${vertex_region}"
       modelId: "${vertex_model}"
       method: "streamGenerateContent"
@@ -147,7 +149,8 @@ pipeline:
           functionDeclarations:
             - name: search_vertex
               description: |
-                Current information on Alphabet financials.
+                This function is only for getting current information on Alphabet
+                financials, do not use it for anything else. 
               parameters:
                 type: object
                 properties:

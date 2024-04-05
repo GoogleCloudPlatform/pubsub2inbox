@@ -37,6 +37,12 @@ variable "vertex_region" {
 variable "vertex_model" {
   description = "Vertex AI model to use"
   type        = string
+  default     = "gemini-1.0-pro"
+}
+
+variable "vertex_model_multimodal" {
+  description = "Vertex AI multimodal model to use"
+  type        = string
   default     = "gemini-1.0-pro-vision"
 }
 

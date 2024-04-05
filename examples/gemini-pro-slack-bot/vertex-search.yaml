@@ -17,7 +17,6 @@
 # It can be also run interactively as a non-Pub/Sub function by specifying
 # WEBSERVER=1 environment parameter (or --webserver flag).
 #
-# Example:
 
 pipeline:
   - type: processor.genericjson
@@ -52,6 +51,8 @@ pipeline:
             #  preamble: "Custom prompt preamble"
             modelSpec:
               version: "stable"
+          extractiveContentSpec:
+            maxExtractiveAnswerCount: 1
 
   # Log the response
   - type: output.logger
@@ -65,4 +66,7 @@ pipeline:
       headers:
         content-type: "application/json"
       body: |
-        {{ vertex_response|json_encode }}
+        {%- set resp = [] -%}
+        {%- for result in vertex_response.results -%}
+
+        {%- endfor -%}

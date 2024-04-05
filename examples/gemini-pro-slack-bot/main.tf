@@ -70,7 +70,7 @@ module "function" {
     slack_token   = var.slack_token
     slack_app_id  = var.slack_app_id
     vertex_region = var.vertex_region
-    vertex_model  = var.vertex_model
+    vertex_model  = var.vertex_search.enabled == false ? var.vertex_model : var.vertex_model_multimodal
     api_enabled   = false
     }, var.vertex_search.enabled == true ? {
     api_enabled            = true
