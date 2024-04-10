@@ -71,7 +71,8 @@ class VertexaiProcessor(Processor):
             self.config['servingConfig'], 'serving_config'
         ) if 'servingConfig' in self.config else 'default_config'
 
-        api_version = self._jinja_expand_string(self.config['apiVersion']) if 'apiVersion' in self.config else 'v1'
+        api_version = self._jinja_expand_string(
+            self.config['apiVersion']) if 'apiVersion' in self.config else 'v1'
 
         method = self._jinja_expand_string(
             self.config['method'],
@@ -79,12 +80,12 @@ class VertexaiProcessor(Processor):
         if mode == 'search':
             if engine_id:
                 api_path = 'https://%s-discoveryengine.googleapis.com/%s/projects/%s/locations/%s/collections/%s/engineId/%s/servingConfigs/%s:%s' % (
-                    api_version, location, project, location, collection, engine_id,
-                    serving_config, method)
+                    api_version, location, project, location, collection,
+                    engine_id, serving_config, method)
             else:
                 api_path = 'https://%s-discoveryengine.googleapis.com/%s/projects/%s/locations/%s/collections/%s/dataStores/%s/servingConfigs/%s:%s' % (
-                    location, api_version, project, location, collection, datastore_id,
-                    serving_config, method)
+                    location, api_version, project, location, collection,
+                    datastore_id, serving_config, method)
 
             return_errors = False
             if 'returnErrors' in self.config:

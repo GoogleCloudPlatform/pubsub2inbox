@@ -895,6 +895,9 @@ Vertex AI processor.
     * **returnErrors** (*bool**, **optional*) – Set to true to return errors
 
 
+    * **apiVersion** (*str**, **optional*) – API version, defaults to “v1”.
+
+
     * **request** (*dict*) – Request.
 
 

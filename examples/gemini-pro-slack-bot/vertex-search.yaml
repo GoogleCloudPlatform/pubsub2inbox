@@ -53,11 +53,32 @@ pipeline:
               version: "stable"
           extractiveContentSpec:
             maxExtractiveAnswerCount: 1
+            maxExtractiveSegmentCount: 1
 
   # Log the response
   - type: output.logger
     config:
       message: "Vertex Search response: {{ vertex_response|json_encode }}"
+
+  - type: processor.setvariable
+    description: Process Vertex Search output
+    output: response
+    config:
+      fromJson: true
+      value: |
+        {%- set resp = [] -%}
+        {% for result in vertex_response.results %}
+          {% if "derivedStructData" in result.document and "extractive_answers" in result.document.derivedStructData %}
+            {% for answer in result.document.derivedStructData.extractive_answers %}
+              {% set _ = resp.append({"link": result.document.derivedStructData.link, "contents": answer.content, "pageNumber": answer.pageNumber }) %}
+            {% endfor %}    
+          {% endif %}
+        {%- endfor -%}
+        {{ resp|json_encode }}
+
+  - type: output.logger
+    config:
+      message: "Vertex Search processed response: {{ response|json_encode }}"
 
   - type: output.httpresponse
     runIf: "{% if using_webserver %}1{% endif %}"
@@ -66,7 +87,4 @@ pipeline:
       headers:
         content-type: "application/json"
       body: |
-        {%- set resp = [] -%}
-        {%- for result in vertex_response.results -%}
-
-        {%- endfor -%}
+        {{ {"response":response}|json_encode }}

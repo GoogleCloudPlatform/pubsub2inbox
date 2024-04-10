@@ -180,15 +180,37 @@ class VertexgenaiProcessor(Processor):
         try:
             response.raise_for_status()
         except Exception as e:
-            if return_errors:
-                response_json = response.json()
-                for err in response_json:
-                    if 'error' in err and 'message' in err['error']:
-                        return {output_var: {'error': err['error']['message']}}
             self.logger.error('Error calling %s: %s' % (e.request.url, e),
                               extra={'response': e.response.text})
+            if return_errors:
+                try:
+                    response_json = response.json()
+                    for err in response_json:
+                        if isinstance(
+                                err, dict
+                        ) and 'error' in err and 'message' in err['error']:
+                            return {
+                                output_var: {
+                                    'error': err['error']['message']
+                                }
+                            }
+                        else:
+                            return {output_var: {'error': err}}
+                except Exception as _:
+                    return {output_var: {'error': e.response.text}}
             raise e
-        response_json = response.json()
+        try:
+            response_json = response.json()
+        except Exception as e:
+            self.logger.error('Response was not JSON from %s: %s' %
+                              (e.request.url, e),
+                              extra={'response': e.response.text})
+            if return_errors:
+                return {output_var: {'error': e.response.text}}
+            raise e
+
+        if isinstance(response_json, dict):
+            response_json = [response_json]
 
         # Check if functions need to be called
         if 'callFunctions' in self.config:
@@ -282,6 +304,9 @@ class VertexgenaiProcessor(Processor):
                                       extra={'response': e.response.text})
                     raise e
                 response_json = response.json()
+
+                if isinstance(response_json, dict):
+                    response_json = [response_json]
 
         return {
             output_var: response_json,

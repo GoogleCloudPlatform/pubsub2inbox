@@ -73,7 +73,7 @@ class SlackProcessor(Processor):
         response.raise_for_status()
         return base64.b64encode(response.content).decode('ascii')
 
-    def _slack_message_to_parts(self, message, token, multi_modal):
+    def _slack_message_to_parts(self, message, token, multi_modal, no_question):
         parts = []
         if 'files' in message and multi_modal:
             for file in message['files']:
@@ -84,6 +84,10 @@ class SlackProcessor(Processor):
                         extra={'file': file})
                     continue
                 if file['mimetype'][0:6] == 'image/':
+                    self.logger.info(
+                        'Downloaded Slack image (720p version): %s (mime %s)' %
+                        (file['thumb_720']),
+                        extra={'mimetype': file['mimetype']})
                     if 'thumb_720' in file:
                         parts.append({
                             'inlineData': {
@@ -95,6 +99,10 @@ class SlackProcessor(Processor):
                             }
                         })
                     elif 'url_private_download' in file:
+                        self.logger.info(
+                            'Downloaded Slack image (full version): %s (mime %s)'
+                            % (file['url_private_download'], file['mimetype']),
+                            extra={'mimetype': file['mimetype']})
                         parts.append({
                             'inlineData': {
                                 'mimeType':
@@ -105,6 +113,10 @@ class SlackProcessor(Processor):
                             }
                         })
                 elif 'url_private_download' in file:
+                    self.logger.info(
+                        'Downloaded Slack file: %s (mime %s)' %
+                        (file['url_private_download'], file['mimetype']),
+                        extra={'mimetype': file['mimetype']})
                     parts.append({
                         'inlineData': {
                             'mimeType':
@@ -116,6 +128,9 @@ class SlackProcessor(Processor):
                     })
         if 'text' in message and message['text'] != '':
             parts.append({'text': message['text']})
+        elif no_question != '':
+            parts.append({'text': no_question})
+
         return parts
 
     def process(self, output_var='slack'):
@@ -136,6 +151,9 @@ class SlackProcessor(Processor):
         request_params = self._jinja_expand_dict_all(self.config['request'],
                                                      'request')
 
+        mode = self._jinja_expand_string(
+            self.config['mode'], 'mode') if 'mode' in self.config else 'api'
+
         if mode == 'processMessages' or mode == 'lastImage':
             if 'messages' not in self.config:
                 raise NotConfiguredException('No Slack messages specified.')
@@ -148,6 +166,10 @@ class SlackProcessor(Processor):
             messages = self._jinja_expand_expr(self.config['messages'],
                                                'messages')
 
+            no_question = self._jinja_expand_string(
+                self.config['noQuestionPrompt'], 'no_question_prompt'
+            ) if 'noQuestionPrompt' in self.config else "Answer the question in this audio clip or image."
+
             processed = []
             if 'messages' in messages:
                 messages = messages['messages']
@@ -157,16 +179,18 @@ class SlackProcessor(Processor):
                 if 'app_id' in message:
                     if message['app_id'] == app_id:
                         parts = self._slack_message_to_parts(
-                            message, token, multi_modal)
+                            message, token, multi_modal, no_question)
                         if len(parts) > 0:
                             new_message = {'role': 'MODEL', 'parts': parts}
                 else:
                     parts = self._slack_message_to_parts(
-                        message, token, multi_modal)
+                        message, token, multi_modal, no_question)
                     if len(parts) > 0:
                         new_message = {'role': 'USER', 'parts': parts}
                 if new_message:
                     processed.append(new_message)
+
+            print('PROCESSED', processed)
 
             # Prepend an initial prompt that can be instructions or such
             if 'prompt' in self.config:
