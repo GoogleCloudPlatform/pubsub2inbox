@@ -183,11 +183,17 @@ class VertexgenaiProcessor(Processor):
             self.logger.error('Error calling %s: %s' % (e.request.url, e),
                               extra={'response': e.response.text})
             if return_errors:
-                try: 
+                try:
                     response_json = response.json()
                     for err in response_json:
-                        if isinstance(err, dict) and 'error' in err and 'message' in err['error']:
-                            return {output_var: {'error': err['error']['message']}}
+                        if isinstance(
+                                err, dict
+                        ) and 'error' in err and 'message' in err['error']:
+                            return {
+                                output_var: {
+                                    'error': err['error']['message']
+                                }
+                            }
                         else:
                             return {output_var: {'error': err}}
                 except Exception as ee:
@@ -196,7 +202,8 @@ class VertexgenaiProcessor(Processor):
         try:
             response_json = response.json()
         except Exception as e:
-            self.logger.error('Response was not JSON from %s: %s' % (e.request.url, e),
+            self.logger.error('Response was not JSON from %s: %s' %
+                              (e.request.url, e),
                               extra={'response': e.response.text})
             if return_errors:
                 return {output_var: {'error': e.response.text}}

@@ -37,15 +37,13 @@ variable "vertex_region" {
 variable "vertex_model" {
   description = "Vertex AI model to use"
   type        = string
-  #default     = "gemini-1.5-pro-latest"
-  default = "gemini-1.5-pro-preview-0409"
+  default     = "gemini-1.5-pro-preview-0409"
 }
 
 variable "vertex_model_multimodal" {
   description = "Vertex AI multimodal model to use"
   type        = string
-  #default     = "gemini-1.5-pro-latest"
-  default = "gemini-1.5-pro-preview-0409"
+  default     = "gemini-1.5-pro-preview-0409"
 }
 
 variable "slack_token" {

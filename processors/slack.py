@@ -18,6 +18,7 @@ import json
 import base64
 import shutil
 
+
 class SlackProcessor(Processor):
     """
     Slack processor for fetching messages.
@@ -55,7 +56,6 @@ class SlackProcessor(Processor):
         if urlencoded:
             headers['Content-type'] = 'application/x-www-form-urlencoded'
 
-
         response = requests.post(api_path, data=request_body, headers=headers)
         response.raise_for_status()
         response_json = response.json()
@@ -85,7 +85,10 @@ class SlackProcessor(Processor):
                         extra={'file': file})
                     continue
                 if file['mimetype'][0:6] == 'image/':
-                    self.logger.info('Downloaded Slack image (720p version): %s (mime %s)' % (file['thumb_720']), extra={'mimetype': file['mimetype']})
+                    self.logger.info(
+                        'Downloaded Slack image (720p version): %s (mime %s)' %
+                        (file['thumb_720']),
+                        extra={'mimetype': file['mimetype']})
                     if 'thumb_720' in file:
                         parts.append({
                             'inlineData': {
@@ -97,7 +100,10 @@ class SlackProcessor(Processor):
                             }
                         })
                     elif 'url_private_download' in file:
-                        self.logger.info('Downloaded Slack image (full version): %s (mime %s)' % (file['url_private_download'], file['mimetype']), extra={'mimetype': file['mimetype']})
+                        self.logger.info(
+                            'Downloaded Slack image (full version): %s (mime %s)'
+                            % (file['url_private_download'], file['mimetype']),
+                            extra={'mimetype': file['mimetype']})
                         parts.append({
                             'inlineData': {
                                 'mimeType':
@@ -108,7 +114,10 @@ class SlackProcessor(Processor):
                             }
                         })
                 elif 'url_private_download' in file:
-                    self.logger.info('Downloaded Slack file: %s (mime %s)' % (file['url_private_download'], file['mimetype']), extra={'mimetype': file['mimetype']})
+                    self.logger.info(
+                        'Downloaded Slack file: %s (mime %s)' %
+                        (file['url_private_download'], file['mimetype']),
+                        extra={'mimetype': file['mimetype']})
                     parts.append({
                         'inlineData': {
                             'mimeType':
@@ -146,7 +155,6 @@ class SlackProcessor(Processor):
         mode = self._jinja_expand_string(
             self.config['mode'], 'mode') if 'mode' in self.config else 'api'
 
-
         if mode == 'processMessages' or mode == 'lastImage':
             if 'messages' not in self.config:
                 raise NotConfiguredException('No Slack messages specified.')
@@ -160,8 +168,8 @@ class SlackProcessor(Processor):
                                                'messages')
 
             no_question = self._jinja_expand_string(
-                self.config['noQuestionPrompt'],
-                'no_question_prompt') if 'noQuestionPrompt' in self.config else "Answer the question in this audio clip or image."
+                self.config['noQuestionPrompt'], 'no_question_prompt'
+            ) if 'noQuestionPrompt' in self.config else "Answer the question in this audio clip or image."
 
             processed = []
             if 'messages' in messages:
