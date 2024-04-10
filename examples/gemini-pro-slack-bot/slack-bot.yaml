@@ -104,11 +104,13 @@ pipeline:
       appId: "{{ slackAppId }}"
       multimodal: true
       messages: slack_thread
+      noQuestionPrompt: |
+        Answer the question in this audio clip or image.
+        
 %{ if api_enabled ~}
       prompt: |
-        Do not call functions unless my question is strictly related to Alphabet financials which
-        you don't know the answer for. Answer questions without calling functions if you know the
-        answer well enough.
+        Do not call functions unless my question is strictly related to current and historical
+        Alphabet financial information.
         
 %{ endif ~}
 
@@ -125,10 +127,10 @@ pipeline:
       {% if slack_should_reply %}1{% endif %}
     output: vertex_response
     config:
-      apiVersion: "v1beta"
+      apiVersion: "v1beta1"
       location: "${vertex_region}"
       modelId: "${vertex_model}"
-      method: "streamGenerateContent"
+      method: "generateContent"
       returnErrors: true
 %{ if api_enabled ~}
       callFunctions:
@@ -149,8 +151,8 @@ pipeline:
           functionDeclarations:
             - name: search_vertex
               description: |
-                This function is only for getting current information on Alphabet
-                financials, do not use it for anything else. 
+                This function is only for getting up-to-date information on Alphabet
+                financials.
               parameters:
                 type: object
                 properties:
@@ -159,6 +161,9 @@ pipeline:
                     description: Search query
                 required:
                   - query
+        # toolConfig:
+        #  functionCallingConfig:
+        #    mode: AUTO
 %{ endif ~}
         safetySettings:
           - category: HARM_CATEGORY_SEXUALLY_EXPLICIT
