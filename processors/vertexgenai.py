@@ -196,7 +196,7 @@ class VertexgenaiProcessor(Processor):
                             }
                         else:
                             return {output_var: {'error': err}}
-                except Exception as ee:
+                except Exception as _:
                     return {output_var: {'error': e.response.text}}
             raise e
         try:

@@ -16,7 +16,6 @@ from helpers.base import get_user_agent
 import requests
 import json
 import base64
-import shutil
 
 
 class SlackProcessor(Processor):
