@@ -86,7 +86,7 @@ class SlackProcessor(Processor):
                 if file['mimetype'][0:6] == 'image/':
                     self.logger.info(
                         'Downloaded Slack image (720p version): %s (mime %s)' %
-                        (file['thumb_720']),
+                        (file['thumb_720'], file['mimetype']),
                         extra={'mimetype': file['mimetype']})
                     if 'thumb_720' in file:
                         parts.append({
