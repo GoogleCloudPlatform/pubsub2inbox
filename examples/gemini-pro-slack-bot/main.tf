@@ -72,6 +72,7 @@ module "function" {
     vertex_region = var.vertex_region
     vertex_model  = var.vertex_search.enabled == false ? var.vertex_model : var.vertex_model_multimodal
     api_enabled   = false
+    vertex_search_function = null
     }, var.vertex_search.enabled == true ? {
     api_enabled            = true
     vertex_search_function = module.api[""].run_service.url
