@@ -679,9 +679,9 @@ markupsafe==2.0.1 \
     # via
     #   -r requirements.txt.in
     #   jinja2
-msal==1.25.0 \
-    --hash=sha256:386df621becb506bc315a713ec3d4d5b5d6163116955c7dde23622f156b81af6 \
-    --hash=sha256:f44329fdb59f4f044c779164a34474b8a44ad9e4940afbc4c3a3a2bbe90324d9
+msal==1.28.0 \
+    --hash=sha256:3064f80221a21cd535ad8c3fafbb3a3582cd9c7e9af0bb789ae14f726a0ca99b \
+    --hash=sha256:80bbabe34567cb734efd2ec1869b2d98195c927455369d8077b3c542088c5c9d
     # via -r requirements.txt.in
 mypy-extensions==1.0.0 \
     --hash=sha256:4392f6c0eb8a5668a69e23d168ffa70f0be9ccfd32b5cc2d26a34ae5b844552d \
@@ -981,9 +981,9 @@ pyyaml==6.0.1 \
 recurrent==0.4.1 \
     --hash=sha256:5452089d2cf1294dbaa51463798284bd8abd9a852ff0785dbb317851c5b596a6
     # via -r requirements.txt.in
-requests==2.31.0 \
-    --hash=sha256:58cd2187c01e70e6e26505bca751777aa9f2ee0b7f4300988b709f44e013003f \
-    --hash=sha256:942c5a758f98d790eaed1a29cb6eefc7ffb0d1cf7af05c3d2791656dbd6ad1e1
+requests==2.32.0 \
+    --hash=sha256:f2c3881dddb70d056c5bd7600a4fae312b2a300e39be6a118d30b90bd27262b5 \
+    --hash=sha256:fa5490319474c82ef1d2c9bc459d3652e3ae4ef4c4ebdd18a21145a47ca4b6b8
     # via
     #   -r requirements.txt.in
     #   google-api-core
