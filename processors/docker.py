@@ -34,7 +34,12 @@ class DockerProcessor(Processor):
         destination_password (str, optional): Password for Docker registry. (For copy)
         destination_image (str): Image to pull/push
         destination_tag (str, optional): Tag to pull/push, defaults to latest.
+        tls_verify (bool, optional): Set false to disable TLS verify at source registry.
+        destination_tls_verify (bool, optional): Set false to disable TLS verify at destination registry.
     """
+
+    source_tls_verify = True
+    destination_tls_verify = True
 
     def get_default_config_key():
         return 'docker'
@@ -92,9 +97,18 @@ class DockerProcessor(Processor):
             credentials.refresh(auth_req)
             password = credentials.token
 
+        if 'tls_verify' in self.config:
+            self.source_tls_verify = self._jinja_expand_bool(
+                self.config['tls_verify'], 'tls_verify')
+        
+        if 'destination_tls_verify' in self.config:
+            self.destination_tls_verify = self._jinja_expand_bool(
+                self.config['destination_tls_verify'], 'destination_tls_verify')
+
         source_registry = Registry(hostname=hostname,
                                    username=username,
-                                   password=password)
+                                   password=password,
+                                   verify=self.source_tls_verify)
         destination_registry = None
         destination_hostname = None
         if 'destination_hostname' not in self.config:
@@ -124,7 +138,8 @@ class DockerProcessor(Processor):
 
             destination_registry = Registry(hostname=destination_hostname,
                                             username=destination_username,
-                                            password=destination_password)
+                                            password=destination_password,
+                                            verify=self.destination_tls_verify)
 
         if mode == 'image.copy':
             destination_image = self._jinja_expand_string(
