@@ -152,6 +152,18 @@ class BaseHelper:
             return True
         return False
 
+    def _jinja_expand_bool_str(self, contents, _tpl='config'):
+        if isinstance(contents, bool):
+            return contents
+        var_template = self.jinja_environment.from_string(contents)
+        var_template.name = _tpl
+        val_str = var_template.render().lower()
+        if val_str == 'true' or val_str == 't' or val_str == 'yes' or val_str == 'y' or val_str == '1':
+            return True
+        if val_str == 'false' or val_str == 'f' or val_str == 'no' or val_str == 'n' or val_str == '0':
+            return False;
+        return val_str
+
     def _jinja_expand_string(self, contents, _tpl='config'):
         var_template = self.jinja_environment.from_string(contents)
         var_template.name = _tpl
