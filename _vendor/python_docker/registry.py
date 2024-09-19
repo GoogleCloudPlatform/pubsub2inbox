@@ -13,20 +13,27 @@ from _vendor.python_docker import schema
 
 class Registry:
 
+    tls_verify = True
+
     def __init__(
         self,
         hostname: str = "https://registry-1.docker.io",
         username: str = None,
         password: str = None,
+        verify: bool = True,
     ):
         self.hostname = hostname
         self.username = username
         self.password = password
+        if not verify:
+            self.tls_verify = False
         self.detect_authentication()
         self.session = requests.Session()
+        if not verify:
+            self.session.verify = False
 
     def detect_authentication(self):
-        response = requests.get(f"{self.hostname}/v2/")
+        response = requests.get(f"{self.hostname}/v2/", verify=self.tls_verify)
         if "www-authenticate" in response.headers:
             auth_scheme, parameters = response.headers[
                 "www-authenticate"].split(" ", 1)
@@ -77,7 +84,9 @@ class Registry:
             base_url += "?" + "&".join(
                 f"{key}={value}" for key, value in query.items())
 
-        response = requests.get(base_url, headers=headers)
+        response = requests.get(base_url,
+                                headers=headers,
+                                verify=self.tls_verify)
         if response.status_code != 200:
             raise ValueError(f"token authentication failed for {base_url}")
 

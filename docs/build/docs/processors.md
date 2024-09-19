@@ -341,10 +341,20 @@ Perform actions on Docker registries.
     * **destination_tag** (*str**, **optional*) – Tag to pull/push, defaults to latest.
 
 
+    * **tls_verify** (*bool**, **optional*) – Set false to disable TLS verify at source registry.
+
+
+    * **destination_tls_verify** (*bool**, **optional*) – Set false to disable TLS verify at destination registry.
+
+
+
+#### destination_tls_verify(_ = Tru_ )
 
 #### get_default_config_key()
 
 #### process(output_var='docker')
+
+#### source_tls_verify(_ = Tru_ )
 
 #### wait_for_operation_done(ar_service, operation_name)
 ## processors.download module

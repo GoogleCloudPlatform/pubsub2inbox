@@ -93,7 +93,12 @@ class MailOutput(Output):
 
     def expand_recipients(self, mail, config):
         """Expands group recipients using the Directory API"""
-        to_emails = email.utils.getaddresses([mail['mail_to']])
+        to_emails = []
+        try:
+            to_emails = email.utils.getaddresses([mail['mail_to']],
+                                                 strict=False)
+        except TypeError:
+            to_emails = email.utils.getaddresses([mail['mail_to']])
         self.logger.debug('Starting expansion of group recipients...',
                           extra={'to': to_emails})
 
@@ -243,7 +248,12 @@ class MailOutput(Output):
                     (file_name, len(content)))
                 message.attach(image)
 
-        parsed_recipients = email.utils.getaddresses([mail['mail_to']])
+        parsed_recipients = []
+        try:
+            parsed_recipients = email.utils.getaddresses([mail['mail_to']],
+                                                         strict=False)
+        except TypeError:
+            parsed_recipients = email.utils.getaddresses([mail['mail_to']])
         recipients = []
         for r in parsed_recipients:
             recipients.append(r[1])
@@ -446,14 +456,20 @@ class MailOutput(Output):
                 'No HMTL or text email body configured for email output!')
 
         for tpl in ['from', 'to', 'subject']:
-            mail_template = self.jinja_environment.from_string(
-                self.output_config[tpl])
-            mail['mail_%s' % tpl] = mail_template.render()
+            result = self._jinja_expand_string(self.output_config[tpl], tpl)
+            mail['mail_%s' % tpl] = result
 
         self.logger.debug('Canonicalizing email formats...')
         # Canonicalize the email formats
         for tpl in ['from', 'to']:
-            parsed_emails = email.utils.getaddresses([mail['mail_%s' % tpl]])
+            parsed_emails = []
+            try:
+                parsed_emails = email.utils.getaddresses(
+                    [mail['mail_%s' % tpl]], strict=False)
+            except TypeError:
+                parsed_emails = email.utils.getaddresses(
+                    [mail['mail_%s' % tpl]])
+
             if tpl == 'from' and len(parsed_emails) > 1:
                 raise MultipleSendersException(
                     'Multiple senders in from field!')

@@ -190,8 +190,6 @@ class SlackProcessor(Processor):
                 if new_message:
                     processed.append(new_message)
 
-            print('PROCESSED', processed)
-
             # Prepend an initial prompt that can be instructions or such
             if 'prompt' in self.config:
                 prompt_added = False

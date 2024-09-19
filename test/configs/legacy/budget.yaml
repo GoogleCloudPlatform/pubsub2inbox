@@ -24,8 +24,6 @@ outputs:
         port: 587
         starttls: true
         # ssl: false
-      - type: sendgrid
-        apiKey: your-sendgrid-api-key
     from: notifications@pubsub2inbox.dev
     to: |
       {% for project in projects %}
