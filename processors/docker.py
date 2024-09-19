@@ -100,7 +100,7 @@ class DockerProcessor(Processor):
         if 'tls_verify' in self.config:
             self.source_tls_verify = self._jinja_expand_bool(
                 self.config['tls_verify'], 'tls_verify')
-        
+
         if 'destination_tls_verify' in self.config:
             self.destination_tls_verify = self._jinja_expand_bool(
                 self.config['destination_tls_verify'], 'destination_tls_verify')
