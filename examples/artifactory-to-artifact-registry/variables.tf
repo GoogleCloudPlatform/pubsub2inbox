@@ -57,3 +57,9 @@ variable "artifactory_webhook_secret" {
   description = "Artifactory webhook secret"
   sensitive   = true
 }
+
+variable "tls_verify" {
+  type        = bool
+  default     = true
+  description = "Set false to disable TLS verify of JFrog's cert. This allows JFrog to use a self-signed cert."
+}

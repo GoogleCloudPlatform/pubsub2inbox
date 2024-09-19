@@ -37,7 +37,7 @@ resource "random_id" "random" {
   byte_length = 6
 }
 
-# Create Serverless VPC Connector to access 
+# Create Serverless VPC Connector to access
 resource "google_vpc_access_connector" "connector" {
   count         = var.vpc_config.create_connector ? 1 : 0
   name          = "ar-vpc-connector"
@@ -107,6 +107,7 @@ module "pubsub2inbox" {
     password      = var.artifactory_password
     ar_hostname   = format("https://%s-docker.pkg.dev", var.region)
     ar_repository = google_artifact_registry_repository.repository.repository_id
+    tls_verify    = var.tls_verify
   })
   use_local_files  = true
   local_files_path = "../.."
@@ -118,7 +119,7 @@ module "pubsub2inbox" {
     enabled = true
     suffix  = "-json2pubsub"
     control_cel = format(<<-EOT
-      'x-jfrog-event-auth' in request.headers && 
+      'x-jfrog-event-auth' in request.headers &&
       request.headers['x-jfrog-event-auth'] == '%s'
     EOT
     , var.artifactory_webhook_secret)
