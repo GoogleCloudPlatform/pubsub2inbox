@@ -98,11 +98,11 @@ class DockerProcessor(Processor):
             password = credentials.token
 
         if 'tls_verify' in self.config:
-            self.source_tls_verify = self._jinja_expand_bool(
+            self.source_tls_verify = self._jinja_expand_bool_str(
                 self.config['tls_verify'], 'tls_verify')
 
         if 'destination_tls_verify' in self.config:
-            self.destination_tls_verify = self._jinja_expand_bool(
+            self.destination_tls_verify = self._jinja_expand_bool_str(
                 self.config['destination_tls_verify'], 'destination_tls_verify')
 
         source_registry = Registry(hostname=hostname,
