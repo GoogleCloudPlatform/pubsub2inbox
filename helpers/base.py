@@ -161,7 +161,7 @@ class BaseHelper:
         if val_str == 'true' or val_str == 't' or val_str == 'yes' or val_str == 'y' or val_str == '1':
             return True
         if val_str == 'false' or val_str == 'f' or val_str == 'no' or val_str == 'n' or val_str == '0':
-            return False;
+            return False
         return val_str
 
     def _jinja_expand_string(self, contents, _tpl='config'):
