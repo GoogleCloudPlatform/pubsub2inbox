@@ -12,7 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-# Synchronize changes from Artifactory Docker registry into Google Cloud 
+# Synchronize changes from Artifactory Docker registry into Google Cloud
 # Artifact Registry
 pipeline:
   - type: processor.genericjson
@@ -32,6 +32,7 @@ pipeline:
       tag: "{{ data.data.tag }}"
       destination_hostname: "${ar_hostname}"
       destination_image: "${project_id}/${ar_repository}/{{ data.data.image_name }}"
+      tls_verify: ${tls_verify}
 
   - type: processor.docker
     runIf: "{% if data.event_type == 'deleted' %}1{% endif %}"
@@ -40,4 +41,5 @@ pipeline:
       hostname: "${ar_hostname}"
       image: "${project_id}/${ar_repository}/{{ data.data.image_name }}"
       tag: "{{ data.data.tag }}"
+      tls_verify: ${tls_verify}
 
