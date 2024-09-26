@@ -97,6 +97,7 @@ module "pubsub2inbox" {
   available_memory_mb = 2048 # Container contents have to be kept in memory, so the function might need a lot of memory
   available_cpu       = 2
   vpc_connector       = var.vpc_config.create_connector ? google_vpc_access_connector.connector[0].id : var.vpc_config.connector
+  ingress_settings    = var.ingress_settings
 
   service_account = "artifactory-to-ar"
   pubsub_topic    = module.pubsub.id

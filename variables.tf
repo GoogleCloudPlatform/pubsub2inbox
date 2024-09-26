@@ -262,3 +262,12 @@ variable "deploy_json2pubsub" {
     grant_sa_user   = null
   }
 }
+
+variable "ingress_settings" {
+  type        = string
+  # See
+  #   - https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloudfunctions2_function#ingress_settings
+  #   - https://cloud.google.com/functions/docs/networking/network-settings#ingress_settings
+  description = "VPC Service Controls ingress settings for the Cloud Functions. Default value is ALLOW_ALL. Possible values are: ALLOW_ALL, ALLOW_INTERNAL_ONLY, ALLOW_INTERNAL_AND_GCLB."
+  default     = "ALLOW_ALL"
+}
