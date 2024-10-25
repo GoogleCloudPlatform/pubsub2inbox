@@ -114,7 +114,7 @@ recommendations:
       OWNER_TERMINATED_PROJECT: "Inactive user as Owner"
 
 outputs:
-  # This creates the project specif report on in a bucket as XLSX file
+  # This creates the project specify report on in a bucket as XLSX file
   - type: gcs
     bucket: YOUR-BUCKET
     object: Recommendations_{{ ""|strftime('%b-%Y') }}.xlsx

@@ -453,7 +453,7 @@ class MailOutput(Output):
 
         if mail['html_body'] == '' and mail['text_body'] == '':
             raise NotConfiguredException(
-                'No HMTL or text email body configured for email output!')
+                'No HTML or text email body configured for email output!')
 
         for tpl in ['from', 'to', 'subject']:
             result = self._jinja_expand_string(self.output_config[tpl], tpl)

@@ -745,7 +745,7 @@ Runs any shellscript as a command and exposes the output in Jinja.
     * **args** (*list**, **optional*) – List of arguments.
 
 
-    * **enviroment** (*dict**, **optional*) – Additional environment variables to set.
+    * **environment** (*dict**, **optional*) – Additional environment variables to set.
 
 
     * **stdin** (*str**, **optional*) – Contents to pass via stdin to the process.

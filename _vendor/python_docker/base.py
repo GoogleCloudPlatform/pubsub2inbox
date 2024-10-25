@@ -159,7 +159,7 @@ class Image:
 
     def write_filename(self, filename, version="v1"):
         if version != "v1":
-            raise ValueError("only support writting v1 spec")
+            raise ValueError("only support writing v1 spec")
 
         write_v1(self, filename)
 
