@@ -179,7 +179,7 @@ func Startup() (port string) {
 
 	responseCel, err := getEnvironmentVariable("RESPONSE_CEL", false)
 	if err != nil {
-		log.Fatal().Err(err).Msgf("Failed to get RESPONCE_CEL: %v", err)
+		log.Fatal().Err(err).Msgf("Failed to get RESPONSE_CEL: %v", err)
 	}
 	err = setResponseBodyCel(celEnv, responseCel)
 	if err != nil {

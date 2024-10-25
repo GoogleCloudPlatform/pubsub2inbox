@@ -147,7 +147,7 @@ Output parameters:
 | ----------------- | ------ | ---------------------------------------------------------------------------------------------------------- |
 | all_groups        | object | All groups indexed by group email, format is output from Cloud Identity API with added field `memberships` |
 | groups_by_owner   | object | All groups indexed by the owner(s)                                                                         |
-| groups_by_manager | object | All grups indexed by the manager                                                                           |
+| groups_by_manager | object | All groups indexed by the manager                                                                           |
 
 ## Directory
 

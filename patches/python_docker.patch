@@ -127,7 +127,7 @@ diff -urN a/_vendor/python_docker_orig/registry.py a/_vendor/python_docker/regis
              f"/v2/{image}/manifests/{tag}",
              method="PUT",
              data=manifest,
--            iamge=image,
+-            image=image,
 +            image=image,
              action="push",
              headers={

@@ -51,7 +51,7 @@ pipeline:
       value: |
         {{ data.event.text|regex_replace('^<[^>]+> ', '')|remove_mrkdwn }}
 
-  # Set the type of communicatoin
+  # Set the type of communications
   - type: processor.setvariable
     description: Check if discussion was in public or in private chat
     output: slack_public
