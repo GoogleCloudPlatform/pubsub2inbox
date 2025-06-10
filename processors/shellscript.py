@@ -31,7 +31,7 @@ class ShellscriptProcessor(Processor):
     Args:
         command (str): Command to execute.
         args (list, optional): List of arguments.
-        enviroment (dict, optional): Additional environment variables to set.
+        environment (dict, optional): Additional environment variables to set.
         stdin (str, optional): Contents to pass via stdin to the process.
         json (bool, optional): Interpret the output as JSON.
         jsonMultiline (bool, optional): Interpret the output as multiline JSON.

@@ -35,7 +35,7 @@ variable "sender" {
 
 variable "recipient" {
   type        = string
-  description = "Recipient for the email notificatons"
+  description = "Recipient for the email notifications"
 }
 
 variable "username" {
@@ -46,7 +46,7 @@ variable "username" {
 
 variable "password" {
   type        = string
-  description = "Passowrd from smtp-relay.gmail.com (Workspace account)"
+  description = "Password from smtp-relay.gmail.com (Workspace account)"
   default     = null
 }
 

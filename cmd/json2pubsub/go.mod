@@ -1,12 +1,14 @@
 module github.com/GoogleCloudPlatform/pubsub2inbox/cmd/json2pubsub
 
-go 1.19
+go 1.23.0
+
+toolchain go1.24.2
 
 require (
 	cloud.google.com/go/pubsub v1.30.1
 	cloud.google.com/go/secretmanager v1.10.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.1
-	github.com/golang-jwt/jwt/v5 v5.0.0
+	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/google/cel-go v0.15.1
 	github.com/rs/zerolog v1.29.1
 	github.com/stretchr/testify v1.8.2
@@ -41,13 +43,13 @@ require (
 	go.uber.org/atomic v1.4.0 // indirect
 	go.uber.org/multierr v1.1.0 // indirect
 	go.uber.org/zap v1.10.0 // indirect
-	golang.org/x/crypto v0.21.0 // indirect
+	golang.org/x/crypto v0.36.0 // indirect
 	golang.org/x/exp v0.0.0-20220722155223-a9213eeb770e // indirect
-	golang.org/x/net v0.23.0 // indirect
+	golang.org/x/net v0.38.0 // indirect
 	golang.org/x/oauth2 v0.7.0 // indirect
-	golang.org/x/sync v0.1.0 // indirect
-	golang.org/x/sys v0.18.0 // indirect
-	golang.org/x/text v0.14.0 // indirect
+	golang.org/x/sync v0.12.0 // indirect
+	golang.org/x/sys v0.31.0 // indirect
+	golang.org/x/text v0.23.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
