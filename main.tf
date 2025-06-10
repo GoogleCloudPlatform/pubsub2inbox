@@ -426,6 +426,7 @@ resource "google_cloudfunctions2_function" "function" {
     available_cpu                    = var.available_cpu != null ? var.available_cpu : "0.333"
     timeout_seconds                  = var.function_timeout
     vpc_connector                    = var.vpc_connector
+    ingress_settings                 = var.ingress_settings
     environment_variables = {
       CONFIG          = google_secret_manager_secret_version.config-secret-version.name
       LOG_LEVEL       = var.log_level
@@ -790,6 +791,7 @@ resource "google_cloudfunctions2_function" "json2pubsub-function" {
     available_memory                 = "256M"
     timeout_seconds                  = var.function_timeout
     max_instance_request_concurrency = 1
+    ingress_settings                 = var.ingress_settings
     environment_variables = {
       GOOGLE_CLOUD_PROJECT = var.project_id
       PUBSUB_TOPIC         = basename(var.pubsub_topic)
