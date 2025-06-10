@@ -6,7 +6,7 @@ require (
 	cloud.google.com/go/pubsub v1.30.1
 	cloud.google.com/go/secretmanager v1.10.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.1
-	github.com/golang-jwt/jwt/v5 v5.0.0
+	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/google/cel-go v0.15.1
 	github.com/rs/zerolog v1.29.1
 	github.com/stretchr/testify v1.8.2
