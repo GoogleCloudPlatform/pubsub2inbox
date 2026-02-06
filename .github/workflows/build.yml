@@ -39,7 +39,13 @@ jobs:
 
       - name: Install cosign
         run: |
-          wget -q "https://github.com/sigstore/cosign/releases/download/v1.13.1/cosign-linux-amd64"
+          wget -O cosign_checksums.txt -q https://github.com/sigstore/cosign/releases/download/v3.0.4/cosign_checksums.txt
+          wget -O cosign-linux-amd64 -q "https://github.com/sigstore/cosign/releases/download/v3.0.4/cosign-linux-amd64"
+
+          if ! grep 'cosign-linux-amd64$' cosign_checksums.txt | sha256sum -c ; then
+            echo "Cosign binary does not match published checksum."
+          fi
+
           mv cosign-linux-amd64 /usr/local/bin/cosign
           chmod +x /usr/local/bin/cosign
 
