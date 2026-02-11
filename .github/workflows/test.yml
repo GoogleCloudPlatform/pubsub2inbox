@@ -31,7 +31,8 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10"]
+        # Note that 3.12 does not work for tests due to: https://github.com/PyFilesystem/pyfilesystem2/issues/577
+        python-version: ["3.10", "3.11"]
 
     steps:
       - uses: actions/checkout@v4
@@ -43,7 +44,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install --upgrade pip
+          # PIP 26 does not work with pip-compile: https://github.com/jazzband/pip-tools/issues/2319
+          pip install pip==25.0.1
           pip install --require-hashes --no-cache-dir --no-deps -r requirements.txt
           pip install --no-cache-dir --no-deps -r requirements-dev.txt
 
@@ -54,7 +56,7 @@ jobs:
 
       - name: Run unit tests
         env:
-          SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+          # SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
           GOOGLE_APPLICATION_CREDENTIALS: none
         run: |
           echo "Starting unit tests..."
