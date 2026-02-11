@@ -1,8 +1,8 @@
 module github.com/GoogleCloudPlatform/pubsub2inbox/cmd/json2pubsub
 
-go 1.23.0
+go 1.26
 
-toolchain go1.24.2
+toolchain go1.26.0
 
 require (
 	cloud.google.com/go/pubsub v1.30.1
