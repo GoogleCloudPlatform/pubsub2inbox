@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # Use the official lightweight Python image.
-FROM python:3.10-slim
+FROM python:3.12-slim
 
 # Allow statements and log messages to immediately appear in the Knative logs
 ENV PYTHONUNBUFFERED=True
