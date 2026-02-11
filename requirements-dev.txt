@@ -1,7 +1,7 @@
-mock~=4.0.0
+mock~=5.2.0
 tftest~=1.6.0
-gcp-storage-emulator~=2022.6.11
-fs~=2.4.0
+gcp-storage-emulator~=2024.08.03
+fs==2.4.16
 ruff
 yapf~=0.40.0
 importlib-metadata~=6.8.0
@@ -9,3 +9,4 @@ zipp~=3.17.0
 platformdirs~=3.11.0
 vendoring
 tomli~=2.0.0
+pip-tools
