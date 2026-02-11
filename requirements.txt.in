@@ -34,7 +34,7 @@ google-api-core==2.29.0
 google-api-core[grpc]==2.29.0
 googleapis-common-protos==1.72.0
 Flask==2.2.3
-werkzeug==2.3.8
+werkzeug==3.1.5
 json_fix==1.0.2
 PyGithub==2.8.1
 paramiko==4.0.0
