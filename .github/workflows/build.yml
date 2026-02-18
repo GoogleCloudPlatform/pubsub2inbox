@@ -83,7 +83,7 @@ jobs:
 
       - name: Build and push Json2Pubsub
         id: build-json2pubsub
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v6
         with:
           context: cmd/json2pubsub
           push: true
@@ -101,6 +101,7 @@ jobs:
         env:
           COSIGN_KEY: ${{ secrets.COSIGN_KEY }}
           STEPS_BUILD_OUTPUTS_DIGEST: ${{ steps.build.outputs.digest }}
+          IMAGE_TAG: ${{ steps.build.outputs.imageid }}
         run: |
           /usr/local/bin/cosign sign --key env://COSIGN_KEY ${IMAGE_TAG}@${STEPS_BUILD_OUTPUTS_DIGEST}
   
