@@ -110,5 +110,7 @@ jobs:
         env:
           COSIGN_KEY: ${{ secrets.COSIGN_KEY }}
           STEPS_BUILD_JSON2PUBSUB_OUTPUTS_DIGEST: ${{ steps.build-json2pubsub.outputs.digest }}
+          JSON_IMAGE_TAG: ${{ env.json_image_tag }}
         run: |
+          echo "Signing: ${JSON_IMAGE_TAG}@${STEPS_BUILD_JSON2PUBSUB_OUTPUTS_DIGEST}"
           /usr/local/bin/cosign sign --key env://COSIGN_KEY ${JSON_IMAGE_TAG}@${STEPS_BUILD_JSON2PUBSUB_OUTPUTS_DIGEST}
