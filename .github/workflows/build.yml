@@ -101,8 +101,9 @@ jobs:
         env:
           COSIGN_KEY: ${{ secrets.COSIGN_KEY }}
           STEPS_BUILD_OUTPUTS_DIGEST: ${{ steps.build.outputs.digest }}
-          IMAGE_TAG: ${{ env.IMAGE_TAG }}
+          IMAGE_TAG: ${{ env.image_tag }}
         run: |
+          echo "Signing: ${IMAGE_TAG}@${STEPS_BUILD_OUTPUTS_DIGEST}"
           /usr/local/bin/cosign sign --key env://COSIGN_KEY ${IMAGE_TAG}@${STEPS_BUILD_OUTPUTS_DIGEST}
   
       - name: Sign Json2Pubsub image
