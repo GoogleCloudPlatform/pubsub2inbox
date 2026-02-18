@@ -100,11 +100,13 @@ jobs:
       - name: Sign image
         env:
           COSIGN_KEY: ${{ secrets.COSIGN_KEY }}
+          STEPS_BUILD_OUTPUTS_DIGEST: ${{ steps.build.outputs.digest }}
         run: |
-          /usr/local/bin/cosign sign --key env://COSIGN_KEY ${{ env.image_tag }}@${{ steps.build.outputs.digest }}
+          /usr/local/bin/cosign sign --key env://COSIGN_KEY ${IMAGE_TAG}@${STEPS_BUILD_OUTPUTS_DIGEST}
   
       - name: Sign Json2Pubsub image
         env:
           COSIGN_KEY: ${{ secrets.COSIGN_KEY }}
+          STEPS_BUILD_JSON2PUBSUB_OUTPUTS_DIGEST: ${{ steps.build-json2pubsub.outputs.digest }}
         run: |
-          /usr/local/bin/cosign sign --key env://COSIGN_KEY ${{ env.json_image_tag }}@${{ steps.build-json2pubsub.outputs.digest }}
+          /usr/local/bin/cosign sign --key env://COSIGN_KEY ${JSON_IMAGE_TAG}@${STEPS_BUILD_JSON2PUBSUB_OUTPUTS_DIGEST}
