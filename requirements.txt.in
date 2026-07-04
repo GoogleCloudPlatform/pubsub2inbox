@@ -40,5 +40,5 @@ PyGithub==2.8.1
 paramiko==4.0.0
 GitPython==3.1.46
 parse==1.21.0
-urllib3==2.6.3
+urllib3==2.7.0
 pydantic==2.12.5
